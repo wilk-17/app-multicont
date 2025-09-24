@@ -1,3 +1,7 @@
+""" 
+Daniel abrió el proyecto
+"""
+print("Daniel abrió el proyecto")
 from app import create_app
 
 app = create_app()   
