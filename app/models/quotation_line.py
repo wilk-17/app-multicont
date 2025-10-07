@@ -1,4 +1,4 @@
-from . import db
+from app import db
 
 class QuotationLine(db.Model):
     __tablename__ = "quotation_line"

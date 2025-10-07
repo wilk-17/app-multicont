@@ -1,4 +1,4 @@
-from . import db
+from app import db
 
 class Branch(db.Model):
     __tablename__ = "branch"

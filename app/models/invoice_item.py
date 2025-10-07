@@ -1,4 +1,4 @@
-from . import db
+from app import db
 
 class InvoiceItem(db.Model):
     __tablename__ = "invoice_item"

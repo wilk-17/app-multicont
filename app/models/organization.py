@@ -1,4 +1,4 @@
-from . import db
+from app import db
 
 class Organization(db.Model):
     __tablename__ = "organization"

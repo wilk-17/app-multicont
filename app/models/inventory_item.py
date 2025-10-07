@@ -1,4 +1,4 @@
-from . import db
+from app import db
 
 class InventoryItem(db.Model):
     __tablename__ = "inventory_item"

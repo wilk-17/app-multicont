@@ -1,4 +1,4 @@
-from . import db
+from app import db
 
 class Assignment(db.Model):
     __tablename__ = "assignment"
