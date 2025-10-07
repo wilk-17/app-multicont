@@ -68,3 +68,5 @@ def create_app():
     api.add_namespace(sales_order_item_ns)
     api.add_namespace(invoice_ns)
     api.add_namespace(invoice_item_ns)
+
+    return app

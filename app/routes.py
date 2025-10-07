@@ -1,8 +1,26 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
 from app import db
-from app.models import User
-
+from app.models.user import User
+from app.models.role import Role
+from app.models.person import Person
+from app.models.employee import Employee
+from app.models.organization import Organization
+from app.models.branch import Branch
+from app.models.state import State
+from app.models.city import City
+from app.models.permission import Permission
+from app.models.user_role import UserRole
+from app.models.item_category import ItemCategory
+from app.models.inventory_item import InventoryItem
+from app.models.assignment import Assignment
+from app.models.quote import Quote
+from app.models.quotation_line import QuotationLine
+from app.models.quote_item import QuoteItem
+from app.models.sales_order import SalesOrder
+from app.models.sales_order_item import SalesOrderItem
+from app.models.invoice import Invoice
+from app.models.invoice_item import InvoiceItem
 # Define el namespace para Swagger
 user_ns = Namespace("users", description="Operaciones sobre usuarios")
 
