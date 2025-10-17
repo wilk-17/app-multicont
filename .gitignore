@@ -1,17 +1,161 @@
-# Ignorar entorno virtual
-.venv/
-venv/
-
-# Ignorar archivos compilados
+# ============================================
+# PYTHON
+# ============================================
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
 
-# Ignorar variables sensibles
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# ============================================
+# VIRTUAL ENVIRONMENTS
+# ============================================
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ============================================
+# ENVIRONMENT VARIABLES & SECRETS
+# ============================================
 .env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets.yaml
 
-# Ignorar archivos de sistema
+# ============================================
+# FLASK
+# ============================================
+instance/
+.webassets-cache
+
+# ============================================
+# DATABASE
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+
+# Migrations (descomenta si quieres ignorar versiones)
+# migrations/versions/*.py
+
+# ============================================
+# IDE / EDITORS
+# ============================================
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ============================================
+# OS
+# ============================================
+# macOS
 .DS_Store
-Thumbs.db
+.AppleDouble
+.LSOverride
+._*
 
-# Ignorar versiones de migraciones (opcional)
-migrations/versions/
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
+# LOGS
+# ============================================
+*.log
+logs/
+*.log.*
+
+# ============================================
+# TEMPORARY FILES
+# ============================================
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# ============================================
+# PROJECT SPECIFIC
+# ============================================
+# Submodules accidentales
+app-multicont/
+
+# Archivos de prueba
+test_data/
+scratch/
+temp/
