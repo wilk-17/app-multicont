@@ -1,0 +1,17 @@
+# Ignorar entorno virtual
+.venv/
+venv/
+
+# Ignorar archivos compilados
+__pycache__/
+*.pyc
+
+# Ignorar variables sensibles
+.env
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar versiones de migraciones (opcional)
+migrations/versions/
