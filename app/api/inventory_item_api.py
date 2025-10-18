@@ -13,8 +13,7 @@ def get_all():
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
-        status = request.args.get('status', None, type=str)
-        result = handler.list_all(page=page, per_page=per_page, status=status)
+        result = handler.list_all(page=page, per_page=per_page)
         return jsonify({
             'success': True,
             'data': {

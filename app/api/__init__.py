@@ -22,8 +22,9 @@ from .sales_order_api import sales_order_api
 from .sales_order_item_api import sales_order_item_api
 from .invoice_api import invoice_api
 from .invoice_item_api import invoice_item_api
-from .metrics_api import metrics_api
-from .dashboard_api import dashboard_api
+from .brand_api import brand_api
+from .sales_goal_api import sales_goal_api
+from .sales_analytics_api import sales_analytics_api
 
 __all__ = [
     'user_api', 'role_api', 'person_api', 'employee_api',
@@ -32,5 +33,5 @@ __all__ = [
     'inventory_item_api', 'assignment_api', 'quote_api',
     'quotation_line_api', 'quote_item_api', 'sales_order_api',
     'sales_order_item_api', 'invoice_api', 'invoice_item_api',
-    'metrics_api', 'dashboard_api'
+    'brand_api', 'sales_goal_api', 'sales_analytics_api'
 ]

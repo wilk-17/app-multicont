@@ -31,11 +31,6 @@ def get_all_users():
         type: integer
         default: 10
         description: Usuarios por página
-      - name: status
-        in: query
-        type: string
-        enum: [active, inactive, suspended]
-        description: Filtrar por estado
     responses:
       200:
         description: Lista de usuarios con información de paginación
@@ -65,9 +60,8 @@ def get_all_users():
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
-        status = request.args.get('status', None, type=str)
         
-        result = user_handler.list_users(page=page, per_page=per_page, status=status)
+        result = user_handler.list_users(page=page, per_page=per_page)
         
         return jsonify({
             'success': True,
@@ -86,14 +80,19 @@ def get_all_users():
         }), 500
 
 
-@user_api.route('/active', methods=['GET'])
-def get_active_users():
+@user_api.route('/role/<int:role_id>', methods=['GET'])
+def get_users_by_role(role_id):
     """
-    Consulta todos los usuarios activos con paginación
+    Consulta usuarios filtrados por rol
     ---
     tags:
       - Usuarios
     parameters:
+      - name: role_id
+        in: path
+        type: integer
+        required: true
+        description: ID del rol
       - name: page
         in: query
         type: integer
@@ -104,7 +103,7 @@ def get_active_users():
         default: 10
     responses:
       200:
-        description: Lista de usuarios activos
+        description: Lista de usuarios del rol especificado
       500:
         description: Error del servidor
     """
@@ -112,7 +111,7 @@ def get_active_users():
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
         
-        result = user_handler.list_active_users(page=page, per_page=per_page)
+        result = user_handler.get_users_by_role(role_id=role_id, page=page, per_page=per_page)
         
         return jsonify({
             'success': True,
@@ -238,10 +237,6 @@ def create_user():
             role_id:
               type: integer
               example: 1
-            status:
-              type: string
-              enum: [active, inactive, suspended]
-              default: active
     responses:
       201:
         description: Usuario creado exitosamente
@@ -267,8 +262,7 @@ def create_user():
         user = user_handler.create_user(
             username=data['username'],
             password=data['password'],  # En producción usar password_hash
-            role_id=data['role_id'],
-            status=data.get('status', 'active')
+            role_id=data['role_id']
         )
         
         return jsonify({
@@ -289,10 +283,10 @@ def create_user():
         }), 500
 
 
-@user_api.route('/<int:id>/activate', methods=['PUT'])
-def activate_user(id):
+@user_api.route('/<int:id>', methods=['PUT'])
+def update_user(id):
     """
-    Activa un usuario
+    Actualiza un usuario
     ---
     tags:
       - Usuarios
@@ -301,99 +295,45 @@ def activate_user(id):
         in: path
         type: integer
         required: true
-    responses:
-      200:
-        description: Usuario activado exitosamente
-      404:
-        description: Usuario no encontrado
-      500:
-        description: Error del servidor
-    """
-    try:
-        user = user_handler.activate_user(id)
-        return jsonify({
-            'success': True,
-            'message': f'Usuario "{user.username}" activado exitosamente',
-            'data': user.to_dict()
-        }), 200
-    
-    except ValueError as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 404
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-
-@user_api.route('/<int:id>/inactivate', methods=['PUT'])
-def inactivate_user(id):
-    """
-    Inactiva un usuario
-    ---
-    tags:
-      - Usuarios
-    parameters:
-      - name: id
-        in: path
-        type: integer
+      - name: body
+        in: body
         required: true
+        schema:
+          type: object
+          properties:
+            username:
+              type: string
+              example: "nuevo_username"
+            password:
+              type: string
+              example: "nueva_password"
+            role_id:
+              type: integer
+              example: 2
     responses:
       200:
-        description: Usuario inactivado exitosamente
+        description: Usuario actualizado exitosamente
+      400:
+        description: Datos inválidos
       404:
         description: Usuario no encontrado
       500:
         description: Error del servidor
     """
     try:
-        user = user_handler.inactivate_user(id)
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No se proporcionaron datos para actualizar'
+            }), 400
+        
+        user = user_handler.update_user(id, **data)
+        
         return jsonify({
             'success': True,
-            'message': f'Usuario "{user.username}" inactivado exitosamente',
-            'data': user.to_dict()
-        }), 200
-    
-    except ValueError as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 404
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-
-@user_api.route('/<int:id>/suspend', methods=['PUT'])
-def suspend_user(id):
-    """
-    Suspende un usuario
-    ---
-    tags:
-      - Usuarios
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-    responses:
-      200:
-        description: Usuario suspendido exitosamente
-      404:
-        description: Usuario no encontrado
-      500:
-        description: Error del servidor
-    """
-    try:
-        user = user_handler.suspend_user(id)
-        return jsonify({
-            'success': True,
-            'message': f'Usuario "{user.username}" suspendido exitosamente',
+            'message': 'Usuario actualizado exitosamente',
             'data': user.to_dict()
         }), 200
     
@@ -513,16 +453,16 @@ def delete_user(id):
         }), 500
 
 
-@user_api.route('/statistics', methods=['GET'])
-def get_user_statistics():
+@user_api.route('/count', methods=['GET'])
+def count_users():
     """
-    Obtiene estadísticas de usuarios
+    Cuenta total de usuarios
     ---
     tags:
       - Usuarios
     responses:
       200:
-        description: Estadísticas de usuarios por estado
+        description: Total de usuarios
         schema:
           type: object
           properties:
@@ -531,22 +471,18 @@ def get_user_statistics():
             data:
               type: object
               properties:
-                active:
-                  type: integer
-                inactive:
-                  type: integer
-                suspended:
-                  type: integer
                 total:
                   type: integer
       500:
         description: Error del servidor
     """
     try:
-        stats = user_handler.get_user_statistics()
+        total = user_handler.count_users()
         return jsonify({
             'success': True,
-            'data': stats
+            'data': {
+                'total': total
+            }
         }), 200
     except Exception as e:
         return jsonify({

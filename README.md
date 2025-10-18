@@ -1,13 +1,16 @@
 # 🏢 Multicont Flask API - Clean Architecture
 
-Sistema de gestión empresarial con **Clean Architecture** implementado en Flask + PostgreSQL. Maneja organizaciones, sucursales, empleados, inventario, cotizaciones, órdenes de venta y facturación.
+Sistema de gestión empresarial con **Clean Architecture** implementado en Flask + PostgreSQL. Especializado en **análisis de metas de ventas** con tracking por empleado, sucursal y marca.
 
-## 🚀 Características
+## 🚀 Características Principales
 
+- ✅ **Sistema de Metas de Ventas** (mensual, trimestral, anual)
+- ✅ **Analytics Avanzados** (7 endpoints especializados)
 - ✅ **Clean Architecture** (3 capas: Entities, Use Cases, API)
-- ✅ **19 Modelos de Dominio** completamente implementados
+- ✅ **21 Modelos de Dominio** completamente implementados
+- ✅ **6 Marcas de Productos** (Omron, ING, Gefran, Weidmüller, Rice-Lake, Optec)
+- ✅ **Dataset Completo** poblado (Q2-Q3 2025, $140M facturados)
 - ✅ **Paginación** en todos los endpoints de lista
-- ✅ **Métricas y Dashboard** para KPIs de negocio
 - ✅ **Swagger UI** interactivo (Flasgger)
 - ✅ **PostgreSQL** con SQLAlchemy ORM
 - ✅ **Migraciones** con Flask-Migrate (Alembic)
@@ -89,7 +92,30 @@ flask db migrate -m "Initial migration"
 flask db upgrade
 ```
 
-6. **Ejecutar aplicación**
+6. **Poblar base de datos con dataset completo** (OPCIONAL)
+```bash
+python populate_database.py
+```
+
+Esto crea:
+- 5 Estados y 20 Ciudades
+- 7 Organizaciones y 5 Sucursales
+- 15 Empleados y 10 Usuarios
+- 6 Marcas y 60 Items de inventario
+- 12 Cotizaciones y 10 Facturas ($140M facturados)
+- 18 Metas de ventas retroactivas
+
+7. **Verificar datos poblados** (OPCIONAL)
+```bash
+python verify_data.py
+```
+
+8. **Crear metas retroactivas para análisis** (OPCIONAL)
+```bash
+python create_retroactive_goals.py
+```
+
+9. **Ejecutar aplicación**
 ```bash
 python run.py
 ```
@@ -128,13 +154,27 @@ Documentación interactiva con todos los endpoints, schemas y posibilidad de pro
 - `GET /api/sales_orders/` - Órdenes de venta
 - `GET /api/invoices/` - Facturas
 
-#### 📊 Métricas y Dashboard
-- `GET /api/metrics/users` - Métricas de usuarios
-- `GET /api/metrics/inventory` - Métricas de inventario
-- `GET /api/metrics/sales` - Métricas de ventas
-- `GET /api/metrics/summary` - Resumen general
-- `GET /api/dashboard/?period=month` - Dashboard completo
-- `GET /api/dashboard/kpis` - KPIs del negocio
+#### 🏷️ Marcas
+- `GET /api/brands/` - Listar marcas
+- `POST /api/brands/` - Crear marca
+- `GET /api/brands/<id>` - Obtener marca
+- `GET /api/brands/search?name=Omron` - Buscar por nombre
+
+#### 🎯 Metas de Ventas
+- `GET /api/sales_goals/` - Listar metas
+- `POST /api/sales_goals/` - Crear meta
+- `GET /api/sales_goals/current` - Metas actuales
+- `GET /api/sales_goals/by_employee/<id>` - Metas de empleado
+- `GET /api/sales_goals/by_branch/<id>` - Metas de sucursal
+
+#### 📊 Analytics (CORE FEATURE)
+- `GET /api/analytics/invoicing/by_employee` - Facturación por empleado
+- `GET /api/analytics/invoicing/by_branch` - Facturación por sucursal
+- `GET /api/analytics/invoicing/by_brand` - Facturación por marca
+- `GET /api/analytics/quotes/by_brand` - Cotizaciones por marca
+- `GET /api/analytics/goals/vs_actual` - **Metas vs Ventas Reales** ⭐
+- `GET /api/analytics/sales/summary` - Resumen consolidado
+- `GET /api/analytics/top_performers` - Ranking de vendedores
 
 ## 🧪 Testing
 
@@ -282,11 +322,87 @@ Ver `requirements.txt` para lista completa.
 - [ ] Implementar hash de passwords (bcrypt/werkzeug)
 - [ ] Agregar JWT authentication
 - [ ] Sistema de permisos por roles
+- [ ] Poblar InvoiceItems para análisis por marca
 - [ ] Tests unitarios para todos los handlers
 - [ ] Tests de integración para APIs
+- [ ] Frontend Dashboard (Vue.js/React recomendado)
 - [ ] Docker y docker-compose
 - [ ] CI/CD con GitHub Actions
 - [ ] Rate limiting en endpoints públicos
+
+## 📖 Documentación Adicional
+
+- **RESUMEN_EJECUTIVO.md** - Estado del proyecto y dataset poblado
+- **POBLACION_BASE_DATOS_COMPLETA.md** - Guía completa de población
+- **SISTEMA_METAS_VENTAS_COMPLETO.md** - Documentación técnica (600+ líneas)
+- **IMPLEMENTACION_COMPLETA.md** - Quick reference y checklist
+- **ANALISIS_CRUD_Y_RECOMENDACIONES_VISTAS.md** - Estrategia CRUD
+
+## 🎯 Quick Start para Analytics
+
+### 1. Poblar base de datos
+```bash
+python populate_database.py
+python create_retroactive_goals.py
+```
+
+### 2. Iniciar servidor
+```bash
+python run.py
+```
+
+### 3. Probar endpoint principal
+```bash
+curl "http://127.0.0.1:5000/api/analytics/goals/vs_actual?period_type=monthly&start_date=2025-04-01&end_date=2025-09-30"
+```
+
+### 4. Ver en Swagger UI
+Abrir: `http://127.0.0.1:5000/api/docs/`
+
+Buscar sección **analytics** y probar endpoints interactivamente.
+
+## 📊 Análisis Disponibles
+
+### Metas vs Actual
+Compara metas de ventas configuradas contra facturación real:
+- **Porcentaje de cumplimiento** calculado automáticamente
+- **Status dinámico**: exceeded (≥100%), on_track (80-99%), at_risk (50-79%), failed (<50%)
+- **Filtros**: Por período (monthly/quarterly/yearly), empleado o sucursal
+
+### Top Performers
+Ranking de vendedores por volumen de ventas:
+- Ordenado de mayor a menor facturación
+- Incluye número de facturas y total vendido
+- Filtrable por rango de fechas
+
+### Resumen de Ventas
+KPIs consolidados del negocio:
+- Total facturado y cotizado
+- Número de facturas y cotizaciones
+- Ticket promedio
+- Tasa de conversión (cotizaciones → facturas)
+
+## 🏆 Dataset Completo Incluido
+
+El sistema incluye un dataset realista de 6 meses:
+
+- **Período**: Abril - Septiembre 2025
+- **Total Facturado**: $140,040,000 COP
+- **Facturas**: 10 registros
+- **Cotizaciones**: 12 registros
+- **Empleados**: 15 distribuidos en 5 sucursales
+- **Marcas**: 6 (60 items de inventario)
+- **Metas**: 18 configuradas (13 mensuales + 5 trimestrales)
+
+### Top 3 Vendedores
+1. 🥇 Jorge Nieto: $39,350,000
+2. 🥈 Ana García: $30,200,000
+3. 🥉 Gloria Vega: $19,300,000
+
+### Métricas Clave
+- Crecimiento Q2→Q3: +49.0%
+- Tasa de conversión: ~80%
+- Ticket promedio: $14,004,000
 
 ## 📝 Licencia
 

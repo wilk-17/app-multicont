@@ -92,6 +92,8 @@ def create_app(config_class=DevelopmentConfig):
         from .entities.sales_order_item import SalesOrderItem
         from .entities.invoice import Invoice
         from .entities.invoice_item import InvoiceItem
+        from .entities.brand import Brand
+        from .entities.sales_goal import SalesGoal
 
         # Registrar todos los Blueprints de la API
         from .api.user_api import user_api
@@ -114,8 +116,9 @@ def create_app(config_class=DevelopmentConfig):
         from .api.sales_order_item_api import sales_order_item_api
         from .api.invoice_api import invoice_api
         from .api.invoice_item_api import invoice_item_api
-        from .api.metrics_api import metrics_api
-        from .api.dashboard_api import dashboard_api
+        from .api.brand_api import brand_api
+        from .api.sales_goal_api import sales_goal_api
+        from .api.sales_analytics_api import sales_analytics_api
 
         # Registrar blueprints
         blueprints = [
@@ -123,7 +126,7 @@ def create_app(config_class=DevelopmentConfig):
             branch_api, state_api, city_api, permission_api, user_role_api,
             item_category_api, inventory_item_api, assignment_api, quote_api,
             quotation_line_api, quote_item_api, sales_order_api, sales_order_item_api,
-            invoice_api, invoice_item_api, metrics_api, dashboard_api
+            invoice_api, invoice_item_api, brand_api, sales_goal_api, sales_analytics_api
         ]
         
         for blueprint in blueprints:
@@ -154,7 +157,7 @@ def create_app(config_class=DevelopmentConfig):
             entity_classes = [User, Role, Person, Employee, Organization, Branch, State, City,
                               Permission, UserRole, ItemCategory, InventoryItem, Assignment,
                               Quote, QuotationLine, QuoteItem, SalesOrder, SalesOrderItem,
-                              Invoice, InvoiceItem]
+                              Invoice, InvoiceItem, Brand, SalesGoal]
 
             for cls in entity_classes:
                 try:
