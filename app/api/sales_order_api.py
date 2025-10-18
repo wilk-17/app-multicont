@@ -30,7 +30,7 @@ def get_all():
 
 @sales_order_api.route('/<int:id>', methods=['GET'])
 def get_by_id(id):
-    """Obtiene un orden de venta por ID"""
+    """Obtiene una orden de venta por ID"""
     try:
         obj = handler.get(id)
         if obj:

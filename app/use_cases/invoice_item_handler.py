@@ -32,7 +32,10 @@ class InvoiceItemHandler:
         query = InvoiceItem.query
         if status and hasattr(InvoiceItem, 'status'):
             query = query.filter_by(status=status)
-        query = query.order_by(InvoiceItem.creation_date.desc())
+        if hasattr(InvoiceItem, 'creation_date'):
+            query = query.order_by(InvoiceItem.creation_date.desc())
+        else:
+            query = query.order_by(InvoiceItem.id.desc())
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
         return {
             'items': paginated.items,

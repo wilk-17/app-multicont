@@ -10,9 +10,6 @@ class QuotationLine(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     item_id = db.Column(db.BigInteger, db.ForeignKey("inventory_item.id"), nullable=False)
-    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    inventory_item = db.relationship("InventoryItem", backref="quotation_lines", lazy=True)
-    invoices = db.relationship("Invoice", backref="quotation_line", lazy=True)
     
     def __init__(self, quote_id, item_id, quantity, price, description=None):
         self.quote_id = quote_id
@@ -20,11 +17,6 @@ class QuotationLine(db.Model):
         self.quantity = quantity
         self.price = price
         self.description = description
-        self.creation_date = datetime.utcnow()
-    
-    @property
-    def subtotal(self):
-        return float(self.quantity * self.price) if self.price else 0
     
     def to_dict(self):
         return {
@@ -33,6 +25,5 @@ class QuotationLine(db.Model):
             'item_id': str(self.item_id),
             'description': self.description,
             'quantity': self.quantity,
-            'price': float(self.price) if self.price else 0,
-            'subtotal': self.subtotal
+            'price': float(self.price) if self.price else 0
         }

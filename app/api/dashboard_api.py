@@ -17,39 +17,7 @@ dashboard_api = Blueprint('dashboard_api', __name__, url_prefix='/api/dashboard'
 
 @dashboard_api.route('/', methods=['GET'])
 def get_dashboard():
-    """
-    Obtiene datos consolidados para el dashboard principal
-    ---
-    tags:
-      - Dashboard
-    parameters:
-      - name: period
-        in: query
-        type: string
-        enum: [day, week, month, year]
-        default: month
-        description: Período de tiempo para las métricas
-    responses:
-      200:
-        description: Datos completos del dashboard
-        schema:
-          type: object
-          properties:
-            success:
-              type: boolean
-            data:
-              type: object
-              properties:
-                summary:
-                  type: object
-                  description: Resumen de métricas principales
-                charts:
-                  type: object
-                  description: Datos para gráficos
-                recent_activity:
-                  type: array
-                  description: Actividad reciente
-    """
+    """Obtiene datos consolidados para el dashboard principal"""
     try:
         period = request.args.get('period', 'month', type=str)
         
@@ -184,12 +152,7 @@ def get_dashboard():
 
 @dashboard_api.route('/kpis', methods=['GET'])
 def get_kpis():
-    """
-    Obtiene KPIs (Key Performance Indicators) del negocio
-    ---
-    tags:
-      - Dashboard
-    """
+    """Obtiene KPIs (Key Performance Indicators) del negocio"""
     try:
         now = datetime.utcnow()
         last_month = now - timedelta(days=30)

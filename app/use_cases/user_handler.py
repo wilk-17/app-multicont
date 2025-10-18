@@ -104,7 +104,10 @@ class UserHandler:
             query = query.filter_by(status=status)
         
         # Ordenar por fecha de creación (más recientes primero)
-        query = query.order_by(User.creation_date.desc())
+        if hasattr(User, 'creation_date'):
+            query = query.order_by(User.creation_date.desc())
+        else:
+            query = query.order_by(User.id.desc())
         
         # Paginar
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)

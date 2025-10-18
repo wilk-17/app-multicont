@@ -1,26 +1,31 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
 from app import db
-from app.models.user import User
-from app.models.role import Role
-from app.models.person import Person
-from app.models.employee import Employee
-from app.models.organization import Organization
-from app.models.branch import Branch
-from app.models.state import State
-from app.models.city import City
-from app.models.permission import Permission
-from app.models.user_role import UserRole
-from app.models.item_category import ItemCategory
-from app.models.inventory_item import InventoryItem
-from app.models.assignment import Assignment
-from app.models.quote import Quote
-from app.models.quotation_line import QuotationLine
-from app.models.quote_item import QuoteItem
-from app.models.sales_order import SalesOrder
-from app.models.sales_order_item import SalesOrderItem
-from app.models.invoice import Invoice
-from app.models.invoice_item import InvoiceItem
+# NOTE: `app/routes.py` is a legacy Flask-RESTX-based file kept for
+# reference. The project now uses `app.entities/` + `app/use_cases/`
+# and `app/api/` Blueprints. The imports below were migrated from
+# `app.models` to `app.entities` so they match the domain models
+# used by the rest of the application.
+from app.entities.user import User
+from app.entities.role import Role
+from app.entities.person import Person
+from app.entities.employee import Employee
+from app.entities.organization import Organization
+from app.entities.branch import Branch
+from app.entities.state import State
+from app.entities.city import City
+from app.entities.permission import Permission
+from app.entities.user_role import UserRole
+from app.entities.item_category import ItemCategory
+from app.entities.inventory_item import InventoryItem
+from app.entities.assignment import Assignment
+from app.entities.quote import Quote
+from app.entities.quotation_line import QuotationLine
+from app.entities.quote_item import QuoteItem
+from app.entities.sales_order import SalesOrder
+from app.entities.sales_order_item import SalesOrderItem
+from app.entities.invoice import Invoice
+from app.entities.invoice_item import InvoiceItem
 # Define el namespace para Swagger
 user_ns = Namespace("users", description="Operaciones sobre usuarios")
 
@@ -77,11 +82,7 @@ class UserDetail(Resource):
         db.session.commit()
         return {"message": "Usuario eliminado"}, 204
 
-from app.models import (
-    Role, Person, Employee, Organization, Branch, State, City,
-    Permission, UserRole, ItemCategory, InventoryItem, Assignment,
-    Quote, QuotationLine, QuoteItem, SalesOrder, SalesOrderItem, Invoice, InvoiceItem
-)
+# Deprecated: explicit imports from `app.entities` are preferred.
 
 # ========== ROLES ==========
 role_ns = Namespace("role", description="Operaciones sobre roles")

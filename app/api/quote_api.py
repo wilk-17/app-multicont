@@ -30,7 +30,7 @@ def get_all():
 
 @quote_api.route('/<int:id>', methods=['GET'])
 def get_by_id(id):
-    """Obtiene un cotización por ID"""
+    """Obtiene una cotización por ID"""
     try:
         obj = handler.get(id)
         if obj:

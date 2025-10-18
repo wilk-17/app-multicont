@@ -32,7 +32,10 @@ class QuoteHandler:
         query = Quote.query
         if status and hasattr(Quote, 'status'):
             query = query.filter_by(status=status)
-        query = query.order_by(Quote.creation_date.desc())
+        if hasattr(Quote, 'creation_date'):
+            query = query.order_by(Quote.creation_date.desc())
+        else:
+            query = query.order_by(Quote.id.desc())
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
         return {
             'items': paginated.items,

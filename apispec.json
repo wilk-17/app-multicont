@@ -1,0 +1,1079 @@
+{
+  "basePath": "/",
+  "definitions": {
+    "Assignment": {
+      "properties": {
+        "assigned_date": {
+          "format": "date",
+          "type": "string"
+        },
+        "employee_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "item_id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "employee_id",
+        "item_id",
+        "assigned_date"
+      ],
+      "type": "object"
+    },
+    "Branch": {
+      "properties": {
+        "city_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "organization_id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "organization_id",
+        "city_id"
+      ],
+      "type": "object"
+    },
+    "City": {
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "state_id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "description",
+        "state_id"
+      ],
+      "type": "object"
+    },
+    "Employee": {
+      "properties": {
+        "branch_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "person_id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "person_id",
+        "branch_id"
+      ],
+      "type": "object"
+    },
+    "InventoryItem": {
+      "properties": {
+        "category_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "price": {
+          "format": "double",
+          "type": "number"
+        },
+        "quantity": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "quantity",
+        "price"
+      ],
+      "type": "object"
+    },
+    "Invoice": {
+      "properties": {
+        "date": {
+          "format": "date",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "quotation_line_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sales_order_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "total": {
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "required": [
+        "sales_order_id",
+        "date",
+        "total"
+      ],
+      "type": "object"
+    },
+    "InvoiceItem": {
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "invoice_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "item_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "price": {
+          "format": "double",
+          "type": "number"
+        },
+        "quantity": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "invoice_id",
+        "item_id",
+        "quantity",
+        "price"
+      ],
+      "type": "object"
+    },
+    "ItemCategory": {
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "Organization": {
+      "properties": {
+        "current_name": {
+          "type": "string"
+        },
+        "historical_name": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "historical_name",
+        "current_name"
+      ],
+      "type": "object"
+    },
+    "Permission": {
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "Person": {
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "city_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "creation_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "dni": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "update_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "first_name",
+        "last_name",
+        "status",
+        "creation_date",
+        "update_date"
+      ],
+      "type": "object"
+    },
+    "QuotationLine": {
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "item_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "price": {
+          "format": "double",
+          "type": "number"
+        },
+        "quantity": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "quote_id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "quote_id",
+        "quantity",
+        "price",
+        "item_id"
+      ],
+      "type": "object"
+    },
+    "Quote": {
+      "properties": {
+        "customer_name": {
+          "type": "string"
+        },
+        "date": {
+          "format": "date",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "total": {
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "required": [
+        "customer_name",
+        "date",
+        "total"
+      ],
+      "type": "object"
+    },
+    "QuoteItem": {
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "item_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "quantity": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "quote_id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "quote_id",
+        "item_id",
+        "quantity"
+      ],
+      "type": "object"
+    },
+    "Role": {
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "SalesOrder": {
+      "properties": {
+        "date": {
+          "format": "date",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "quote_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "total": {
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "required": [
+        "quote_id",
+        "date",
+        "total"
+      ],
+      "type": "object"
+    },
+    "SalesOrderItem": {
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "item_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "quantity": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sales_order_id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sales_order_id",
+        "item_id",
+        "quantity"
+      ],
+      "type": "object"
+    },
+    "State": {
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "description",
+        "code"
+      ],
+      "type": "object"
+    },
+    "User": {
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "password": {
+          "type": "string"
+        },
+        "role_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "username",
+        "password",
+        "role_id"
+      ],
+      "type": "object"
+    },
+    "UserRole": {
+      "properties": {
+        "creation_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "role_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "user_id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "user_id",
+        "role_id",
+        "creation_date"
+      ],
+      "type": "object"
+    }
+  },
+  "info": {
+    "contact": {
+      "name": "Multicont Development Team"
+    },
+    "description": "API RESTful para sistema de gesti\u00f3n empresarial con arquitectura en capas",
+    "title": "API Multicont - Clean Architecture",
+    "version": "2.0.0"
+  },
+  "paths": {
+    "/api/dashboard/": {
+      "get": {
+        "parameters": [
+          {
+            "default": "month",
+            "description": "Per\u00edodo de tiempo para las m\u00e9tricas",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year"
+            ],
+            "in": "query",
+            "name": "period",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datos completos del dashboard",
+            "schema": {
+              "properties": {
+                "data": {
+                  "properties": {
+                    "charts": {
+                      "description": "Datos para gr\u00e1ficos",
+                      "type": "object"
+                    },
+                    "recent_activity": {
+                      "description": "Actividad reciente",
+                      "type": "array"
+                    },
+                    "summary": {
+                      "description": "Resumen de m\u00e9tricas principales",
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "success": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "summary": "Obtiene datos consolidados para el dashboard principal",
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/api/dashboard/kpis": {
+      "get": {
+        "summary": "Obtiene KPIs (Key Performance Indicators) del negocio",
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/api/metrics/employees": {
+      "get": {
+        "summary": "Obtiene m\u00e9tricas de empleados",
+        "tags": [
+          "M\u00e9tricas"
+        ]
+      }
+    },
+    "/api/metrics/inventory": {
+      "get": {
+        "summary": "Obtiene m\u00e9tricas de inventario",
+        "tags": [
+          "M\u00e9tricas"
+        ]
+      }
+    },
+    "/api/metrics/sales": {
+      "get": {
+        "summary": "Obtiene m\u00e9tricas de ventas",
+        "tags": [
+          "M\u00e9tricas"
+        ]
+      }
+    },
+    "/api/metrics/summary": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Resumen completo de m\u00e9tricas del sistema"
+          }
+        },
+        "summary": "Obtiene un resumen de todas las m\u00e9tricas principales",
+        "tags": [
+          "M\u00e9tricas"
+        ]
+      }
+    },
+    "/api/metrics/users": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Estad\u00edsticas de usuarios",
+            "schema": {
+              "properties": {
+                "data": {
+                  "properties": {
+                    "active_users": {
+                      "type": "integer"
+                    },
+                    "growth_last_month": {
+                      "type": "integer"
+                    },
+                    "inactive_users": {
+                      "type": "integer"
+                    },
+                    "suspended_users": {
+                      "type": "integer"
+                    },
+                    "total_users": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "success": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "summary": "Obtiene m\u00e9tricas de usuarios",
+        "tags": [
+          "M\u00e9tricas"
+        ]
+      }
+    },
+    "/api/users/": {
+      "get": {
+        "parameters": [
+          {
+            "default": 1,
+            "description": "N\u00famero de p\u00e1gina",
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          },
+          {
+            "default": 10,
+            "description": "Usuarios por p\u00e1gina",
+            "in": "query",
+            "name": "per_page",
+            "type": "integer"
+          },
+          {
+            "description": "Filtrar por estado",
+            "enum": [
+              "active",
+              "inactive",
+              "suspended"
+            ],
+            "in": "query",
+            "name": "status",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios con informaci\u00f3n de paginaci\u00f3n",
+            "schema": {
+              "properties": {
+                "data": {
+                  "properties": {
+                    "page": {
+                      "type": "integer"
+                    },
+                    "per_page": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "total_pages": {
+                      "type": "integer"
+                    },
+                    "users": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                },
+                "success": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Consulta todos los usuarios con paginaci\u00f3n",
+        "tags": [
+          "Usuarios"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "properties": {
+                "password": {
+                  "example": "secreto123",
+                  "type": "string"
+                },
+                "role_id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "status": {
+                  "default": "active",
+                  "enum": [
+                    "active",
+                    "inactive",
+                    "suspended"
+                  ],
+                  "type": "string"
+                },
+                "username": {
+                  "example": "juan",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "username",
+                "password",
+                "role_id"
+              ],
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Usuario creado exitosamente"
+          },
+          "400": {
+            "description": "Datos inv\u00e1lidos o usuario ya existe"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Crea un nuevo usuario",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/api/users/active": {
+      "get": {
+        "parameters": [
+          {
+            "default": 1,
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          },
+          {
+            "default": 10,
+            "in": "query",
+            "name": "per_page",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios activos"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Consulta todos los usuarios activos con paginaci\u00f3n",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/api/users/statistics": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Estad\u00edsticas de usuarios por estado",
+            "schema": {
+              "properties": {
+                "data": {
+                  "properties": {
+                    "active": {
+                      "type": "integer"
+                    },
+                    "inactive": {
+                      "type": "integer"
+                    },
+                    "suspended": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "success": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Obtiene estad\u00edsticas de usuarios",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/api/users/username/{username}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Nombre de usuario a buscar",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario encontrado"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Consulta un usuario por username",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/api/users/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario eliminado exitosamente"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Elimina un usuario",
+        "tags": [
+          "Usuarios"
+        ]
+      },
+      "get": {
+        "parameters": [
+          {
+            "description": "ID del usuario a buscar",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario encontrado"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Consulta un usuario por ID",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/api/users/{id}/activate": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario activado exitosamente"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Activa un usuario",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/api/users/{id}/inactivate": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario inactivado exitosamente"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Inactiva un usuario",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/api/users/{id}/password": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "properties": {
+                "new_password": {
+                  "example": "nueva_contrase\u00f1a123",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "new_password"
+              ],
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contrase\u00f1a actualizada exitosamente"
+          },
+          "400": {
+            "description": "Datos inv\u00e1lidos"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Actualiza la contrase\u00f1a de un usuario",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/api/users/{id}/suspend": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario suspendido exitosamente"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        },
+        "summary": "Suspende un usuario",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    }
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "description": "JWT Authorization header usando Bearer scheme. Ejemplo: 'Bearer {token}'",
+      "in": "header",
+      "name": "Authorization",
+      "type": "apiKey"
+    }
+  },
+  "swagger": "2.0"
+}

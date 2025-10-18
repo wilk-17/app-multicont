@@ -8,13 +8,11 @@ class QuoteItem(db.Model):
     quote_id = db.Column(db.BigInteger, db.ForeignKey("quote.id"), nullable=False)
     item_id = db.Column(db.BigInteger, db.ForeignKey("inventory_item.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     
     def __init__(self, quote_id, item_id, quantity):
         self.quote_id = quote_id
         self.item_id = item_id
         self.quantity = quantity
-        self.creation_date = datetime.utcnow()
     
     def to_dict(self):
         return {
