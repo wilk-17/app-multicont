@@ -227,7 +227,6 @@ def create():
         obj = handler.create(**validated_data)
         
         # Invalidar cache del listado
-        cache.delete_memoized(get_all)
         
         # Serializar respuesta
         result = quote_response_schema.dump(obj)
@@ -253,12 +252,15 @@ def create():
 
 @quote_api.route('/<int:id>', methods=['PUT'])
 @jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def update(id):
     """
-    Actualiza una cotización con validación automática
+    Actualiza una cotización con validación automática (ADMIN o MANAGER)
     ---
     tags:
       - Cotizaciones
+    security:
+      - Bearer: []
     parameters:
       - name: id
         in: path
@@ -322,8 +324,6 @@ def update(id):
             return error_response('Cotización no encontrada', 404)
         
         # Invalidar cache del listado y del detalle
-        cache.delete_memoized(get_all)
-        cache.delete_memoized(get_by_id, id)
         
         # Serializar respuesta
         result = quote_response_schema.dump(obj)
@@ -349,13 +349,15 @@ def update(id):
 
 @quote_api.route('/<int:id>', methods=['DELETE'])
 @jwt_required()
-@require_role('ADMIN', 'MANAGER')
+@require_role('ADMIN')
 def delete(id):
     """
-    Elimina una cotización
+    Elimina una cotización (SOLO ADMIN)
     ---
     tags:
       - Cotizaciones
+    security:
+      - Bearer: []
     parameters:
       - name: id
         in: path
@@ -376,8 +378,6 @@ def delete(id):
             return error_response('Cotización no encontrada', 404)
         
         # Invalidar cache del listado
-        cache.delete_memoized(get_all)
-        cache.delete_memoized(get_by_id, id)
         
         return success_response(message='Cotización eliminada exitosamente')
     except Exception as e:

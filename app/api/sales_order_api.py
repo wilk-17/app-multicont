@@ -26,10 +26,11 @@ handler = SalesOrderHandler()
 
 @sales_order_api.route('/', methods=['GET'])
 @jwt_required()
+@require_role('ADMIN', 'MANAGER')
 @cache.cached(timeout=300, query_string=True)
 def get_all():
     """
-    Lista todas las órdenes de venta con eager loading de items
+    Lista todas las órdenes de venta con eager loading de items (ADMIN o MANAGER)
     ---
     tags:
       - Órdenes de Venta
@@ -56,29 +57,32 @@ def get_all():
         description: No autenticado
     """
     try:
-        page, per_page = parse_pagination_params(request)
+        page, per_page = parse_pagination_params()
         status = request.args.get('status')
         
         # Usar eager loading para evitar N+1 queries
         result = handler.list_all_with_items(page=page, per_page=per_page, status=status)
         serialized_items = sales_orders_response_schema.dump(result['items'])
         
-        return paginated_response(
-            items=serialized_items,
-            total=result['total'],
-            page=result['page'],
-            per_page=result['per_page'],
-            total_pages=result['total_pages']
-        )
+        paginated_data = {
+            'items': serialized_items,
+            'total': result['total'],
+            'page': result['page'],
+            'per_page': result['per_page'],
+            'total_pages': result['total_pages']
+        }
+        
+        return paginated_response(paginated_data)
     except Exception as e:
         return error_response(str(e), 500)
 
 @sales_order_api.route('/<int:id>', methods=['GET'])
 @jwt_required()
+@require_role('ADMIN', 'MANAGER')
 @cache.cached(timeout=300)
 def get_by_id(id):
     """
-    Obtiene una orden de venta por ID
+    Obtiene una orden de venta por ID (ADMIN o MANAGER)
     ---
     tags:
       - Órdenes de Venta
@@ -106,9 +110,10 @@ def get_by_id(id):
 
 @sales_order_api.route('/', methods=['POST'])
 @jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def create():
     """
-    Crea una nueva orden de venta
+    Crea una nueva orden de venta (solo ADMIN y MANAGER)
     ---
     tags:
       - Órdenes de Venta
@@ -151,7 +156,6 @@ def create():
     try:
         validated_data = sales_order_create_schema.load(request.get_json())
         obj = handler.create(**validated_data)
-        cache.delete_memoized(get_all)
         
         result = sales_order_response_schema.dump(obj)
         return success_response(
@@ -198,8 +202,6 @@ def update(id):
             return error_response('No se proporcionaron datos para actualizar', 400)
         
         obj = handler.update(id, **validated_data)
-        cache.delete_memoized(get_all)
-        cache.delete_memoized(get_by_id, id)
         
         result = sales_order_response_schema.dump(obj)
         return success_response(data=result, message='Orden de venta actualizada exitosamente')
@@ -234,8 +236,6 @@ def delete(id):
     """
     try:
         deleted = handler.delete(id)
-        cache.delete_memoized(get_all)
-        cache.delete_memoized(get_by_id, id)
         
         if deleted:
             return success_response(message='Orden de venta eliminada exitosamente')

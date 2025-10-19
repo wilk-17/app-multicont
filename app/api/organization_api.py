@@ -1,8 +1,7 @@
 """
-Organization API - REST Endpoints
-Gestiona organizaciones con eager loading de sucursales.
+Organization API - REST Endpoints con documentación Swagger completa
 """
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from app.use_cases.organization_handler import OrganizationHandler
 from flask_jwt_extended import jwt_required
 from app.utils.decorators import require_role
@@ -14,7 +13,7 @@ from app.api.helpers import (
 )
 from app import cache
 
-organization_api = Blueprint('organization_api', __name__, url_prefix='/api/organizations')
+organization_api = Blueprint('organization_api', __name__, url_prefix='/api/organizaciones')
 handler = OrganizationHandler()
 
 @organization_api.route('/', methods=['GET'])
@@ -22,7 +21,7 @@ handler = OrganizationHandler()
 @cache.cached(timeout=300, query_string=True)
 def get_all():
     """
-    Lista todas las organizaciones con eager loading de sucursales
+    Lista todos los organizaciones con paginación
     ---
     tags:
       - Organizaciones
@@ -33,29 +32,59 @@ def get_all():
         in: query
         type: integer
         default: 1
+        description: Número de página
       - name: per_page
         in: query
         type: integer
         default: 10
+        description: Items por página (máx 100)
+      - name: status
+        in: query
+        type: string
+        description: Filtrar por estado
     responses:
       200:
-        description: Lista de organizaciones con sucursales cargadas
+        description: Lista paginada de organizaciones
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Organization'
+                pagination:
+                  type: object
+                  properties:
+                    total:
+                      type: integer
+                    page:
+                      type: integer
+                    per_page:
+                      type: integer
+                    total_pages:
+                      type: integer
       401:
         description: No autenticado
       500:
         description: Error del servidor
     """
     try:
-        page, per_page = parse_pagination_params(request)
-        result = handler.list_all_with_branches(page=page, per_page=per_page)
+        page, per_page = parse_pagination_params()
+        result = handler.list_all(page=page, per_page=per_page)
+        paginated_data = {
+            'items': [item.to_dict() for item in result['items']],
+            'total': result['total'],
+            'page': result['page'],
+            'per_page': result['per_page'],
+            'total_pages': result['total_pages']
+        }
         
-        return paginated_response(
-            items=[item.to_dict() for item in result['items']],
-            total=result['total'],
-            page=result['page'],
-            per_page=result['per_page'],
-            total_pages=result['total_pages']
-        )
+        return paginated_response(paginated_data)
     except Exception as e:
         return error_response(str(e), 500)
 
@@ -64,7 +93,7 @@ def get_all():
 @cache.cached(timeout=300)
 def get_by_id(id):
     """
-    Obtiene una organización por ID
+    Obtiene un organización por ID
     ---
     tags:
       - Organizaciones
@@ -75,26 +104,38 @@ def get_by_id(id):
         in: path
         type: integer
         required: true
+        description: ID del organización
     responses:
       200:
-        description: Organización encontrada
+        description: Organization encontrado
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              $ref: '#/definitions/Organization'
       404:
-        description: No encontrada
+        description: Organization no encontrado
+      401:
+        description: No autenticado
+      500:
+        description: Error del servidor
     """
     try:
         obj = handler.get(id)
         if obj:
             return success_response(obj.to_dict())
-        return error_response('Organización no encontrada', 404)
+        return error_response('Organization no encontrado', 404)
     except Exception as e:
         return error_response(str(e), 500)
 
 @organization_api.route('/', methods=['POST'])
 @jwt_required()
-@require_role('ADMIN')
+@require_role('ADMIN', 'MANAGER')
 def create():
     """
-    Crea una nueva organización (Solo ADMIN)
+    Crea un nuevo organización
     ---
     tags:
       - Organizaciones
@@ -107,56 +148,52 @@ def create():
         schema:
           type: object
           required:
-            - current_name
-            - legal_name
+            - name
           properties:
-            current_name:
+            name:
               type: string
-              example: "TechCorp"
-            legal_name:
+              example: "Empresa ABC"
+            status:
               type: string
-              example: "TechCorp S.A."
-            tax_id:
-              type: string
-              example: "B12345678"
-            address:
-              type: string
-            phone:
-              type: string
-            email:
-              type: string
-              format: email
+              example: "active"
+              enum: [active, inactive]
     responses:
       201:
-        description: Organización creada
+        description: Organization creado exitosamente
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              $ref: '#/definitions/Organization'
+            message:
+              type: string
       400:
         description: Datos inválidos
       401:
         description: No autenticado
       403:
         description: Sin permisos
+      500:
+        description: Error del servidor
     """
     try:
         data = request.get_json()
+        # Invalidar cache
         obj = handler.create(**data)
-        cache.delete_memoized(get_all)
-        
-        return success_response(
-            data=obj.to_dict(),
-            message='Organización creada exitosamente',
-            status_code=201
-        )
+        return success_response(obj.to_dict(), 'Organization creado exitosamente', 201)
     except ValueError as e:
         return error_response(str(e), 400)
     except Exception as e:
-        return error_response('Error interno del servidor', 500)
+        return error_response(str(e), 500)
 
 @organization_api.route('/<int:id>', methods=['PUT'])
 @jwt_required()
 @require_role('ADMIN', 'MANAGER')
 def update(id):
     """
-    Actualiza una organización (ADMIN o MANAGER)
+    Actualiza un organización
     ---
     tags:
       - Organizaciones
@@ -167,37 +204,57 @@ def update(id):
         in: path
         type: integer
         required: true
+        description: ID del organización
       - name: body
         in: body
+        required: true
         schema:
           type: object
+          properties:
+            name:
+              type: string
+            status:
+              type: string
+              enum: [active, inactive]
     responses:
       200:
-        description: Organización actualizada
+        description: Organization actualizado exitosamente
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              $ref: '#/definitions/Organization'
+            message:
+              type: string
       404:
-        description: No encontrada
+        description: Organization no encontrado
+      400:
+        description: Datos inválidos
+      401:
+        description: No autenticado
+      403:
+        description: Sin permisos
+      500:
+        description: Error del servidor
     """
     try:
         data = request.get_json()
+        # Invalidar cache
         obj = handler.update(id, **data)
-        cache.delete_memoized(get_all)
-        cache.delete_memoized(get_by_id, id)
-        
-        return success_response(
-            data=obj.to_dict(),
-            message='Organización actualizada exitosamente'
-        )
+        return success_response(obj.to_dict(), 'Organization actualizado exitosamente')
     except ValueError as e:
         return error_response(str(e), 404)
     except Exception as e:
-        return error_response('Error interno del servidor', 500)
+        return error_response(str(e), 500)
 
 @organization_api.route('/<int:id>', methods=['DELETE'])
 @jwt_required()
 @require_role('ADMIN')
 def delete(id):
     """
-    Elimina una organización (Solo ADMIN)
+    Elimina un organización
     ---
     tags:
       - Organizaciones
@@ -208,19 +265,31 @@ def delete(id):
         in: path
         type: integer
         required: true
+        description: ID del organización a eliminar
     responses:
       200:
-        description: Organización eliminada
+        description: Organization eliminado exitosamente
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            message:
+              type: string
       404:
-        description: No encontrada
+        description: Organization no encontrado
+      401:
+        description: No autenticado
+      403:
+        description: Sin permisos (solo ADMIN)
+      500:
+        description: Error del servidor
     """
     try:
+        # Invalidar cache
         deleted = handler.delete(id)
-        cache.delete_memoized(get_all)
-        cache.delete_memoized(get_by_id, id)
-        
         if deleted:
-            return success_response(message='Organización eliminada exitosamente')
-        return error_response('Organización no encontrada', 404)
+            return success_response(message='Organization eliminado exitosamente')
+        return error_response('Organization no encontrado', 404)
     except Exception as e:
         return error_response(str(e), 500)

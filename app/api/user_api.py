@@ -20,17 +20,62 @@ handler = UserHandler()
 @jwt_required()
 @cache.cached(timeout=300, query_string=True)
 def get_all():
-    """Lista todos los usuarios con paginación"""
+    """
+    Lista todos los usuarios con paginación
+    ---
+    tags:
+      - Usuarios
+    security:
+      - Bearer: []
+    parameters:
+      - name: page
+        in: query
+        type: integer
+        default: 1
+        description: Número de página
+      - name: per_page
+        in: query
+        type: integer
+        default: 10
+        description: Items por página (máx 100)
+      - name: status
+        in: query
+        type: string
+        description: Filtrar por estado
+    responses:
+      200:
+        description: Lista paginada de usuarios
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: '#/definitions/User'
+                pagination:
+                  type: object
+      401:
+        description: No autenticado
+      500:
+        description: Error del servidor
+    """
     try:
-        page, per_page = parse_pagination_params(request)
+        page, per_page = parse_pagination_params()
         result = handler.list_all(page=page, per_page=per_page)
-        return paginated_response(
-            items=[item.to_dict() for item in result['items']],
-            total=result['total'],
-            page=result['page'],
-            per_page=result['per_page'],
-            total_pages=result['total_pages']
-        )
+        paginated_data = {
+            'items': [item.to_dict() for item in result['items']],
+            'total': result['total'],
+            'page': result['page'],
+            'per_page': result['per_page'],
+            'total_pages': result['total_pages']
+        }
+        
+        return paginated_response(paginated_data)
     except Exception as e:
         return error_response(str(e), 500)
 
@@ -38,7 +83,34 @@ def get_all():
 @jwt_required()
 @cache.cached(timeout=300)
 def get_by_id(id):
-    """Obtiene un usuario por ID"""
+    """
+    Obtiene un usuario por ID
+    ---
+    tags:
+      - Usuarios
+    security:
+      - Bearer: []
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: ID del usuario
+    responses:
+      200:
+        description: Usuario encontrado
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              $ref: '#/definitions/User'
+      404:
+        description: Usuario no encontrado
+      401:
+        description: No autenticado
+    """
     try:
         obj = handler.get(id)
         if obj:
@@ -51,11 +123,53 @@ def get_by_id(id):
 @jwt_required()
 @require_role('ADMIN', 'MANAGER')
 def create():
-    """Crea un nuevo usuario"""
+    """
+    Crea un nuevo usuario
+    ---
+    tags:
+      - Usuarios
+    security:
+      - Bearer: []
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - username
+            - password
+            - role_id
+          properties:
+            username:
+              type: string
+              example: "nuevo_usuario"
+            password:
+              type: string
+              example: "password123"
+            role_id:
+              type: integer
+              example: 1
+    responses:
+      201:
+        description: Usuario creado exitosamente
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              $ref: '#/definitions/User'
+            message:
+              type: string
+      400:
+        description: Datos inválidos
+      403:
+        description: Sin permisos
+    """
     try:
         data = request.get_json()
         # Invalidar cache
-        cache.delete_memoized(get_all)
         obj = handler.create(**data)
         return success_response(obj.to_dict(), 'Usuario creado exitosamente', 201)
     except ValueError as e:
@@ -67,12 +181,42 @@ def create():
 @jwt_required()
 @require_role('ADMIN', 'MANAGER')
 def update(id):
-    """Actualiza un usuario"""
+    """
+    Actualiza un usuario
+    ---
+    tags:
+      - Usuarios
+    security:
+      - Bearer: []
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: ID del usuario
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            username:
+              type: string
+            password:
+              type: string
+            role_id:
+              type: integer
+    responses:
+      200:
+        description: Usuario actualizado exitosamente
+      404:
+        description: Usuario no encontrado
+      403:
+        description: Sin permisos
+    """
     try:
         data = request.get_json()
         # Invalidar cache
-        cache.delete_memoized(get_all)
-        cache.delete_memoized(get_by_id, id)
         obj = handler.update(id, **data)
         return success_response(obj.to_dict(), 'Usuario actualizado exitosamente')
     except ValueError as e:
@@ -84,11 +228,36 @@ def update(id):
 @jwt_required()
 @require_role('ADMIN')
 def delete(id):
-    """Elimina un usuario"""
+    """
+    Elimina un usuario
+    ---
+    tags:
+      - Usuarios
+    security:
+      - Bearer: []
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: ID del usuario a eliminar
+    responses:
+      200:
+        description: Usuario eliminado exitosamente
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            message:
+              type: string
+      404:
+        description: Usuario no encontrado
+      403:
+        description: Sin permisos (solo ADMIN)
+    """
     try:
         # Invalidar cache
-        cache.delete_memoized(get_all)
-        cache.delete_memoized(get_by_id, id)
         deleted = handler.delete(id)
         if deleted:
             return success_response(message='Usuario eliminado exitosamente')

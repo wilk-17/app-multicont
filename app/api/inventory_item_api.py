@@ -4,6 +4,8 @@ Gestiona items de inventario con stock control y validación automática.
 """
 from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
+from flask_jwt_extended import jwt_required
+from app.utils.decorators import require_role
 from app.use_cases.inventory_item_handler import InventoryItemHandler
 from app.schemas import (
     inventory_item_create_schema,
@@ -23,6 +25,7 @@ inventory_item_api = Blueprint('inventory_item_api', __name__, url_prefix='/api/
 handler = InventoryItemHandler()
 
 @inventory_item_api.route('/', methods=['GET'])
+@jwt_required()
 @cache.cached(timeout=300, query_string=True)
 def get_all():
     """
@@ -30,6 +33,8 @@ def get_all():
     ---
     tags:
       - Inventory Items
+    security:
+      - Bearer: []
     parameters:
       - name: page
         in: query
@@ -78,24 +83,27 @@ def get_all():
         description: Error interno del servidor
     """
     try:
-        page, per_page = parse_pagination_params(request)
+        page, per_page = parse_pagination_params()
         status = request.args.get('status')
         result = handler.list_all(page=page, per_page=per_page, status=status)
         
         # Serializar con Marshmallow
         serialized_items = inventory_items_response_schema.dump(result['items'])
         
-        return paginated_response(
-            items=serialized_items,
-            total=result['total'],
-            page=result['page'],
-            per_page=result['per_page'],
-            total_pages=result['total_pages']
-        )
+        paginated_data = {
+            'items': serialized_items,
+            'total': result['total'],
+            'page': result['page'],
+            'per_page': result['per_page'],
+            'total_pages': result['total_pages']
+        }
+        
+        return paginated_response(paginated_data)
     except Exception as e:
         return error_response(str(e), 500)
 
 @inventory_item_api.route('/<int:id>', methods=['GET'])
+@jwt_required()
 @cache.cached(timeout=300)
 def get_by_id(id):
     """
@@ -103,6 +111,8 @@ def get_by_id(id):
     ---
     tags:
       - Inventory Items
+    security:
+      - Bearer: []
     parameters:
       - name: id
         in: path
@@ -135,12 +145,16 @@ def get_by_id(id):
         return error_response(str(e), 500)
 
 @inventory_item_api.route('/', methods=['POST'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def create():
     """
-    Crea un nuevo item de inventario con validación automática
+    Crea un nuevo item de inventario con validación automática (ADMIN o MANAGER)
     ---
     tags:
       - Inventory Items
+    security:
+      - Bearer: []
     parameters:
       - name: body
         in: body
@@ -208,7 +222,6 @@ def create():
         obj = handler.create(**validated_data)
         
         # Invalidar cache
-        cache.delete_memoized(get_all)
         
         # Serializar respuesta
         result = inventory_item_response_schema.dump(obj)
@@ -233,12 +246,16 @@ def create():
         return error_response('Error interno del servidor', 500)
 
 @inventory_item_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def update(id):
     """
-    Actualiza un item de inventario con validación automática
+    Actualiza un item de inventario con validación automática (ADMIN o MANAGER)
     ---
     tags:
       - Inventory Items
+    security:
+      - Bearer: []
     parameters:
       - name: id
         in: path
@@ -282,8 +299,6 @@ def update(id):
         obj = handler.update(id, **validated_data)
         
         # Invalidar cache
-        cache.delete_memoized(get_all)
-        cache.delete_memoized(get_by_id, id)
         
         # Serializar respuesta
         result = inventory_item_response_schema.dump(obj)
@@ -307,12 +322,16 @@ def update(id):
         return error_response('Error interno del servidor', 500)
 
 @inventory_item_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN')
 def delete(id):
     """
-    Elimina un item de inventario
+    Elimina un item de inventario (SOLO ADMIN)
     ---
     tags:
       - Inventory Items
+    security:
+      - Bearer: []
     parameters:
       - name: id
         in: path
@@ -331,8 +350,6 @@ def delete(id):
         deleted = handler.delete(id)
         
         # Invalidar cache
-        cache.delete_memoized(get_all)
-        cache.delete_memoized(get_by_id, id)
         
         if deleted:
             return success_response(message='Item de inventario eliminado exitosamente')
