@@ -1491,7 +1491,50 @@ python run.py --ssl
 
 ---
 
-## 📞 Soporte y Recursos
+## � Testing con pytest
+
+### Ejecución de Tests
+
+```bash
+# Ejecutar todos los tests
+pytest
+
+# Con coverage report
+pytest --cov=app --cov-report=html
+start htmlcov/index.html
+
+# Solo tests de autenticación
+pytest -m auth -v
+
+# Solo tests rápidos
+pytest -m "unit and not slow"
+```
+
+### Estructura de Tests
+
+```
+tests/
+├── conftest.py              # Fixtures globales
+├── test_auth.py             # Autenticación (20 tests)
+├── test_validation.py       # Validación Marshmallow (48 tests)
+├── test_handlers.py         # Use cases (28 tests)
+└── test_entities.py         # Domain models (15 tests)
+```
+
+### Cobertura Actual
+
+| Módulo | Coverage |
+|--------|----------|
+| app/config.py | 90% ⭐ |
+| app/entities/ | 71% ✅ |
+| app/use_cases/ | 19-23% ⚠️ |
+| **TOTAL** | **37.69%** 🎯 |
+
+📄 Ver documentación completa en **FASE_4_TESTING.md**
+
+---
+
+## �📞 Soporte y Recursos
 
 ### Documentación
 
