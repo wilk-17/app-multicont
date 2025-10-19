@@ -71,21 +71,174 @@ def create_app(config_class=DevelopmentConfig):
         "swagger": "2.0",
         "info": {
             "title": "API Multicont - Clean Architecture",
-            "description": "API RESTful para sistema de gestión empresarial con arquitectura en capas",
+            "description": """
+# Sistema de Gestión Empresarial - API RESTful
+
+## 🏗️ Arquitectura Clean (Hexagonal)
+Esta API sigue los principios de **Clean Architecture** con separación en 3 capas:
+
+- **Entities (Domain Layer)**: Modelos de dominio con lógica de negocio
+- **Use Cases (Application Layer)**: Handlers con lógica de aplicación
+- **API (Presentation Layer)**: Endpoints REST con validación
+
+## 🚀 Características Principales
+
+### Performance & Caching
+- **Flask-Caching**: Cache de 5 minutos en endpoints GET
+- **Eager Loading**: Prevención de N+1 queries con joinedload()
+- **Paginación**: Todos los listados soportan `?page=1&per_page=10`
+
+### Seguridad
+- **JWT Authentication**: Bearer token en header `Authorization`
+- **Role-Based Access**: Control de acceso por roles (ADMIN, MANAGER, USER)
+- **Validación**: Marshmallow schemas automáticos en todos los endpoints
+
+### Documentación
+- **Swagger UI**: Interfaz interactiva para probar endpoints
+- **OpenAPI 2.0**: Especificación completa con ejemplos
+- **Auto-generated Schemas**: Definiciones desde modelos SQLAlchemy
+
+## 📊 Módulos Disponibles
+
+### Core Business
+- **Organizations & Branches**: Gestión de organizaciones y sucursales
+- **Users & Roles**: Sistema de autenticación y autorización
+- **Employees**: Gestión de empleados con asignaciones
+
+### Inventory & Products
+- **Inventory Items**: Control de stock con alertas de bajo inventario
+- **Item Categories**: Categorización de productos
+- **Assignments**: Asignación de items a empleados
+
+### Sales & Invoicing
+- **Quotes**: Cotizaciones con líneas de items
+- **Sales Orders**: Órdenes de venta con workflow de estados
+- **Invoices**: Facturación con items y totales
+- **Sales Analytics**: Métricas y reportes de ventas
+
+## 🔑 Autenticación
+
+1. **Login**: `POST /api/auth/login` con username y password
+2. **Obtener Token**: Response incluye `access_token`
+3. **Usar Token**: Agregar header `Authorization: Bearer {token}` en requests
+
+Ejemplo:
+```bash
+# Login
+curl -X POST http://localhost:5000/api/auth/login \\
+  -H "Content-Type: application/json" \\
+  -d '{"username": "admin", "password": "admin123"}'
+
+# Usar token en requests
+curl http://localhost:5000/api/inventory_items/ \\
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..."
+```
+
+## 📖 Convenciones API
+
+### Respuestas Estándar
+Todas las respuestas siguen este formato:
+
+**Éxito**:
+```json
+{
+  "success": true,
+  "data": {...},
+  "message": "Operación exitosa"
+}
+```
+
+**Error**:
+```json
+{
+  "success": false,
+  "error": "Descripción del error",
+  "errors": {"field": ["mensaje de validación"]}
+}
+```
+
+**Paginación**:
+```json
+{
+  "success": true,
+  "data": {
+    "items": [...],
+    "total": 100,
+    "page": 1,
+    "per_page": 10,
+    "total_pages": 10
+  }
+}
+```
+
+### Códigos HTTP
+- `200 OK`: Operación exitosa
+- `201 Created`: Recurso creado
+- `400 Bad Request`: Datos inválidos
+- `401 Unauthorized`: No autenticado
+- `403 Forbidden`: Sin permisos
+- `404 Not Found`: Recurso no encontrado
+- `500 Internal Server Error`: Error del servidor
+
+## 🔧 Parámetros de Query Comunes
+
+- `page`: Número de página (default: 1)
+- `per_page`: Items por página (default: 10, máx: 100)
+- `status`: Filtrar por estado (active, inactive, pending, etc.)
+
+## 💡 Tips de Performance
+
+- Usa paginación en listados grandes
+- Los endpoints GET están cacheados (5 min)
+- Usa eager loading endpoints cuando necesites relaciones (ej: `/api/employees/` carga branches automáticamente)
+
+## 📚 Recursos Adicionales
+
+- **GitHub**: [github.com/wilk-17/app-multicont](https://github.com/wilk-17/app-multicont)
+- **Deployment Guide**: Ver `DEPLOYMENT.md` para guía de producción
+- **Architecture Docs**: Ver `.github/copilot-instructions.md`
+            """,
             "version": "2.0.0",
             "contact": {
-                "name": "Multicont Development Team"
+                "name": "Multicont Development Team",
+                "email": "dev@multicont.com",
+                "url": "https://github.com/wilk-17/app-multicont"
+            },
+            "license": {
+                "name": "MIT",
+                "url": "https://opensource.org/licenses/MIT"
             }
         },
         "basePath": "/",
         "schemes": ["http", "https"],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "securityDefinitions": {
             "Bearer": {
                 "type": "apiKey",
                 "name": "Authorization",
                 "in": "header",
-                "description": "JWT Authorization header usando Bearer scheme. Ejemplo: 'Bearer {token}'"
+                "description": "JWT Authorization header usando Bearer scheme. Formato: `Authorization: Bearer {token}`\n\nPara obtener un token:\n1. Haz login en `POST /api/auth/login`\n2. Copia el `access_token` de la respuesta\n3. Úsalo en el header de tus requests"
             }
+        },
+        "tags": [
+            {"name": "Autenticación", "description": "Login y gestión de tokens JWT"},
+            {"name": "Usuarios", "description": "Gestión de usuarios del sistema"},
+            {"name": "Roles", "description": "Roles y permisos"},
+            {"name": "Organizaciones", "description": "Gestión de organizaciones y empresas"},
+            {"name": "Sucursales", "description": "Sucursales por organización"},
+            {"name": "Empleados", "description": "Gestión de empleados y asignaciones"},
+            {"name": "Inventory Items", "description": "Control de inventario y stock"},
+            {"name": "Categorías", "description": "Categorías de productos"},
+            {"name": "Cotizaciones", "description": "Cotizaciones para clientes"},
+            {"name": "Órdenes de Venta", "description": "Órdenes de venta con workflow"},
+            {"name": "Facturas", "description": "Facturación y pagos"},
+            {"name": "Analytics", "description": "Reportes y métricas de negocio"},
+            {"name": "Ubicaciones", "description": "Estados y ciudades"}
+        ],
+        "externalDocs": {
+            "description": "Documentación Completa del Proyecto",
+            "url": "https://github.com/wilk-17/app-multicont/blob/main/README.md"
         }
     }
 
