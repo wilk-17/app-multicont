@@ -3,6 +3,8 @@ Permission API - REST Endpoints
 """
 from flask import Blueprint, request, jsonify
 from app.use_cases.permission_handler import PermissionHandler
+from flask_jwt_extended import jwt_required
+from app.utils.decorators import require_role
 
 permission_api = Blueprint('permission_api', __name__, url_prefix='/api/permissions')
 handler = PermissionHandler()
@@ -39,6 +41,8 @@ def get_by_id(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @permission_api.route('/', methods=['POST'])
+@jwt_required()
+@require_role('ADMIN')
 def create():
     """Crea un nuevo permiso"""
     try:
@@ -51,6 +55,8 @@ def create():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @permission_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN')
 def update(id):
     """Actualiza un permiso"""
     try:
@@ -63,6 +69,8 @@ def update(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @permission_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN')
 def delete(id):
     """Elimina un permiso"""
     try:

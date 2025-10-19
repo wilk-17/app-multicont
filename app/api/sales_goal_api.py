@@ -3,12 +3,15 @@ SalesGoal API - REST endpoints para metas de ventas
 """
 from flask import Blueprint, request, jsonify
 from app.use_cases.sales_goal_handler import SalesGoalHandler
+from flask_jwt_extended import jwt_required
+from app.utils.decorators import require_role
 
 sales_goal_api = Blueprint('sales_goal_api', __name__, url_prefix='/api/sales_goals')
 handler = SalesGoalHandler()
 
 
 @sales_goal_api.route('/', methods=['GET'])
+@jwt_required()
 def list_sales_goals():
     """
     Listar metas de ventas con filtros
@@ -67,6 +70,7 @@ def list_sales_goals():
 
 
 @sales_goal_api.route('/<int:id>', methods=['GET'])
+@jwt_required()
 def get_sales_goal(id):
     """
     Obtener meta por ID
@@ -91,6 +95,7 @@ def get_sales_goal(id):
 
 
 @sales_goal_api.route('/current', methods=['GET'])
+@jwt_required()
 def get_current_goals():
     """
     Obtener metas activas para la fecha actual o especificada
@@ -120,6 +125,7 @@ def get_current_goals():
 
 
 @sales_goal_api.route('/employee/<int:employee_id>', methods=['GET'])
+@jwt_required()
 def get_goals_by_employee(employee_id):
     """
     Obtener todas las metas de un empleado
@@ -152,6 +158,7 @@ def get_goals_by_employee(employee_id):
 
 
 @sales_goal_api.route('/branch/<int:branch_id>', methods=['GET'])
+@jwt_required()
 def get_goals_by_branch(branch_id):
     """
     Obtener todas las metas de una sucursal
@@ -184,6 +191,8 @@ def get_goals_by_branch(branch_id):
 
 
 @sales_goal_api.route('/', methods=['POST'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def create_sales_goal():
     """
     Crear nueva meta de ventas
@@ -262,6 +271,8 @@ def create_sales_goal():
 
 
 @sales_goal_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def update_sales_goal(id):
     """
     Actualizar meta de ventas
@@ -321,6 +332,8 @@ def update_sales_goal(id):
 
 
 @sales_goal_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def delete_sales_goal(id):
     """
     Eliminar meta de ventas
@@ -351,6 +364,7 @@ def delete_sales_goal(id):
 
 
 @sales_goal_api.route('/count', methods=['GET'])
+@jwt_required()
 def count_sales_goals():
     """
     Contar metas con filtros

@@ -3,12 +3,15 @@ Brand API - REST endpoints para marcas de productos
 """
 from flask import Blueprint, request, jsonify
 from app.use_cases.brand_handler import BrandHandler
+from flask_jwt_extended import jwt_required
+from app.utils.decorators import require_role
 
 brand_api = Blueprint('brand_api', __name__, url_prefix='/api/brands')
 handler = BrandHandler()
 
 
 @brand_api.route('/', methods=['GET'])
+@jwt_required()
 def list_brands():
     """
     Listar todas las marcas
@@ -48,6 +51,7 @@ def list_brands():
 
 
 @brand_api.route('/<int:id>', methods=['GET'])
+@jwt_required()
 def get_brand(id):
     """
     Obtener marca por ID
@@ -72,6 +76,7 @@ def get_brand(id):
 
 
 @brand_api.route('/name/<string:name>', methods=['GET'])
+@jwt_required()
 def get_brand_by_name(name):
     """
     Obtener marca por nombre
@@ -96,6 +101,8 @@ def get_brand_by_name(name):
 
 
 @brand_api.route('/', methods=['POST'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def create_brand():
     """
     Crear nueva marca
@@ -146,6 +153,8 @@ def create_brand():
 
 
 @brand_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def update_brand(id):
     """
     Actualizar marca
@@ -194,6 +203,8 @@ def update_brand(id):
 
 
 @brand_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN')
 def delete_brand(id):
     """
     Eliminar marca
@@ -230,6 +241,7 @@ def delete_brand(id):
 
 
 @brand_api.route('/count', methods=['GET'])
+@jwt_required()
 def count_brands():
     """
     Contar total de marcas

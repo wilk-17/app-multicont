@@ -3,11 +3,14 @@ Branch API - REST Endpoints
 """
 from flask import Blueprint, request, jsonify
 from app.use_cases.branch_handler import BranchHandler
+from flask_jwt_extended import jwt_required
+from app.utils.decorators import require_role
 
 branch_api = Blueprint('branch_api', __name__, url_prefix='/api/branches')
 handler = BranchHandler()
 
 @branch_api.route('/', methods=['GET'])
+@jwt_required()
 def get_all():
     """Lista todos los branches con paginación"""
     try:
@@ -28,6 +31,7 @@ def get_all():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @branch_api.route('/<int:id>', methods=['GET'])
+@jwt_required()
 def get_by_id(id):
     """Obtiene un sucursal por ID"""
     try:
@@ -39,6 +43,8 @@ def get_by_id(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @branch_api.route('/', methods=['POST'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def create():
     """Crea un nuevo sucursal"""
     try:
@@ -51,6 +57,8 @@ def create():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @branch_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def update(id):
     """Actualiza un sucursal"""
     try:
@@ -63,6 +71,8 @@ def update(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @branch_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN')
 def delete(id):
     """Elimina un sucursal"""
     try:

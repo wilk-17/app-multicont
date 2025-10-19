@@ -3,11 +3,14 @@ SalesOrder API - REST Endpoints
 """
 from flask import Blueprint, request, jsonify
 from app.use_cases.sales_order_handler import SalesOrderHandler
+from flask_jwt_extended import jwt_required
+from app.utils.decorators import require_role
 
 sales_order_api = Blueprint('sales_order_api', __name__, url_prefix='/api/sales_orders')
 handler = SalesOrderHandler()
 
 @sales_order_api.route('/', methods=['GET'])
+@jwt_required()
 def get_all():
     """Lista todos los sales orders con paginación"""
     try:
@@ -28,6 +31,7 @@ def get_all():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @sales_order_api.route('/<int:id>', methods=['GET'])
+@jwt_required()
 def get_by_id(id):
     """Obtiene una orden de venta por ID"""
     try:
@@ -39,6 +43,7 @@ def get_by_id(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @sales_order_api.route('/', methods=['POST'])
+@jwt_required()
 def create():
     """Crea un nuevo orden de venta"""
     try:
@@ -51,6 +56,8 @@ def create():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @sales_order_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def update(id):
     """Actualiza un orden de venta"""
     try:
@@ -63,6 +70,8 @@ def update(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @sales_order_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN')
 def delete(id):
     """Elimina un orden de venta"""
     try:

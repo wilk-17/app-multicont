@@ -3,6 +3,8 @@ Role API - REST Endpoints
 """
 from flask import Blueprint, request, jsonify
 from app.use_cases.role_handler import RoleHandler
+from flask_jwt_extended import jwt_required
+from app.utils.decorators import require_role
 
 role_api = Blueprint('role_api', __name__, url_prefix='/api/roles')
 handler = RoleHandler()
@@ -39,6 +41,8 @@ def get_by_id(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @role_api.route('/', methods=['POST'])
+@jwt_required()
+@require_role('ADMIN')
 def create():
     """Crea un nuevo rol"""
     try:
@@ -51,6 +55,8 @@ def create():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @role_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN')
 def update(id):
     """Actualiza un rol"""
     try:
@@ -63,6 +69,8 @@ def update(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @role_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN')
 def delete(id):
     """Elimina un rol"""
     try:

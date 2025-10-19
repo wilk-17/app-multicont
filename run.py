@@ -1,4 +1,4 @@
-print("Daniel añadió el comentario: Daniel abrió el proyecto")
+print("lanzamiento de servidor flask y api multicont")
 from app import create_app
 
 app = create_app()   

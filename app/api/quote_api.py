@@ -4,11 +4,14 @@ Gestiona las cotizaciones del sistema
 """
 from flask import Blueprint, request, jsonify
 from app.use_cases.quote_handler import QuoteHandler
+from flask_jwt_extended import jwt_required
+from app.utils.decorators import require_role
 
 quote_api = Blueprint('quote_api', __name__, url_prefix='/api/quotes')
 handler = QuoteHandler()
 
 @quote_api.route('/', methods=['GET'])
+@jwt_required()
 def get_all():
     """
     Lista todas las cotizaciones con paginación
@@ -70,6 +73,7 @@ def get_all():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @quote_api.route('/<int:id>', methods=['GET'])
+@jwt_required()
 def get_by_id(id):
     """
     Obtiene una cotización por ID
@@ -106,6 +110,7 @@ def get_by_id(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @quote_api.route('/', methods=['POST'])
+@jwt_required()
 def create():
     """
     Crea una nueva cotización
@@ -183,6 +188,7 @@ def create():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @quote_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
 def update(id):
     """
     Actualiza una cotización
@@ -242,6 +248,8 @@ def update(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @quote_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def delete(id):
     """
     Elimina una cotización

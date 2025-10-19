@@ -4,7 +4,10 @@ Blueprint de Flask para operaciones REST con usuarios.
 """
 from flask import Blueprint, request, jsonify
 from flasgger import swag_from
+from flask_jwt_extended import jwt_required
 from app.use_cases.user_handler import UserHandler
+from app.utils.decorators import require_role
+from app.utils.security import hash_password
 
 # Crear blueprint para la API de usuarios
 user_api = Blueprint('user_api', __name__, url_prefix='/api/users')
@@ -14,6 +17,8 @@ user_handler = UserHandler()
 
 
 @user_api.route('/', methods=['GET'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def get_all_users():
     """
     Consulta todos los usuarios con paginación
@@ -211,6 +216,8 @@ def get_user_by_id(id):
 
 
 @user_api.route('/', methods=['POST'])
+@jwt_required()
+@require_role('ADMIN')
 def create_user():
     """
     Crea un nuevo usuario
@@ -255,13 +262,12 @@ def create_user():
                 'error': 'Faltan campos requeridos: username, password, role_id'
             }), 400
         
-        # TODO: Aquí deberías hashear la contraseña antes de guardar
-        # from werkzeug.security import generate_password_hash
-        # password_hash = generate_password_hash(data['password'])
+        # Hashear la contraseña antes de guardar
+        password_hashed = hash_password(data['password'])
         
         user = user_handler.create_user(
             username=data['username'],
-            password=data['password'],  # En producción usar password_hash
+            password=password_hashed,
             role_id=data['role_id']
         )
         
@@ -284,6 +290,8 @@ def create_user():
 
 
 @user_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN')
 def update_user(id):
     """
     Actualiza un usuario
@@ -350,6 +358,8 @@ def update_user(id):
 
 
 @user_api.route('/<int:id>/password', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN')
 def update_password(id):
     """
     Actualiza la contraseña de un usuario
@@ -391,8 +401,9 @@ def update_password(id):
                 'error': 'Campo requerido: new_password'
             }), 400
         
-        # TODO: Hashear la nueva contraseña
-        user = user_handler.update_password(id, data['new_password'])
+        # Hashear la nueva contraseña
+        password_hashed = hash_password(data['new_password'])
+        user = user_handler.update_password(id, password_hashed)
         
         return jsonify({
             'success': True,
@@ -413,6 +424,8 @@ def update_password(id):
 
 
 @user_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN')
 def delete_user(id):
     """
     Elimina un usuario

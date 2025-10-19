@@ -3,11 +3,14 @@ Organization API - REST Endpoints
 """
 from flask import Blueprint, request, jsonify
 from app.use_cases.organization_handler import OrganizationHandler
+from flask_jwt_extended import jwt_required
+from app.utils.decorators import require_role
 
 organization_api = Blueprint('organization_api', __name__, url_prefix='/api/organizations')
 handler = OrganizationHandler()
 
 @organization_api.route('/', methods=['GET'])
+@jwt_required()
 def get_all():
     """Lista todos los organizations con paginación"""
     try:
@@ -28,6 +31,7 @@ def get_all():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @organization_api.route('/<int:id>', methods=['GET'])
+@jwt_required()
 def get_by_id(id):
     """Obtiene un organización por ID"""
     try:
@@ -39,6 +43,8 @@ def get_by_id(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @organization_api.route('/', methods=['POST'])
+@jwt_required()
+@require_role('ADMIN')
 def create():
     """Crea un nuevo organización"""
     try:
@@ -51,6 +57,8 @@ def create():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @organization_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def update(id):
     """Actualiza un organización"""
     try:
@@ -63,6 +71,8 @@ def update(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @organization_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN')
 def delete(id):
     """Elimina un organización"""
     try:

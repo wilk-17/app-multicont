@@ -16,6 +16,7 @@ from app.entities.person import Person
 from app.entities.inventory_item import InventoryItem
 from app.entities.brand import Brand
 from app.entities.sales_goal import SalesGoal
+from flask_jwt_extended import jwt_required
 
 sales_analytics_api = Blueprint('sales_analytics_api', __name__, url_prefix='/api/analytics')
 
@@ -31,6 +32,7 @@ def parse_date(date_str):
 
 
 @sales_analytics_api.route('/invoicing/by_employee', methods=['GET'])
+@jwt_required()
 def invoicing_by_employee():
     """
     Facturación por empleado (vendedor) en un periodo
@@ -131,6 +133,7 @@ def invoicing_by_employee():
 
 
 @sales_analytics_api.route('/invoicing/by_branch', methods=['GET'])
+@jwt_required()
 def invoicing_by_branch():
     """
     Facturación por sucursal en un periodo
@@ -207,6 +210,7 @@ def invoicing_by_branch():
 
 
 @sales_analytics_api.route('/invoicing/by_brand', methods=['GET'])
+@jwt_required()
 def invoicing_by_brand():
     """
     Facturación por marca de producto en un periodo
@@ -286,6 +290,7 @@ def invoicing_by_brand():
 
 
 @sales_analytics_api.route('/quotes/by_brand', methods=['GET'])
+@jwt_required()
 def quotes_by_brand():
     """
     Cotizaciones por marca de producto en un periodo
@@ -366,6 +371,7 @@ def quotes_by_brand():
 
 
 @sales_analytics_api.route('/goals/vs_actual', methods=['GET'])
+@jwt_required()
 def goals_vs_actual():
     """
     Comparación de metas vs facturación real
@@ -536,6 +542,7 @@ def goals_vs_actual():
 
 
 @sales_analytics_api.route('/sales/summary', methods=['GET'])
+@jwt_required()
 def sales_summary():
     """
     Resumen consolidado de ventas en un periodo
@@ -643,6 +650,7 @@ def sales_summary():
 
 
 @sales_analytics_api.route('/top_performers', methods=['GET'])
+@jwt_required()
 def top_performers():
     """
     Top empleados vendedores en un periodo
