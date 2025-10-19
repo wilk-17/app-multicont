@@ -1,15 +1,25 @@
 """
-User Handler - Use Case Layer
+User Handler - Use Case Layer (Refactored with BaseHandler)
 Gestiona la lógica de aplicación para operaciones con usuarios.
 """
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict, Any
 from sqlalchemy.exc import IntegrityError
 from app import db
 from app.entities.user import User
+from app.use_cases.base_handler import BaseHandler
 
 
-class UserHandler:
-    """Handler para gestionar operaciones con usuarios."""
+class UserHandler(BaseHandler):
+    """
+    Handler para gestionar operaciones con usuarios.
+    
+    Hereda CRUD genérico de BaseHandler, pero mantiene métodos
+    personalizados para lógica específica de usuarios.
+    """
+    
+    def __init__(self):
+        """Inicializa con el modelo User."""
+        super().__init__(User)
     
     def create_user(self, username: str, password: str, role_id: int) -> User:
         """
@@ -93,17 +103,14 @@ class UserHandler:
                 'total_pages': int
             }
         """
-        query = User.query.order_by(User.id.desc())
-        
-        # Paginar
-        paginated = query.paginate(page=page, per_page=per_page, error_out=False)
-        
+        # Usar list_all de BaseHandler y mapear 'items' a 'users'
+        result = self.list_all(page=page, per_page=per_page)
         return {
-            'users': paginated.items,
-            'total': paginated.total,
-            'page': paginated.page,
-            'per_page': paginated.per_page,
-            'total_pages': paginated.pages
+            'users': result['items'],
+            'total': result['total'],
+            'page': result['page'],
+            'per_page': result['per_page'],
+            'total_pages': result['total_pages']
         }
     
     def update_user(self, user_id: int, **kwargs) -> User:
@@ -181,17 +188,8 @@ class UserHandler:
         Returns:
             bool: True si se eliminó, False si no existía.
         """
-        user = User.query.get(user_id)
-        if not user:
-            return False
-        
-        try:
-            db.session.delete(user)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar usuario: {str(e)}")
+        # Usar delete de BaseHandler
+        return self.delete(user_id)
     
     def count_users(self) -> int:
         """
@@ -200,7 +198,8 @@ class UserHandler:
         Returns:
             int: Cantidad de usuarios.
         """
-        return User.query.count()
+        # Usar count de BaseHandler
+        return self.count()
     
     def get_users_by_role(self, role_id: int, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
         """

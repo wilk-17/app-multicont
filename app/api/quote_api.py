@@ -1,11 +1,13 @@
 """
-Quote API - REST Endpoints (Refactored)
+Quote API - REST Endpoints (Refactored with Caching)
 Gestiona las cotizaciones del sistema con validación Marshmallow.
 
 Usa utilidades de helpers para respuestas JSON estandarizadas.
+Implementa caching para mejorar performance.
 """
 from flask import Blueprint, request
 from marshmallow import ValidationError
+from app import cache
 from app.use_cases.quote_handler import QuoteHandler
 from app.schemas import (
     quote_create_schema,
@@ -27,6 +29,7 @@ handler = QuoteHandler()
 
 @quote_api.route('/', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=300, query_string=True)
 def get_all():
     """
     Lista todas las cotizaciones con paginación
@@ -223,6 +226,9 @@ def create():
         # Crear cotización con datos validados
         obj = handler.create(**validated_data)
         
+        # Invalidar cache del listado
+        cache.delete_memoized(get_all)
+        
         # Serializar respuesta
         result = quote_response_schema.dump(obj)
         
@@ -315,6 +321,10 @@ def update(id):
         if not obj:
             return error_response('Cotización no encontrada', 404)
         
+        # Invalidar cache del listado y del detalle
+        cache.delete_memoized(get_all)
+        cache.delete_memoized(get_by_id, id)
+        
         # Serializar respuesta
         result = quote_response_schema.dump(obj)
         
@@ -364,6 +374,10 @@ def delete(id):
         deleted = handler.delete(id)
         if not deleted:
             return error_response('Cotización no encontrada', 404)
+        
+        # Invalidar cache del listado
+        cache.delete_memoized(get_all)
+        cache.delete_memoized(get_by_id, id)
         
         return success_response(message='Cotización eliminada exitosamente')
     except Exception as e:

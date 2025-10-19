@@ -1,42 +1,51 @@
 """
-SalesOrderHandler - Use Case Layer
+SalesOrderHandler - Use Case Layer (Refactored with BaseHandler)
 """
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
+from typing import Optional, Dict, Any
+from sqlalchemy.orm import joinedload
 from app.entities.sales_order import SalesOrder
+from app.use_cases.base_handler import BaseHandler
 
-class SalesOrderHandler:
-    """Handler para gestionar operaciones con sales orders."""
+
+class SalesOrderHandler(BaseHandler):
+    """
+    Handler para gestionar operaciones con sales orders.
     
-    def create(self, **kwargs) -> SalesOrder:
-        """Crea un nuevo orden de venta."""
-        try:
-            obj = SalesOrder(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear orden de venta: {str(e)}")
+    Hereda CRUD genérico de BaseHandler.
+    """
     
-    def get(self, id: int) -> Optional[SalesOrder]:
-        """Obtiene un orden de venta por ID."""
-        return SalesOrder.query.get(id)
+    def __init__(self):
+        """Inicializa con el modelo SalesOrder."""
+        super().__init__(SalesOrder)
     
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista sales orders con paginación."""
+    # Métodos específicos del dominio SalesOrder
+    
+    def list_all_with_items(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Lista órdenes con eager loading de items (optimizado para evitar N+1).
+        
+        Args:
+            page (int): Número de página
+            per_page (int): Items por página
+            status (str): Filtrar por status
+        
+        Returns:
+            dict: Resultado paginado con órdenes e items cargados
+        """
         query = SalesOrder.query
+        
+        # Eager load items para evitar N+1 queries
+        if hasattr(SalesOrder, 'items'):
+            query = query.options(joinedload(SalesOrder.items))
+        
         if status and hasattr(SalesOrder, 'status'):
             query = query.filter_by(status=status)
+        
         if hasattr(SalesOrder, 'creation_date'):
             query = query.order_by(SalesOrder.creation_date.desc())
-        else:
-            query = query.order_by(SalesOrder.id.desc())
+        
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
         return {
             'items': paginated.items,
             'total': paginated.total,
@@ -45,37 +54,18 @@ class SalesOrderHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, id: int, **kwargs) -> SalesOrder:
-        """Actualiza un orden de venta."""
-        obj = SalesOrder.query.get(id)
-        if not obj:
-            raise ValueError(f"SalesOrder con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
+    def confirm(self, id: int) -> Optional[SalesOrder]:
+        """Confirma una orden de venta."""
+        return self.update(id, status='confirmed')
     
-    def delete(self, id: int) -> bool:
-        """Elimina un orden de venta."""
-        obj = SalesOrder.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
+    def ship(self, id: int) -> Optional[SalesOrder]:
+        """Marca una orden como enviada."""
+        return self.update(id, status='shipped')
     
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta sales orders."""
-        query = SalesOrder.query
-        if status and hasattr(SalesOrder, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def deliver(self, id: int) -> Optional[SalesOrder]:
+        """Marca una orden como entregada."""
+        return self.update(id, status='delivered')
+    
+    def cancel(self, id: int) -> Optional[SalesOrder]:
+        """Cancela una orden de venta."""
+        return self.update(id, status='cancelled')

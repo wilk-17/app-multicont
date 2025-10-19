@@ -6,6 +6,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from flask_caching import Cache
 from flasgger import Swagger
 from .config import DevelopmentConfig
 
@@ -13,6 +14,7 @@ from .config import DevelopmentConfig
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
+cache = Cache()
 
 
 def create_app(config_class=DevelopmentConfig):
@@ -33,11 +35,20 @@ def create_app(config_class=DevelopmentConfig):
     jwt_config = get_jwt_config()
     for key, value in jwt_config.items():
         app.config[key] = value
+    
+    # Configurar Cache
+    cache_config = {
+        'CACHE_TYPE': 'SimpleCache',  # SimpleCache para desarrollo
+        'CACHE_DEFAULT_TIMEOUT': 300,  # 5 minutos por defecto
+        'CACHE_KEY_PREFIX': 'multicont_'
+    }
+    app.config.update(cache_config)
 
     # Inicializar extensiones
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    cache.init_app(app)
     
     # Configurar Swagger/Flasgger (se inicializará más abajo
     # una vez que hayamos importado las entidades para generar definitions)

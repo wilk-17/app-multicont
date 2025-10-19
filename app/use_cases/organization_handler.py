@@ -1,42 +1,61 @@
 """
-OrganizationHandler - Use Case Layer
+OrganizationHandler - Use Case Layer (Refactored with BaseHandler)
 """
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
+from typing import Optional, Dict, Any
+from sqlalchemy.orm import joinedload
 from app.entities.organization import Organization
+from app.use_cases.base_handler import BaseHandler
 
-class OrganizationHandler:
-    """Handler para gestionar operaciones con organizations."""
+
+class OrganizationHandler(BaseHandler):
+    """
+    Handler para gestionar operaciones con organizations.
     
-    def create(self, **kwargs) -> Organization:
-        """Crea un nuevo organización."""
-        try:
-            obj = Organization(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear organización: {str(e)}")
+    Hereda CRUD genérico de BaseHandler.
+    """
     
-    def get(self, id: int) -> Optional[Organization]:
-        """Obtiene un organización por ID."""
-        return Organization.query.get(id)
+    def __init__(self):
+        """Inicializa con el modelo Organization."""
+        super().__init__(Organization)
     
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista organizations con paginación."""
+    # Métodos específicos del dominio Organization
+    
+    def get_by_name(self, name: str) -> Optional[Organization]:
+        """
+        Busca una organización por nombre actual.
+        
+        Args:
+            name (str): Nombre de la organización
+        
+        Returns:
+            Organization: Organización encontrada o None
+        """
+        if hasattr(Organization, 'current_name'):
+            return Organization.query.filter_by(current_name=name).first()
+        return None
+    
+    def list_all_with_branches(self, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Lista organizaciones con eager loading de sucursales (optimizado).
+        
+        Args:
+            page (int): Número de página
+            per_page (int): Items por página
+        
+        Returns:
+            dict: Resultado paginado con organizaciones y sucursales cargadas
+        """
         query = Organization.query
-        if status and hasattr(Organization, 'status'):
-            query = query.filter_by(status=status)
+        
+        # Eager load branches para evitar N+1 queries
+        if hasattr(Organization, 'branches'):
+            query = query.options(joinedload(Organization.branches))
+        
         if hasattr(Organization, 'creation_date'):
             query = query.order_by(Organization.creation_date.desc())
-        else:
-            query = query.order_by(Organization.id.desc())
+        
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
         return {
             'items': paginated.items,
             'total': paginated.total,
@@ -45,37 +64,10 @@ class OrganizationHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, id: int, **kwargs) -> Organization:
-        """Actualiza un organización."""
-        obj = Organization.query.get(id)
-        if not obj:
-            raise ValueError(f"Organization con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
+    def activate(self, id: int) -> Optional[Organization]:
+        """Activa una organización."""
+        return self.update(id, status='active')
     
-    def delete(self, id: int) -> bool:
-        """Elimina un organización."""
-        obj = Organization.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
-    
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta organizations."""
-        query = Organization.query
-        if status and hasattr(Organization, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def deactivate(self, id: int) -> Optional[Organization]:
+        """Desactiva una organización."""
+        return self.update(id, status='inactive')

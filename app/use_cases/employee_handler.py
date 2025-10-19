@@ -1,42 +1,65 @@
 """
-EmployeeHandler - Use Case Layer
+EmployeeHandler - Use Case Layer (Refactored with BaseHandler)
 """
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
+from typing import Optional, Dict, Any
+from sqlalchemy.orm import joinedload
 from app.entities.employee import Employee
+from app.use_cases.base_handler import BaseHandler
 
-class EmployeeHandler:
-    """Handler para gestionar operaciones con employees."""
+
+class EmployeeHandler(BaseHandler):
+    """
+    Handler para gestionar operaciones con employees.
     
-    def create(self, **kwargs) -> Employee:
-        """Crea un nuevo empleado."""
-        try:
-            obj = Employee(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear empleado: {str(e)}")
+    Hereda CRUD genérico de BaseHandler.
+    """
     
-    def get(self, id: int) -> Optional[Employee]:
-        """Obtiene un empleado por ID."""
-        return Employee.query.get(id)
+    def __init__(self):
+        """Inicializa con el modelo Employee."""
+        super().__init__(Employee)
     
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista employees con paginación."""
+    # Métodos específicos del dominio Employee
+    
+    def get_by_branch(self, branch_id: int, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Lista empleados de una sucursal específica.
+        
+        Args:
+            branch_id (int): ID de la sucursal
+            page (int): Número de página
+            per_page (int): Items por página
+        
+        Returns:
+            dict: Resultado paginado con empleados de la sucursal
+        """
+        return self.list_all(page=page, per_page=per_page, branch_id=branch_id)
+    
+    def list_all_with_branch(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Lista empleados con eager loading de sucursal (optimizado para evitar N+1).
+        
+        Args:
+            page (int): Número de página
+            per_page (int): Items por página
+            status (str): Filtrar por status
+        
+        Returns:
+            dict: Resultado paginado con empleados y sucursales cargadas
+        """
         query = Employee.query
+        
+        # Eager load branch para evitar N+1 queries
+        if hasattr(Employee, 'branch'):
+            query = query.options(joinedload(Employee.branch))
+        
         if status and hasattr(Employee, 'status'):
             query = query.filter_by(status=status)
+        
         if hasattr(Employee, 'creation_date'):
             query = query.order_by(Employee.creation_date.desc())
-        else:
-            query = query.order_by(Employee.id.desc())
+        
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
         return {
             'items': paginated.items,
             'total': paginated.total,
@@ -45,37 +68,10 @@ class EmployeeHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, id: int, **kwargs) -> Employee:
-        """Actualiza un empleado."""
-        obj = Employee.query.get(id)
-        if not obj:
-            raise ValueError(f"Employee con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
+    def activate(self, id: int) -> Optional[Employee]:
+        """Activa un empleado."""
+        return self.update(id, status='active')
     
-    def delete(self, id: int) -> bool:
-        """Elimina un empleado."""
-        obj = Employee.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
-    
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta employees."""
-        query = Employee.query
-        if status and hasattr(Employee, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def deactivate(self, id: int) -> Optional[Employee]:
+        """Desactiva un empleado."""
+        return self.update(id, status='inactive')
