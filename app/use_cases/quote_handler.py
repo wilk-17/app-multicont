@@ -1,81 +1,78 @@
 """
-QuoteHandler - Use Case Layer
-"""
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
-from app.entities.quote import Quote
+QuoteHandler - Use Case Layer (Refactored with BaseHandler)
 
-class QuoteHandler:
-    """Handler para gestionar operaciones con quotes."""
+Hereda de BaseHandler para eliminar duplicación de código.
+Solo contiene métodos específicos del dominio Quote.
+"""
+from typing import Optional, Dict, Any
+from app.entities.quote import Quote
+from app.use_cases.base_handler import BaseHandler
+
+
+class QuoteHandler(BaseHandler):
+    """
+    Handler para gestionar operaciones con quotes.
     
-    def create(self, **kwargs) -> Quote:
-        """Crea un nuevo cotización."""
-        try:
-            obj = Quote(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear cotización: {str(e)}")
+    Hereda CRUD genérico de BaseHandler:
+    - create(**kwargs)
+    - get(id)
+    - list_all(page, per_page, status)
+    - update(id, **kwargs)
+    - delete(id)
+    - count(status)
     
-    def get(self, id: int) -> Optional[Quote]:
-        """Obtiene un cotización por ID."""
-        return Quote.query.get(id)
+    Solo agrega métodos específicos del dominio.
+    """
     
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista quotes con paginación."""
-        query = Quote.query
-        if status and hasattr(Quote, 'status'):
-            query = query.filter_by(status=status)
-        if hasattr(Quote, 'creation_date'):
-            query = query.order_by(Quote.creation_date.desc())
-        else:
-            query = query.order_by(Quote.id.desc())
-        paginated = query.paginate(page=page, per_page=per_page, error_out=False)
-        return {
-            'items': paginated.items,
-            'total': paginated.total,
-            'page': paginated.page,
-            'per_page': paginated.per_page,
-            'total_pages': paginated.pages
-        }
+    def __init__(self):
+        """Inicializa con el modelo Quote."""
+        super().__init__(Quote)
     
-    def update(self, id: int, **kwargs) -> Quote:
-        """Actualiza un cotización."""
-        obj = Quote.query.get(id)
-        if not obj:
-            raise ValueError(f"Quote con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
+    # Métodos específicos del dominio Quote
     
-    def delete(self, id: int) -> bool:
-        """Elimina un cotización."""
-        obj = Quote.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
+    def approve(self, id: int) -> Optional[Quote]:
+        """
+        Aprueba una cotización (cambia status a 'approved').
+        
+        Args:
+            id (int): ID de la quote
+        
+        Returns:
+            Quote: Quote actualizada o None si no existe
+        
+        Example:
+            quote = handler.approve(1)
+            if quote:
+                print(f"Quote {quote.id} approved")
+        """
+        return self.update(id, status='approved')
     
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta quotes."""
-        query = Quote.query
-        if status and hasattr(Quote, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def reject(self, id: int) -> Optional[Quote]:
+        """
+        Rechaza una cotización (cambia status a 'rejected').
+        
+        Args:
+            id (int): ID de la quote
+        
+        Returns:
+            Quote: Quote actualizada o None si no existe
+        """
+        return self.update(id, status='rejected')
+    
+    def get_by_organization(self, organization_id: int, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Lista quotes de una organización específica.
+        
+        Args:
+            organization_id (int): ID de la organización
+            page (int): Número de página
+            per_page (int): Items por página
+        
+        Returns:
+            dict: Resultado paginado con quotes de la organización
+        
+        Example:
+            result = handler.get_by_organization(1, page=1, per_page=20)
+            print(f"Found {result['total']} quotes for org 1")
+        """
+        return self.list_all(page=page, per_page=per_page, organization_id=organization_id)

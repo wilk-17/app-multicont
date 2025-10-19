@@ -1,8 +1,10 @@
 """
-Quote API - REST Endpoints
-Gestiona las cotizaciones del sistema con validación Marshmallow
+Quote API - REST Endpoints (Refactored)
+Gestiona las cotizaciones del sistema con validación Marshmallow.
+
+Usa utilidades de helpers para respuestas JSON estandarizadas.
 """
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from marshmallow import ValidationError
 from app.use_cases.quote_handler import QuoteHandler
 from app.schemas import (
@@ -13,6 +15,12 @@ from app.schemas import (
 )
 from flask_jwt_extended import jwt_required
 from app.utils.decorators import require_role
+from app.utils.helpers import (
+    parse_pagination_params,
+    success_response,
+    error_response,
+    paginated_response
+)
 
 quote_api = Blueprint('quote_api', __name__, url_prefix='/api/quotes')
 handler = QuoteHandler()
@@ -63,25 +71,28 @@ def get_all():
         description: Error del servidor
     """
     try:
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 10, type=int)
+        # Parsear parámetros de paginación con utilidades
+        page, per_page = parse_pagination_params(default_per_page=10)
+        
+        # Obtener datos paginados
         result = handler.list_all(page=page, per_page=per_page)
         
-        # Serializar respuesta con Marshmallow
+        # Serializar items con Marshmallow
         serialized_items = quotes_response_schema.dump(result['items'])
         
-        return jsonify({
-            'success': True,
-            'data': {
-                'items': serialized_items,
-                'total': result['total'],
-                'page': result['page'],
-                'per_page': result['per_page'],
-                'total_pages': result['total_pages']
-            }
-        }), 200
+        # Preparar datos para respuesta paginada
+        paginated_data = {
+            'items': serialized_items,
+            'total': result['total'],
+            'page': result['page'],
+            'per_page': result['per_page'],
+            'total_pages': result['total_pages']
+        }
+        
+        # Usar utilidad de respuesta paginada
+        return paginated_response(paginated_data, "Cotizaciones obtenidas exitosamente")
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(f"Error al listar cotizaciones: {str(e)}", 500)
 
 @quote_api.route('/<int:id>', methods=['GET'])
 @jwt_required()
@@ -114,13 +125,14 @@ def get_by_id(id):
     """
     try:
         obj = handler.get(id)
-        if obj:
-            # Serializar respuesta con Marshmallow
-            result = quote_response_schema.dump(obj)
-            return jsonify({'success': True, 'data': result}), 200
-        return jsonify({'success': False, 'error': 'Cotización no encontrada'}), 404
+        if not obj:
+            return error_response('Cotización no encontrada', 404)
+        
+        # Serializar respuesta con Marshmallow
+        result = quote_response_schema.dump(obj)
+        return success_response(result, "Cotización obtenida exitosamente")
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(f"Error al obtener cotización: {str(e)}", 500)
 
 @quote_api.route('/', methods=['POST'])
 @jwt_required()
@@ -214,14 +226,11 @@ def create():
         # Serializar respuesta
         result = quote_response_schema.dump(obj)
         
-        return jsonify({
-            'success': True,
-            'message': 'Cotización creada exitosamente',
-            'data': result
-        }), 201
+        return success_response(result, 'Cotización creada exitosamente', 201)
         
     except ValidationError as e:
         # Errores de validación de Marshmallow
+        from flask import jsonify
         return jsonify({
             'success': False,
             'errors': e.messages,
@@ -230,17 +239,11 @@ def create():
         
     except ValueError as e:
         # Errores de lógica de negocio
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 400
+        return error_response(str(e), 400)
         
     except Exception as e:
         # Errores inesperados
-        return jsonify({
-            'success': False,
-            'error': 'Error interno del servidor'
-        }), 500
+        return error_response('Error interno del servidor', 500)
 
 @quote_api.route('/<int:id>', methods=['PUT'])
 @jwt_required()
@@ -304,25 +307,22 @@ def update(id):
         validated_data = quote_update_schema.load(request.get_json())
         
         if not validated_data:
-            return jsonify({
-                'success': False,
-                'error': 'No se proporcionaron datos para actualizar'
-            }), 400
+            return error_response('No se proporcionaron datos para actualizar', 400)
         
         # Actualizar cotización con datos validados
         obj = handler.update(id, **validated_data)
         
+        if not obj:
+            return error_response('Cotización no encontrada', 404)
+        
         # Serializar respuesta
         result = quote_response_schema.dump(obj)
         
-        return jsonify({
-            'success': True,
-            'message': 'Cotización actualizada exitosamente',
-            'data': result
-        }), 200
+        return success_response(result, 'Cotización actualizada exitosamente')
         
     except ValidationError as e:
         # Errores de validación de Marshmallow
+        from flask import jsonify
         return jsonify({
             'success': False,
             'errors': e.messages,
@@ -331,17 +331,11 @@ def update(id):
         
     except ValueError as e:
         # Cotización no encontrada
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 404
+        return error_response(str(e), 404)
         
     except Exception as e:
         # Errores inesperados
-        return jsonify({
-            'success': False,
-            'error': 'Error interno del servidor'
-        }), 500
+        return error_response('Error interno del servidor', 500)
 
 @quote_api.route('/<int:id>', methods=['DELETE'])
 @jwt_required()
@@ -368,14 +362,9 @@ def delete(id):
     """
     try:
         deleted = handler.delete(id)
-        if deleted:
-            return jsonify({
-                'success': True,
-                'message': 'Cotización eliminada exitosamente'
-            }), 200
-        return jsonify({
-            'success': False,
-            'error': 'Cotización no encontrada'
-        }), 404
+        if not deleted:
+            return error_response('Cotización no encontrada', 404)
+        
+        return success_response(message='Cotización eliminada exitosamente')
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(f'Error al eliminar cotización: {str(e)}', 500)
