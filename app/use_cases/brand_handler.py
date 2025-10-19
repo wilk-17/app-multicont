@@ -1,20 +1,28 @@
 """
-Brand Handler - Lógica de negocio para marcas de productos
+BrandHandler - Use Case Layer
+Gestiona marcas de productos con validaciones de integridad.
 """
+from typing import Optional, Dict, Any
+from sqlalchemy.orm import joinedload
 from app import db
 from app.entities.brand import Brand
+from app.use_cases.base_handler import BaseHandler
 
 
-class BrandHandler:
-    """Handler para gestión de marcas de productos"""
+class BrandHandler(BaseHandler):
+    """Handler para gestión de marcas de productos con validación de unicidad."""
     
-    def create(self, name, description=None):
+    def __init__(self):
+        super().__init__(Brand)
+    
+    def create(self, name: str, description: Optional[str] = None, **kwargs) -> Brand:
         """
-        Crear una nueva marca
+        Crear una nueva marca con validación de unicidad.
         
         Args:
             name: Nombre de la marca (único)
             description: Descripción opcional
+            **kwargs: Otros campos opcionales
             
         Returns:
             Brand: Objeto Brand creado
@@ -22,30 +30,15 @@ class BrandHandler:
         Raises:
             ValueError: Si la marca ya existe
         """
-        existing = Brand.query.filter_by(name=name).first()
+        existing = self.get_by_name(name)
         if existing:
             raise ValueError(f"Brand with name '{name}' already exists")
         
-        brand = Brand(name=name, description=description)
-        db.session.add(brand)
-        db.session.commit()
-        return brand
+        return super().create(name=name, description=description, **kwargs)
     
-    def get(self, brand_id):
+    def get_by_name(self, name: str) -> Optional[Brand]:
         """
-        Obtener marca por ID
-        
-        Args:
-            brand_id: ID de la marca
-            
-        Returns:
-            Brand o None si no existe
-        """
-        return Brand.query.get(brand_id)
-    
-    def get_by_name(self, name):
-        """
-        Obtener marca por nombre
+        Obtener marca por nombre.
         
         Args:
             name: Nombre de la marca
@@ -55,18 +48,19 @@ class BrandHandler:
         """
         return Brand.query.filter_by(name=name).first()
     
-    def list_all(self, page=1, per_page=10):
+    def list_all_with_items(self, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
         """
-        Listar todas las marcas con paginación
+        Lista marcas con eager loading de items para evitar N+1 queries.
         
         Args:
             page: Número de página
             per_page: Items por página
             
         Returns:
-            dict con items, total, page, per_page, total_pages
+            Dict con items, total, page, per_page, total_pages
         """
-        query = Brand.query.order_by(Brand.name.asc())
+        query = Brand.query.options(joinedload(Brand.items))
+        query = query.order_by(Brand.name.asc())
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
         
         return {
@@ -77,9 +71,9 @@ class BrandHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, brand_id, **kwargs):
+    def update(self, brand_id: int, **kwargs) -> Brand:
         """
-        Actualizar marca
+        Actualizar marca con validación de unicidad de nombre.
         
         Args:
             brand_id: ID de la marca
@@ -91,27 +85,21 @@ class BrandHandler:
         Raises:
             ValueError: Si la marca no existe o nombre duplicado
         """
-        brand = Brand.query.get(brand_id)
+        brand = self.get(brand_id)
         if not brand:
             raise ValueError(f"Brand with id {brand_id} not found")
         
         # Validar nombre único si se está actualizando
         if 'name' in kwargs and kwargs['name'] != brand.name:
-            existing = Brand.query.filter_by(name=kwargs['name']).first()
+            existing = self.get_by_name(kwargs['name'])
             if existing:
                 raise ValueError(f"Brand with name '{kwargs['name']}' already exists")
         
-        # Actualizar campos permitidos
-        for key, value in kwargs.items():
-            if hasattr(brand, key) and key != 'id':
-                setattr(brand, key, value)
-        
-        db.session.commit()
-        return brand
+        return super().update(brand_id, **kwargs)
     
-    def delete(self, brand_id):
+    def delete(self, brand_id: int) -> bool:
         """
-        Eliminar marca
+        Eliminar marca verificando que no tenga items asociados.
         
         Args:
             brand_id: ID de la marca
@@ -120,9 +108,9 @@ class BrandHandler:
             True si se eliminó correctamente
             
         Raises:
-            ValueError: Si la marca no existe o tiene items asociados
+            ValueError: Si la marca tiene items asociados
         """
-        brand = Brand.query.get(brand_id)
+        brand = self.get(brand_id)
         if not brand:
             raise ValueError(f"Brand with id {brand_id} not found")
         
@@ -132,15 +120,24 @@ class BrandHandler:
         if items_count > 0:
             raise ValueError(f"Cannot delete brand: {items_count} inventory items are associated")
         
-        db.session.delete(brand)
-        db.session.commit()
-        return True
+        return super().delete(brand_id)
     
-    def count(self):
+    def get_brands_with_items_count(self) -> list:
         """
-        Contar total de marcas
+        Obtiene todas las marcas con el conteo de items de cada una.
         
         Returns:
-            int: Total de marcas
+            Lista de marcas con metadata de conteo
         """
-        return Brand.query.count()
+        from app.entities.inventory_item import InventoryItem
+        
+        brands = Brand.query.all()
+        result = []
+        
+        for brand in brands:
+            items_count = InventoryItem.query.filter_by(brand_id=brand.id).count()
+            brand_dict = brand.to_dict() if hasattr(brand, 'to_dict') else {'id': brand.id, 'name': brand.name}
+            brand_dict['items_count'] = items_count
+            result.append(brand_dict)
+        
+        return result

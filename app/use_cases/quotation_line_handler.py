@@ -1,42 +1,35 @@
 """
 QuotationLineHandler - Use Case Layer
+Gestiona líneas de cotización (items en una cotización).
 """
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
+from typing import Optional, Dict, Any
+from sqlalchemy.orm import joinedload
 from app.entities.quotation_line import QuotationLine
+from app.use_cases.base_handler import BaseHandler
 
-class QuotationLineHandler:
-    """Handler para gestionar operaciones con quotation lines."""
+
+class QuotationLineHandler(BaseHandler):
+    """Handler para gestionar operaciones con líneas de cotización."""
     
-    def create(self, **kwargs) -> QuotationLine:
-        """Crea un nuevo línea de cotización."""
-        try:
-            obj = QuotationLine(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear línea de cotización: {str(e)}")
+    def __init__(self):
+        super().__init__(QuotationLine)
     
-    def get(self, id: int) -> Optional[QuotationLine]:
-        """Obtiene un línea de cotización por ID."""
-        return QuotationLine.query.get(id)
-    
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista quotation lines con paginación."""
-        query = QuotationLine.query
-        if status and hasattr(QuotationLine, 'status'):
-            query = query.filter_by(status=status)
-        if hasattr(QuotationLine, 'creation_date'):
-            query = query.order_by(QuotationLine.creation_date.desc())
-        else:
-            query = query.order_by(QuotationLine.id.desc())
+    def get_by_quote(self, quote_id: int, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Obtiene todas las líneas de una cotización específica.
+        
+        Args:
+            quote_id: ID de la cotización
+            page: Número de página
+            per_page: Items por página
+        
+        Returns:
+            Dict con líneas paginadas
+        """
+        query = QuotationLine.query.filter_by(quote_id=quote_id)
+        query = query.order_by(QuotationLine.id)
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
         return {
             'items': paginated.items,
             'total': paginated.total,
@@ -45,37 +38,18 @@ class QuotationLineHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, id: int, **kwargs) -> QuotationLine:
-        """Actualiza un línea de cotización."""
-        obj = QuotationLine.query.get(id)
-        if not obj:
-            raise ValueError(f"QuotationLine con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
-    
-    def delete(self, id: int) -> bool:
-        """Elimina un línea de cotización."""
-        obj = QuotationLine.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
-    
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta quotation lines."""
-        query = QuotationLine.query
-        if status and hasattr(QuotationLine, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def calculate_total(self, quote_id: int) -> float:
+        """
+        Calcula el total de todas las líneas de una cotización.
+        
+        Args:
+            quote_id: ID de la cotización
+        
+        Returns:
+            Total calculado
+        """
+        from sqlalchemy import func
+        total = QuotationLine.query.filter_by(quote_id=quote_id).with_entities(
+            func.sum(QuotationLine.quantity * QuotationLine.unit_price)
+        ).scalar()
+        return float(total) if total else 0.0

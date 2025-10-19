@@ -1,42 +1,35 @@
 """
 SalesOrderItemHandler - Use Case Layer
+Gestiona items de orden de venta.
 """
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
+from typing import Optional, Dict, Any
+from sqlalchemy.orm import joinedload
 from app.entities.sales_order_item import SalesOrderItem
+from app.use_cases.base_handler import BaseHandler
 
-class SalesOrderItemHandler:
-    """Handler para gestionar operaciones con sales order items."""
+
+class SalesOrderItemHandler(BaseHandler):
+    """Handler para gestionar operaciones con items de orden de venta."""
     
-    def create(self, **kwargs) -> SalesOrderItem:
-        """Crea un nuevo item de orden de venta."""
-        try:
-            obj = SalesOrderItem(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear item de orden de venta: {str(e)}")
+    def __init__(self):
+        super().__init__(SalesOrderItem)
     
-    def get(self, id: int) -> Optional[SalesOrderItem]:
-        """Obtiene un item de orden de venta por ID."""
-        return SalesOrderItem.query.get(id)
-    
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista sales order items con paginación."""
-        query = SalesOrderItem.query
-        if status and hasattr(SalesOrderItem, 'status'):
-            query = query.filter_by(status=status)
-        if hasattr(SalesOrderItem, 'creation_date'):
-            query = query.order_by(SalesOrderItem.creation_date.desc())
-        else:
-            query = query.order_by(SalesOrderItem.id.desc())
+    def get_by_order(self, order_id: int, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Obtiene todos los items de una orden de venta específica.
+        
+        Args:
+            order_id: ID de la orden de venta
+            page: Número de página
+            per_page: Items por página
+        
+        Returns:
+            Dict con items paginados
+        """
+        query = SalesOrderItem.query.filter_by(sales_order_id=order_id)
+        query = query.order_by(SalesOrderItem.id)
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
         return {
             'items': paginated.items,
             'total': paginated.total,
@@ -45,37 +38,30 @@ class SalesOrderItemHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, id: int, **kwargs) -> SalesOrderItem:
-        """Actualiza un item de orden de venta."""
-        obj = SalesOrderItem.query.get(id)
-        if not obj:
-            raise ValueError(f"SalesOrderItem con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
+    def get_by_inventory_item(self, item_id: int) -> list:
+        """
+        Obtiene todas las órdenes de venta que incluyen un item específico.
+        
+        Args:
+            item_id: ID del item de inventario
+        
+        Returns:
+            Lista de sales order items
+        """
+        return SalesOrderItem.query.filter_by(inventory_item_id=item_id).all()
     
-    def delete(self, id: int) -> bool:
-        """Elimina un item de orden de venta."""
-        obj = SalesOrderItem.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
-    
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta sales order items."""
-        query = SalesOrderItem.query
-        if status and hasattr(SalesOrderItem, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def calculate_total(self, order_id: int) -> float:
+        """
+        Calcula el total de todos los items de una orden de venta.
+        
+        Args:
+            order_id: ID de la orden de venta
+        
+        Returns:
+            Total calculado
+        """
+        from sqlalchemy import func
+        total = SalesOrderItem.query.filter_by(sales_order_id=order_id).with_entities(
+            func.sum(SalesOrderItem.quantity * SalesOrderItem.unit_price)
+        ).scalar()
+        return float(total) if total else 0.0

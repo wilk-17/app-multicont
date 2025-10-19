@@ -1,42 +1,39 @@
 """
 ItemCategoryHandler - Use Case Layer
+Gestiona categorías de productos del inventario.
 """
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
+from typing import Optional, Dict, Any
+from sqlalchemy.orm import joinedload
 from app.entities.item_category import ItemCategory
+from app.use_cases.base_handler import BaseHandler
 
-class ItemCategoryHandler:
-    """Handler para gestionar operaciones con item categories."""
+
+class ItemCategoryHandler(BaseHandler):
+    """Handler para gestionar operaciones con categorías de items."""
     
-    def create(self, **kwargs) -> ItemCategory:
-        """Crea un nuevo categoría."""
-        try:
-            obj = ItemCategory(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear categoría: {str(e)}")
+    def __init__(self):
+        super().__init__(ItemCategory)
     
-    def get(self, id: int) -> Optional[ItemCategory]:
-        """Obtiene un categoría por ID."""
-        return ItemCategory.query.get(id)
-    
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista item categories con paginación."""
-        query = ItemCategory.query
-        if status and hasattr(ItemCategory, 'status'):
+    def list_all_with_items(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Lista categorías con eager loading de items para evitar N+1 queries.
+        
+        Args:
+            page: Número de página
+            per_page: Items por página
+            status: Filtrar por estado (opcional)
+        
+        Returns:
+            Dict con items, total, page, per_page, total_pages
+        """
+        query = ItemCategory.query.options(joinedload(ItemCategory.items))
+        
+        if status:
             query = query.filter_by(status=status)
-        if hasattr(ItemCategory, 'creation_date'):
-            query = query.order_by(ItemCategory.creation_date.desc())
-        else:
-            query = query.order_by(ItemCategory.id.desc())
+        
+        query = query.order_by(ItemCategory.name)
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
         return {
             'items': paginated.items,
             'total': paginated.total,
@@ -45,37 +42,35 @@ class ItemCategoryHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, id: int, **kwargs) -> ItemCategory:
-        """Actualiza un categoría."""
-        obj = ItemCategory.query.get(id)
-        if not obj:
-            raise ValueError(f"ItemCategory con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
+    def get_by_name(self, name: str) -> Optional[ItemCategory]:
+        """
+        Busca una categoría por nombre.
+        
+        Args:
+            name: Nombre de la categoría
+        
+        Returns:
+            ItemCategory si existe, None si no
+        """
+        return ItemCategory.query.filter_by(name=name).first()
     
-    def delete(self, id: int) -> bool:
-        """Elimina un categoría."""
-        obj = ItemCategory.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
-    
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta item categories."""
-        query = ItemCategory.query
-        if status and hasattr(ItemCategory, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def get_categories_with_items_count(self) -> list:
+        """
+        Obtiene todas las categorías con el conteo de items en cada una.
+        
+        Returns:
+            Lista de categorías con metadata de conteo
+        """
+        from app.entities.inventory_item import InventoryItem
+        from sqlalchemy import func
+        
+        categories = ItemCategory.query.outerjoin(InventoryItem).group_by(ItemCategory.id).all()
+        
+        result = []
+        for category in categories:
+            items_count = InventoryItem.query.filter_by(category_id=category.id).count()
+            category_dict = category.to_dict() if hasattr(category, 'to_dict') else {'id': category.id, 'name': category.name}
+            category_dict['items_count'] = items_count
+            result.append(category_dict)
+        
+        return result
