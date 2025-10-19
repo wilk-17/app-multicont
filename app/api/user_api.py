@@ -1,11 +1,19 @@
 """
-User API - REST Endpoints
+User API - REST Endpoints con validación Marshmallow
 Blueprint de Flask para operaciones REST con usuarios.
 """
 from flask import Blueprint, request, jsonify
+from marshmallow import ValidationError
 from flasgger import swag_from
 from flask_jwt_extended import jwt_required
 from app.use_cases.user_handler import UserHandler
+from app.schemas import (
+    user_create_schema,
+    user_update_schema,
+    password_change_schema,
+    user_response_schema,
+    users_response_schema
+)
 from app.utils.decorators import require_role
 from app.utils.security import hash_password
 
@@ -220,7 +228,7 @@ def get_user_by_id(id):
 @require_role('ADMIN')
 def create_user():
     """
-    Crea un nuevo usuario
+    Crea un nuevo usuario con validación automática
     ---
     tags:
       - Usuarios
@@ -233,15 +241,29 @@ def create_user():
           required:
             - username
             - password
-            - role_id
+            - email
           properties:
             username:
               type: string
-              example: "juan"
+              minLength: 4
+              maxLength: 50
+              example: "juan_perez"
+            email:
+              type: string
+              format: email
+              example: "juan@example.com"
             password:
               type: string
-              example: "secreto123"
-            role_id:
+              minLength: 8
+              example: "Password123!"
+              description: Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número, 1 especial
+            full_name:
+              type: string
+              example: "Juan Pérez"
+            phone:
+              type: string
+              example: "+34612345678"
+            employee_id:
               type: integer
               example: 1
     responses:
@@ -253,39 +275,41 @@ def create_user():
         description: Error del servidor
     """
     try:
-        data = request.get_json()
-        
-        # Validar campos requeridos
-        if not data or not all(k in data for k in ['username', 'password', 'role_id']):
-            return jsonify({
-                'success': False,
-                'error': 'Faltan campos requeridos: username, password, role_id'
-            }), 400
+        # Validar datos con Marshmallow
+        validated_data = user_create_schema.load(request.get_json())
         
         # Hashear la contraseña antes de guardar
-        password_hashed = hash_password(data['password'])
+        validated_data['password'] = hash_password(validated_data['password'])
         
-        user = user_handler.create_user(
-            username=data['username'],
-            password=password_hashed,
-            role_id=data['role_id']
-        )
+        # Crear usuario
+        user = user_handler.create_user(**validated_data)
+        
+        # Serializar respuesta
+        result = user_response_schema.dump(user)
         
         return jsonify({
             'success': True,
             'message': 'Usuario creado exitosamente',
-            'data': user.to_dict()
+            'data': result
         }), 201
     
+    except ValidationError as e:
+        return jsonify({
+            'success': False,
+            'errors': e.messages,
+            'message': 'Datos de validación incorrectos'
+        }), 400
+        
     except ValueError as e:
         return jsonify({
             'success': False,
             'error': str(e)
         }), 400
+        
     except Exception as e:
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': 'Error interno del servidor'
         }), 500
 
 
@@ -294,7 +318,7 @@ def create_user():
 @require_role('ADMIN')
 def update_user(id):
     """
-    Actualiza un usuario
+    Actualiza un usuario con validación automática
     ---
     tags:
       - Usuarios
@@ -311,13 +335,18 @@ def update_user(id):
           properties:
             username:
               type: string
-              example: "nuevo_username"
-            password:
+              minLength: 4
+              maxLength: 50
+            email:
               type: string
-              example: "nueva_password"
-            role_id:
-              type: integer
-              example: 2
+              format: email
+            full_name:
+              type: string
+            phone:
+              type: string
+            status:
+              type: string
+              enum: [active, inactive, suspended]
     responses:
       200:
         description: Usuario actualizado exitosamente
@@ -329,31 +358,44 @@ def update_user(id):
         description: Error del servidor
     """
     try:
-        data = request.get_json()
+        # Validar datos con Marshmallow
+        validated_data = user_update_schema.load(request.get_json())
         
-        if not data:
+        if not validated_data:
             return jsonify({
                 'success': False,
                 'error': 'No se proporcionaron datos para actualizar'
             }), 400
         
-        user = user_handler.update_user(id, **data)
+        # Actualizar usuario
+        user = user_handler.update_user(id, **validated_data)
+        
+        # Serializar respuesta
+        result = user_response_schema.dump(user)
         
         return jsonify({
             'success': True,
             'message': 'Usuario actualizado exitosamente',
-            'data': user.to_dict()
+            'data': result
         }), 200
     
+    except ValidationError as e:
+        return jsonify({
+            'success': False,
+            'errors': e.messages,
+            'message': 'Datos de validación incorrectos'
+        }), 400
+        
     except ValueError as e:
         return jsonify({
             'success': False,
             'error': str(e)
         }), 404
+        
     except Exception as e:
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': 'Error interno del servidor'
         }), 500
 
 
@@ -362,7 +404,7 @@ def update_user(id):
 @require_role('ADMIN')
 def update_password(id):
     """
-    Actualiza la contraseña de un usuario
+    Actualiza la contraseña de un usuario con validación
     ---
     tags:
       - Usuarios
@@ -377,49 +419,72 @@ def update_password(id):
         schema:
           type: object
           required:
+            - current_password
             - new_password
+            - confirm_password
           properties:
+            current_password:
+              type: string
+              example: "OldPassword123!"
             new_password:
               type: string
-              example: "nueva_contraseña123"
+              minLength: 8
+              example: "NewPassword123!"
+              description: Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número, 1 especial
+            confirm_password:
+              type: string
+              example: "NewPassword123!"
     responses:
       200:
         description: Contraseña actualizada exitosamente
       400:
-        description: Datos inválidos
+        description: Datos inválidos o contraseñas no coinciden
       404:
         description: Usuario no encontrado
       500:
         description: Error del servidor
     """
     try:
-        data = request.get_json()
+        # Validar datos con Marshmallow
+        validated_data = password_change_schema.load(request.get_json())
         
-        if not data or 'new_password' not in data:
+        # Verificar que las contraseñas coinciden
+        if validated_data['new_password'] != validated_data['confirm_password']:
             return jsonify({
                 'success': False,
-                'error': 'Campo requerido: new_password'
+                'error': 'Las contraseñas no coinciden'
             }), 400
         
         # Hashear la nueva contraseña
-        password_hashed = hash_password(data['new_password'])
+        password_hashed = hash_password(validated_data['new_password'])
         user = user_handler.update_password(id, password_hashed)
+        
+        # Serializar respuesta
+        result = user_response_schema.dump(user)
         
         return jsonify({
             'success': True,
             'message': 'Contraseña actualizada exitosamente',
-            'data': user.to_dict()
+            'data': result
         }), 200
     
+    except ValidationError as e:
+        return jsonify({
+            'success': False,
+            'errors': e.messages,
+            'message': 'Datos de validación incorrectos'
+        }), 400
+        
     except ValueError as e:
         return jsonify({
             'success': False,
             'error': str(e)
         }), 404
+        
     except Exception as e:
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': 'Error interno del servidor'
         }), 500
 
 
