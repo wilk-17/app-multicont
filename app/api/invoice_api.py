@@ -13,7 +13,7 @@ from app.schemas import (
 )
 from flask_jwt_extended import jwt_required
 from app.utils.decorators import require_role
-from app.utils.helpers import (
+from app.api.helpers import (
     parse_pagination_params,
     success_response,
     error_response,

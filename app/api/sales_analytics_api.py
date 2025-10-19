@@ -2,10 +2,10 @@
 Sales Analytics API - Endpoints especializados para análisis de ventas, 
 facturación por empleado/sede, análisis por marca, comparación con metas
 """
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from sqlalchemy import func, and_, or_, extract
 from datetime import datetime, date, timedelta
-from app import db
+from app import db, cache
 from app.entities.invoice import Invoice
 from app.entities.invoice_item import InvoiceItem
 from app.entities.sales_order import SalesOrder
@@ -17,6 +17,10 @@ from app.entities.inventory_item import InventoryItem
 from app.entities.brand import Brand
 from app.entities.sales_goal import SalesGoal
 from flask_jwt_extended import jwt_required
+from app.api.helpers import (
+    success_response,
+    error_response
+)
 
 sales_analytics_api = Blueprint('sales_analytics_api', __name__, url_prefix='/api/analytics')
 
@@ -33,6 +37,7 @@ def parse_date(date_str):
 
 @sales_analytics_api.route('/invoicing/by_employee', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=600, query_string=True)
 def invoicing_by_employee():
     """
     Facturación por empleado (vendedor) en un periodo
@@ -85,7 +90,7 @@ def invoicing_by_employee():
     employee_id = request.args.get('employee_id', None, type=int)
     
     if not start_date or not end_date:
-        return jsonify({'success': False, 'error': 'start_date and end_date are required'}), 400
+        return error_response('start_date and end_date are required', 400)
     
     try:
         # Query principal: agregar facturación por empleado
@@ -126,14 +131,15 @@ def invoicing_by_employee():
         # Ordenar por total facturado descendente
         data.sort(key=lambda x: x['total_invoiced'], reverse=True)
         
-        return jsonify({'success': True, 'data': data}), 200
+        return success_response(data, 'Facturación por empleado obtenida', 200)
     
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)
 
 
 @sales_analytics_api.route('/invoicing/by_branch', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=600, query_string=True)
 def invoicing_by_branch():
     """
     Facturación por sucursal en un periodo
@@ -164,7 +170,7 @@ def invoicing_by_branch():
     branch_id = request.args.get('branch_id', None, type=int)
     
     if not start_date or not end_date:
-        return jsonify({'success': False, 'error': 'start_date and end_date are required'}), 400
+        return error_response('start_date and end_date are required', 400)
     
     try:
         # Join Invoice → Employee → Branch
@@ -203,14 +209,15 @@ def invoicing_by_branch():
         # Ordenar por total facturado descendente
         data.sort(key=lambda x: x['total_invoiced'], reverse=True)
         
-        return jsonify({'success': True, 'data': data}), 200
+        return success_response(data, 'Datos obtenidos exitosamente', 200)
     
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)
 
 
 @sales_analytics_api.route('/invoicing/by_brand', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=600, query_string=True)
 def invoicing_by_brand():
     """
     Facturación por marca de producto en un periodo
@@ -241,7 +248,7 @@ def invoicing_by_brand():
     brand_id = request.args.get('brand_id', None, type=int)
     
     if not start_date or not end_date:
-        return jsonify({'success': False, 'error': 'start_date and end_date are required'}), 400
+        return error_response('start_date and end_date are required', 400)
     
     try:
         # Join Invoice → InvoiceItem → InventoryItem → Brand
@@ -283,14 +290,15 @@ def invoicing_by_brand():
         # Ordenar por total facturado descendente
         data.sort(key=lambda x: x['total_invoiced'], reverse=True)
         
-        return jsonify({'success': True, 'data': data}), 200
+        return success_response(data, 'Datos obtenidos exitosamente', 200)
     
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)
 
 
 @sales_analytics_api.route('/quotes/by_brand', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=600, query_string=True)
 def quotes_by_brand():
     """
     Cotizaciones por marca de producto en un periodo
@@ -321,7 +329,7 @@ def quotes_by_brand():
     brand_id = request.args.get('brand_id', None, type=int)
     
     if not start_date or not end_date:
-        return jsonify({'success': False, 'error': 'start_date and end_date are required'}), 400
+        return error_response('start_date and end_date are required', 400)
     
     try:
         # Importar QuoteItem
@@ -364,14 +372,15 @@ def quotes_by_brand():
         # Ordenar por cantidad de cotizaciones descendente
         data.sort(key=lambda x: x['quote_count'], reverse=True)
         
-        return jsonify({'success': True, 'data': data}), 200
+        return success_response(data, 'Datos obtenidos exitosamente', 200)
     
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)
 
 
 @sales_analytics_api.route('/goals/vs_actual', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=600, query_string=True)
 def goals_vs_actual():
     """
     Comparación de metas vs facturación real
@@ -441,7 +450,7 @@ def goals_vs_actual():
     branch_id = request.args.get('branch_id', None, type=int)
     
     if period_type not in ['monthly', 'quarterly', 'yearly']:
-        return jsonify({'success': False, 'error': 'period_type must be monthly, quarterly, or yearly'}), 400
+        return error_response('period_type must be monthly, quarterly, or yearly', 400)
     
     try:
         # Obtener metas activas para la fecha de referencia
@@ -535,14 +544,15 @@ def goals_vs_actual():
         # Ordenar por porcentaje de logro descendente
         data.sort(key=lambda x: x['achievement_percentage'], reverse=True)
         
-        return jsonify({'success': True, 'data': data}), 200
+        return success_response(data, 'Datos obtenidos exitosamente', 200)
     
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)
 
 
 @sales_analytics_api.route('/sales/summary', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=600, query_string=True)
 def sales_summary():
     """
     Resumen consolidado de ventas en un periodo
@@ -568,7 +578,7 @@ def sales_summary():
     end_date = parse_date(request.args.get('end_date'))
     
     if not start_date or not end_date:
-        return jsonify({'success': False, 'error': 'start_date and end_date are required'}), 400
+        return error_response('start_date and end_date are required', 400)
     
     try:
         # Total de facturación
@@ -628,29 +638,29 @@ def sales_summary():
         # Tasa de conversión quote → invoice (aproximada)
         conversion_rate = (invoice_count / quote_count * 100) if quote_count > 0 else 0
         
-        return jsonify({
-            'success': True,
-            'data': {
-                'period': {
-                    'start_date': start_date.isoformat(),
-                    'end_date': end_date.isoformat()
-                },
-                'total_invoiced': float(total_invoiced),
-                'invoice_count': invoice_count,
-                'quote_count': quote_count,
-                'sales_order_count': sales_order_count,
-                'active_employees': active_employees,
-                'avg_invoice_amount': round(avg_invoice, 2),
-                'conversion_rate': round(conversion_rate, 2)
-            }
-        }), 200
+        summary_data = {
+            'period': {
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat()
+            },
+            'total_invoiced': float(total_invoiced),
+            'invoice_count': invoice_count,
+            'quote_count': quote_count,
+            'sales_order_count': sales_order_count,
+            'active_employees': active_employees,
+            'avg_invoice_amount': round(avg_invoice, 2),
+            'conversion_rate': round(conversion_rate, 2)
+        }
+        
+        return success_response(summary_data, 'Resumen de ventas obtenido', 200)
     
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)
 
 
 @sales_analytics_api.route('/top_performers', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=600, query_string=True)
 def top_performers():
     """
     Top empleados vendedores en un periodo
@@ -682,7 +692,7 @@ def top_performers():
     limit = request.args.get('limit', 10, type=int)
     
     if not start_date or not end_date:
-        return jsonify({'success': False, 'error': 'start_date and end_date are required'}), 400
+        return error_response('start_date and end_date are required', 400)
     
     try:
         # Top por facturación total
@@ -721,7 +731,7 @@ def top_performers():
             })
             rank += 1
         
-        return jsonify({'success': True, 'data': data}), 200
+        return success_response(data, 'Datos obtenidos exitosamente', 200)
     
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)

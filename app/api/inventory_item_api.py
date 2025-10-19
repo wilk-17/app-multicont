@@ -11,7 +11,7 @@ from app.schemas import (
     inventory_item_response_schema,
     inventory_items_response_schema
 )
-from app.utils.helpers import (
+from app.api.helpers import (
     parse_pagination_params,
     success_response,
     error_response,
