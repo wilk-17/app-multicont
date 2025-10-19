@@ -5,12 +5,14 @@ Aplicación Flask con arquitectura en capas (Entities, Use Cases, API)
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
 from flasgger import Swagger
 from .config import DevelopmentConfig
 
 # Inicializar extensiones
 db = SQLAlchemy()
 migrate = Migrate()
+jwt = JWTManager()
 
 
 def create_app(config_class=DevelopmentConfig):
@@ -26,9 +28,16 @@ def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    # Configurar JWT
+    from .utils.security import get_jwt_config
+    jwt_config = get_jwt_config()
+    for key, value in jwt_config.items():
+        app.config[key] = value
+
     # Inicializar extensiones
     db.init_app(app)
     migrate.init_app(app, db)
+    jwt.init_app(app)
     
     # Configurar Swagger/Flasgger (se inicializará más abajo
     # una vez que hayamos importado las entidades para generar definitions)
@@ -119,6 +128,7 @@ def create_app(config_class=DevelopmentConfig):
         from .api.brand_api import brand_api
         from .api.sales_goal_api import sales_goal_api
         from .api.sales_analytics_api import sales_analytics_api
+        from .api.auth_api import auth_api
 
         # Registrar blueprints
         blueprints = [
@@ -126,7 +136,8 @@ def create_app(config_class=DevelopmentConfig):
             branch_api, state_api, city_api, permission_api, user_role_api,
             item_category_api, inventory_item_api, assignment_api, quote_api,
             quotation_line_api, quote_item_api, sales_order_api, sales_order_item_api,
-            invoice_api, invoice_item_api, brand_api, sales_goal_api, sales_analytics_api
+            invoice_api, invoice_item_api, brand_api, sales_goal_api, sales_analytics_api,
+            auth_api
         ]
         
         for blueprint in blueprints:
