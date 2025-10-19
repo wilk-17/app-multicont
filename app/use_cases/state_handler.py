@@ -1,42 +1,46 @@
 """
 StateHandler - Use Case Layer
+Gestiona estados/departamentos geográficos.
 """
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
+from typing import Optional, Dict, Any, List
+from sqlalchemy.orm import joinedload
 from app.entities.state import State
+from app.use_cases.base_handler import BaseHandler
 
-class StateHandler:
-    """Handler para gestionar operaciones con states."""
+
+class StateHandler(BaseHandler):
+    """Handler para gestionar operaciones con estados."""
     
-    def create(self, **kwargs) -> State:
-        """Crea un nuevo estado."""
-        try:
-            obj = State(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear estado: {str(e)}")
+    def __init__(self):
+        super().__init__(State)
     
-    def get(self, id: int) -> Optional[State]:
-        """Obtiene un estado por ID."""
-        return State.query.get(id)
+    def get_by_name(self, name: str) -> Optional[State]:
+        """
+        Obtiene un estado por su nombre.
+        
+        Args:
+            name: Nombre del estado
+        
+        Returns:
+            State o None si no existe
+        """
+        return State.query.filter_by(name=name).first()
     
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista states con paginación."""
-        query = State.query
-        if status and hasattr(State, 'status'):
-            query = query.filter_by(status=status)
-        if hasattr(State, 'creation_date'):
-            query = query.order_by(State.creation_date.desc())
-        else:
-            query = query.order_by(State.id.desc())
+    def list_all_with_cities(self, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Lista estados con sus ciudades (eager loading).
+        
+        Args:
+            page: Número de página
+            per_page: Items por página
+        
+        Returns:
+            Dict con estados paginados incluyendo ciudades
+        """
+        query = State.query.options(joinedload(State.cities))
+        query = query.order_by(State.name)
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
         return {
             'items': paginated.items,
             'total': paginated.total,
@@ -45,37 +49,16 @@ class StateHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, id: int, **kwargs) -> State:
-        """Actualiza un estado."""
-        obj = State.query.get(id)
-        if not obj:
-            raise ValueError(f"State con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
-    
-    def delete(self, id: int) -> bool:
-        """Elimina un estado."""
-        obj = State.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
-    
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta states."""
-        query = State.query
-        if status and hasattr(State, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def search_by_name(self, search_term: str) -> List[State]:
+        """
+        Busca estados por nombre (búsqueda parcial).
+        
+        Args:
+            search_term: Término de búsqueda
+        
+        Returns:
+            Lista de estados que coinciden
+        """
+        return State.query.filter(
+            State.name.ilike(f'%{search_term}%')
+        ).order_by(State.name).all()

@@ -1,42 +1,47 @@
 """
 UserRoleHandler - Use Case Layer
+Gestiona la relación entre usuarios y roles (tabla pivot).
 """
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
+from typing import Optional, Dict, Any, List
+from sqlalchemy.orm import joinedload
 from app.entities.user_role import UserRole
+from app.use_cases.base_handler import BaseHandler
 
-class UserRoleHandler:
-    """Handler para gestionar operaciones con user roles."""
+
+class UserRoleHandler(BaseHandler):
+    """Handler para gestionar operaciones con roles de usuario."""
     
-    def create(self, **kwargs) -> UserRole:
-        """Crea un nuevo rol de usuario."""
-        try:
-            obj = UserRole(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear rol de usuario: {str(e)}")
+    def __init__(self):
+        super().__init__(UserRole)
     
-    def get(self, id: int) -> Optional[UserRole]:
-        """Obtiene un rol de usuario por ID."""
-        return UserRole.query.get(id)
+    def get_by_user(self, user_id: int) -> List[UserRole]:
+        """
+        Obtiene todos los roles de un usuario específico.
+        
+        Args:
+            user_id: ID del usuario
+        
+        Returns:
+            Lista de UserRole del usuario
+        """
+        return UserRole.query.filter_by(user_id=user_id).all()
     
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista user roles con paginación."""
-        query = UserRole.query
-        if status and hasattr(UserRole, 'status'):
-            query = query.filter_by(status=status)
-        if hasattr(UserRole, 'creation_date'):
-            query = query.order_by(UserRole.creation_date.desc())
-        else:
-            query = query.order_by(UserRole.id.desc())
+    def get_by_role(self, role_id: int, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Obtiene todos los usuarios con un rol específico.
+        
+        Args:
+            role_id: ID del rol
+            page: Número de página
+            per_page: Items por página
+        
+        Returns:
+            Dict con user_roles paginados
+        """
+        query = UserRole.query.filter_by(role_id=role_id)
+        query = query.order_by(UserRole.id.desc())
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
         return {
             'items': paginated.items,
             'total': paginated.total,
@@ -45,37 +50,44 @@ class UserRoleHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, id: int, **kwargs) -> UserRole:
-        """Actualiza un rol de usuario."""
-        obj = UserRole.query.get(id)
-        if not obj:
-            raise ValueError(f"UserRole con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
+    def list_all_with_relations(self, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Lista user_roles con usuario y rol (eager loading).
+        
+        Args:
+            page: Número de página
+            per_page: Items por página
+        
+        Returns:
+            Dict con user_roles paginados incluyendo relaciones
+        """
+        query = UserRole.query.options(
+            joinedload(UserRole.user),
+            joinedload(UserRole.role)
+        )
+        query = query.order_by(UserRole.id.desc())
+        paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
+        return {
+            'items': paginated.items,
+            'total': paginated.total,
+            'page': paginated.page,
+            'per_page': paginated.per_page,
+            'total_pages': paginated.pages
+        }
     
-    def delete(self, id: int) -> bool:
-        """Elimina un rol de usuario."""
-        obj = UserRole.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
-    
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta user roles."""
-        query = UserRole.query
-        if status and hasattr(UserRole, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def user_has_role(self, user_id: int, role_id: int) -> bool:
+        """
+        Verifica si un usuario tiene un rol específico.
+        
+        Args:
+            user_id: ID del usuario
+            role_id: ID del rol
+        
+        Returns:
+            True si el usuario tiene el rol, False en caso contrario
+        """
+        return UserRole.query.filter_by(
+            user_id=user_id,
+            role_id=role_id
+        ).first() is not None

@@ -1,42 +1,35 @@
 """
 CityHandler - Use Case Layer
+Gestiona ciudades asociadas a estados.
 """
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
+from typing import Optional, Dict, Any, List
+from sqlalchemy.orm import joinedload
 from app.entities.city import City
+from app.use_cases.base_handler import BaseHandler
 
-class CityHandler:
-    """Handler para gestionar operaciones con cities."""
+
+class CityHandler(BaseHandler):
+    """Handler para gestionar operaciones con ciudades."""
     
-    def create(self, **kwargs) -> City:
-        """Crea un nuevo ciudad."""
-        try:
-            obj = City(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear ciudad: {str(e)}")
+    def __init__(self):
+        super().__init__(City)
     
-    def get(self, id: int) -> Optional[City]:
-        """Obtiene un ciudad por ID."""
-        return City.query.get(id)
-    
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista cities con paginación."""
-        query = City.query
-        if status and hasattr(City, 'status'):
-            query = query.filter_by(status=status)
-        if hasattr(City, 'creation_date'):
-            query = query.order_by(City.creation_date.desc())
-        else:
-            query = query.order_by(City.id.desc())
+    def get_by_state(self, state_id: int, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Obtiene todas las ciudades de un estado específico.
+        
+        Args:
+            state_id: ID del estado
+            page: Número de página
+            per_page: Items por página
+        
+        Returns:
+            Dict con ciudades paginadas
+        """
+        query = City.query.filter_by(state_id=state_id)
+        query = query.order_by(City.name)
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
         return {
             'items': paginated.items,
             'total': paginated.total,
@@ -45,37 +38,41 @@ class CityHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, id: int, **kwargs) -> City:
-        """Actualiza un ciudad."""
-        obj = City.query.get(id)
-        if not obj:
-            raise ValueError(f"City con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
+    def list_all_with_state(self, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Lista ciudades con su estado (eager loading).
+        
+        Args:
+            page: Número de página
+            per_page: Items por página
+        
+        Returns:
+            Dict con ciudades paginadas incluyendo estado
+        """
+        query = City.query.options(joinedload(City.state))
+        query = query.order_by(City.name)
+        paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
+        return {
+            'items': paginated.items,
+            'total': paginated.total,
+            'page': paginated.page,
+            'per_page': paginated.per_page,
+            'total_pages': paginated.pages
+        }
     
-    def delete(self, id: int) -> bool:
-        """Elimina un ciudad."""
-        obj = City.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
-    
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta cities."""
-        query = City.query
-        if status and hasattr(City, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def search_by_name(self, search_term: str, state_id: Optional[int] = None) -> List[City]:
+        """
+        Busca ciudades por nombre (búsqueda parcial).
+        
+        Args:
+            search_term: Término de búsqueda
+            state_id: Filtrar por estado (opcional)
+        
+        Returns:
+            Lista de ciudades que coinciden
+        """
+        query = City.query.filter(City.name.ilike(f'%{search_term}%'))
+        if state_id:
+            query = query.filter_by(state_id=state_id)
+        return query.order_by(City.name).all()

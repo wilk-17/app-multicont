@@ -1,43 +1,35 @@
 """
 AssignmentHandler - Use Case Layer
+Gestiona asignaciones de items de inventario a empleados.
 """
-from typing import Optional, List, Dict, Any
-from sqlalchemy.exc import IntegrityError
-from app import db
+from typing import Optional, Dict, Any, List
+from sqlalchemy.orm import joinedload
 from app.entities.assignment import Assignment
+from app.use_cases.base_handler import BaseHandler
 
-class AssignmentHandler:
-    """Handler para gestionar operaciones con assignments."""
+
+class AssignmentHandler(BaseHandler):
+    """Handler para gestionar operaciones con asignaciones."""
     
-    def create(self, **kwargs) -> Assignment:
-        """Crea un nuevo asignación."""
-        try:
-            obj = Assignment(**kwargs)
-            db.session.add(obj)
-            db.session.commit()
-            return obj
-        except IntegrityError as e:
-            db.session.rollback()
-            raise ValueError(f"Error de integridad: {str(e)}")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al crear asignación: {str(e)}")
+    def __init__(self):
+        super().__init__(Assignment)
     
-    def get(self, id: int) -> Optional[Assignment]:
-        """Obtiene un asignación por ID."""
-        return Assignment.query.get(id)
-    
-    def list_all(self, page: int = 1, per_page: int = 10, status: Optional[str] = None) -> Dict[str, Any]:
-        """Lista assignments con paginación."""
-        query = Assignment.query
-        if status and hasattr(Assignment, 'status'):
-            query = query.filter_by(status=status)
-        # Order by creation_date if present, otherwise fallback to id
-        if hasattr(Assignment, 'creation_date'):
-            query = query.order_by(Assignment.creation_date.desc())
-        else:
-            query = query.order_by(Assignment.id.desc())
+    def get_by_employee(self, employee_id: int, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Obtiene todas las asignaciones de un empleado específico.
+        
+        Args:
+            employee_id: ID del empleado
+            page: Número de página
+            per_page: Items por página
+        
+        Returns:
+            Dict con asignaciones paginadas
+        """
+        query = Assignment.query.filter_by(employee_id=employee_id)
+        query = query.order_by(Assignment.creation_date.desc() if hasattr(Assignment, 'creation_date') else Assignment.id.desc())
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
         return {
             'items': paginated.items,
             'total': paginated.total,
@@ -46,37 +38,40 @@ class AssignmentHandler:
             'total_pages': paginated.pages
         }
     
-    def update(self, id: int, **kwargs) -> Assignment:
-        """Actualiza un asignación."""
-        obj = Assignment.query.get(id)
-        if not obj:
-            raise ValueError(f"Assignment con ID '{id}' no existe")
-        try:
-            for key, value in kwargs.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            db.session.commit()
-            return obj
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al actualizar: {str(e)}")
+    def get_by_item(self, inventory_item_id: int) -> List[Assignment]:
+        """
+        Obtiene todas las asignaciones de un item de inventario específico.
+        
+        Args:
+            inventory_item_id: ID del item de inventario
+        
+        Returns:
+            Lista de asignaciones del item
+        """
+        return Assignment.query.filter_by(inventory_item_id=inventory_item_id).all()
     
-    def delete(self, id: int) -> bool:
-        """Elimina un asignación."""
-        obj = Assignment.query.get(id)
-        if not obj:
-            return False
-        try:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Error al eliminar: {str(e)}")
-    
-    def count(self, status: Optional[str] = None) -> int:
-        """Cuenta assignments."""
-        query = Assignment.query
-        if status and hasattr(Assignment, 'status'):
-            query = query.filter_by(status=status)
-        return query.count()
+    def list_all_with_relations(self, page: int = 1, per_page: int = 10) -> Dict[str, Any]:
+        """
+        Lista asignaciones con empleado e item (eager loading).
+        
+        Args:
+            page: Número de página
+            per_page: Items por página
+        
+        Returns:
+            Dict con asignaciones paginadas incluyendo relaciones
+        """
+        query = Assignment.query.options(
+            joinedload(Assignment.employee),
+            joinedload(Assignment.inventory_item)
+        )
+        query = query.order_by(Assignment.creation_date.desc() if hasattr(Assignment, 'creation_date') else Assignment.id.desc())
+        paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
+        return {
+            'items': paginated.items,
+            'total': paginated.total,
+            'page': paginated.page,
+            'per_page': paginated.per_page,
+            'total_pages': paginated.pages
+        }

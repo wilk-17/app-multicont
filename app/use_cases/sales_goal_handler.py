@@ -2,18 +2,24 @@
 SalesGoal Handler - Lógica de negocio para metas de ventas
 """
 from datetime import datetime, date
-from app import db
+from typing import Optional, Dict, Any, List
+from sqlalchemy import and_, or_, func
+from sqlalchemy.orm import joinedload
 from app.entities.sales_goal import SalesGoal
-from sqlalchemy import and_, or_
+from app.use_cases.base_handler import BaseHandler
 
 
-class SalesGoalHandler:
+class SalesGoalHandler(BaseHandler):
     """Handler para gestión de metas de ventas"""
     
-    def create(self, period_type, start_date, end_date, target_amount, 
-               employee_id=None, branch_id=None, created_by_user_id=None):
+    def __init__(self):
+        super().__init__(SalesGoal)
+    
+    def create(self, period_type: str, start_date, end_date, target_amount: float, 
+               employee_id: Optional[int] = None, branch_id: Optional[int] = None, 
+               created_by_user_id: Optional[int] = None) -> SalesGoal:
         """
-        Crear una nueva meta de ventas
+        Crear una nueva meta de ventas con validaciones de negocio.
         
         Args:
             period_type: 'monthly', 'quarterly', 'yearly'
@@ -53,7 +59,8 @@ class SalesGoalHandler:
         if target_amount <= 0:
             raise ValueError("target_amount must be positive")
         
-        goal = SalesGoal(
+        # Usar el create genérico de BaseHandler
+        return super().create(
             period_type=period_type,
             start_date=start_date,
             end_date=end_date,
@@ -62,58 +69,16 @@ class SalesGoalHandler:
             branch_id=branch_id,
             created_by_user_id=created_by_user_id
         )
-        
-        db.session.add(goal)
-        db.session.commit()
-        return goal
     
-    def get(self, goal_id):
-        """Obtener meta por ID"""
-        return SalesGoal.query.get(goal_id)
-    
-    def list_all(self, page=1, per_page=10, period_type=None, employee_id=None, branch_id=None):
+    def get_current_goals(self, reference_date: Optional[date] = None) -> List[SalesGoal]:
         """
-        Listar metas con filtros
-        
-        Args:
-            page: Número de página
-            per_page: Items por página
-            period_type: Filtrar por tipo de periodo
-            employee_id: Filtrar por empleado
-            branch_id: Filtrar por sucursal
-            
-        Returns:
-            dict con items paginados
-        """
-        query = SalesGoal.query
-        
-        if period_type:
-            query = query.filter_by(period_type=period_type)
-        if employee_id:
-            query = query.filter_by(employee_id=employee_id)
-        if branch_id:
-            query = query.filter_by(branch_id=branch_id)
-        
-        query = query.order_by(SalesGoal.start_date.desc())
-        paginated = query.paginate(page=page, per_page=per_page, error_out=False)
-        
-        return {
-            'items': paginated.items,
-            'total': paginated.total,
-            'page': paginated.page,
-            'per_page': paginated.per_page,
-            'total_pages': paginated.pages
-        }
-    
-    def get_current_goals(self, reference_date=None):
-        """
-        Obtener metas activas para una fecha específica
+        Obtener metas activas para una fecha específica.
         
         Args:
             reference_date: Fecha de referencia (default: hoy)
             
         Returns:
-            list de SalesGoal activos
+            Lista de SalesGoal activos
         """
         if reference_date is None:
             reference_date = date.today()
@@ -127,41 +92,65 @@ class SalesGoalHandler:
             )
         ).all()
     
-    def get_goals_by_employee(self, employee_id, period_type=None):
+    def get_goals_by_employee(self, employee_id: int, period_type: Optional[str] = None, 
+                              page: int = 1, per_page: int = 10) -> Dict[str, Any]:
         """
-        Obtener todas las metas de un empleado
+        Obtener todas las metas de un empleado.
         
         Args:
             employee_id: ID del empleado
             period_type: Filtrar por tipo de periodo (opcional)
+            page: Número de página
+            per_page: Items por página
             
         Returns:
-            list de SalesGoal
+            Dict con metas paginadas
         """
         query = SalesGoal.query.filter_by(employee_id=employee_id)
         if period_type:
             query = query.filter_by(period_type=period_type)
-        return query.order_by(SalesGoal.start_date.desc()).all()
+        query = query.order_by(SalesGoal.start_date.desc())
+        paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
+        return {
+            'items': paginated.items,
+            'total': paginated.total,
+            'page': paginated.page,
+            'per_page': paginated.per_page,
+            'total_pages': paginated.pages
+        }
     
-    def get_goals_by_branch(self, branch_id, period_type=None):
+    def get_goals_by_branch(self, branch_id: int, period_type: Optional[str] = None,
+                            page: int = 1, per_page: int = 10) -> Dict[str, Any]:
         """
-        Obtener todas las metas de una sucursal
+        Obtener todas las metas de una sucursal.
         
         Args:
             branch_id: ID de la sucursal
             period_type: Filtrar por tipo de periodo (opcional)
+            page: Número de página
+            per_page: Items por página
             
         Returns:
-            list de SalesGoal
+            Dict con metas paginadas
         """
         query = SalesGoal.query.filter_by(branch_id=branch_id)
         if period_type:
             query = query.filter_by(period_type=period_type)
-        return query.order_by(SalesGoal.start_date.desc()).all()
+        query = query.order_by(SalesGoal.start_date.desc())
+        paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
+        return {
+            'items': paginated.items,
+            'total': paginated.total,
+            'page': paginated.page,
+            'per_page': paginated.per_page,
+            'total_pages': paginated.pages
+        }
     
-    def update(self, goal_id, **kwargs):
+    def update(self, goal_id: int, **kwargs) -> SalesGoal:
         """
-        Actualizar meta de ventas
+        Actualizar meta de ventas con validaciones.
         
         Args:
             goal_id: ID de la meta
@@ -173,10 +162,6 @@ class SalesGoalHandler:
         Raises:
             ValueError: Si validaciones fallan
         """
-        goal = SalesGoal.query.get(goal_id)
-        if not goal:
-            raise ValueError(f"SalesGoal with id {goal_id} not found")
-        
         # Validaciones según campos actualizados
         if 'period_type' in kwargs and kwargs['period_type'] not in ['monthly', 'quarterly', 'yearly']:
             raise ValueError("period_type must be 'monthly', 'quarterly', or 'yearly'")
@@ -184,51 +169,35 @@ class SalesGoalHandler:
         if 'target_amount' in kwargs and kwargs['target_amount'] <= 0:
             raise ValueError("target_amount must be positive")
         
-        # Actualizar campos permitidos
-        allowed_fields = ['period_type', 'start_date', 'end_date', 'target_amount', 
-                          'employee_id', 'branch_id']
-        for key, value in kwargs.items():
-            if key in allowed_fields and hasattr(goal, key):
-                setattr(goal, key, value)
-        
-        db.session.commit()
-        return goal
+        # Usar update genérico de BaseHandler
+        return super().update(goal_id, **kwargs)
     
-    def delete(self, goal_id):
+    def list_all_with_relations(self, page: int = 1, per_page: int = 10,
+                                 period_type: Optional[str] = None) -> Dict[str, Any]:
         """
-        Eliminar meta de ventas
+        Lista metas con empleado y sucursal (eager loading).
         
         Args:
-            goal_id: ID de la meta
-            
-        Returns:
-            True si se eliminó correctamente
-            
-        Raises:
-            ValueError: Si la meta no existe
-        """
-        goal = SalesGoal.query.get(goal_id)
-        if not goal:
-            raise ValueError(f"SalesGoal with id {goal_id} not found")
+            page: Número de página
+            per_page: Items por página
+            period_type: Filtrar por tipo de periodo
         
-        db.session.delete(goal)
-        db.session.commit()
-        return True
-    
-    def count(self, employee_id=None, branch_id=None):
-        """
-        Contar metas con filtros
-        
-        Args:
-            employee_id: Filtrar por empleado (opcional)
-            branch_id: Filtrar por sucursal (opcional)
-            
         Returns:
-            int: Total de metas
+            Dict con metas paginadas incluyendo relaciones
         """
-        query = SalesGoal.query
-        if employee_id:
-            query = query.filter_by(employee_id=employee_id)
-        if branch_id:
-            query = query.filter_by(branch_id=branch_id)
-        return query.count()
+        query = SalesGoal.query.options(
+            joinedload(SalesGoal.employee),
+            joinedload(SalesGoal.branch)
+        )
+        if period_type:
+            query = query.filter_by(period_type=period_type)
+        query = query.order_by(SalesGoal.start_date.desc())
+        paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+        
+        return {
+            'items': paginated.items,
+            'total': paginated.total,
+            'page': paginated.page,
+            'per_page': paginated.per_page,
+            'total_pages': paginated.pages
+        }
