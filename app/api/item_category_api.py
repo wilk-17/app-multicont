@@ -1,176 +1,97 @@
 """
-ItemCategory API - REST Endpoints
+Item Category API - REST Endpoints
 """
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from app.use_cases.item_category_handler import ItemCategoryHandler
+from flask_jwt_extended import jwt_required
+from app.utils.decorators import require_role
+from app.api.helpers import (
+    parse_pagination_params,
+    success_response,
+    error_response,
+    paginated_response
+)
+from app import cache
 
-item_category_api = Blueprint('item_category_api', __name__, url_prefix='/api/item_categories')
+item_category_api = Blueprint('item_category_api', __name__, url_prefix='/api/item-categories')
 handler = ItemCategoryHandler()
 
 @item_category_api.route('/', methods=['GET'])
+@jwt_required()
+@cache.cached(timeout=300, query_string=True)
 def get_all():
-    """
-    Lista todas las categorías de items
-    ---
-    tags:
-      - Categorías
-    parameters:
-      - name: page
-        in: query
-        type: integer
-        default: 1
-      - name: per_page
-        in: query
-        type: integer
-        default: 10
-    responses:
-      200:
-        description: Lista de categorías
-    """
+    """Lista todos los categorías con paginación"""
     try:
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 10, type=int)
+        page, per_page = parse_pagination_params(request)
         result = handler.list_all(page=page, per_page=per_page)
-        return jsonify({
-            'success': True,
-            'data': {
-                'items': [item.to_dict() for item in result['items']],
-                'total': result['total'],
-                'page': result['page'],
-                'per_page': result['per_page'],
-                'total_pages': result['total_pages']
-            }
-        }), 200
+        return paginated_response(
+            items=[item.to_dict() for item in result['items']],
+            total=result['total'],
+            page=result['page'],
+            per_page=result['per_page'],
+            total_pages=result['total_pages']
+        )
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)
 
 @item_category_api.route('/<int:id>', methods=['GET'])
+@jwt_required()
+@cache.cached(timeout=300)
 def get_by_id(id):
-    """
-    Obtiene una categoría por ID
-    ---
-    tags:
-      - Categorías
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-    responses:
-      200:
-        description: Categoría encontrada
-      404:
-        description: Categoría no encontrada
-    """
+    """Obtiene un categoría por ID"""
     try:
         obj = handler.get(id)
         if obj:
-            return jsonify({'success': True, 'data': obj.to_dict()}), 200
-        return jsonify({'success': False, 'error': 'Categoría no encontrada'}), 404
+            return success_response(obj.to_dict())
+        return error_response('Categoría no encontrado', 404)
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)
 
 @item_category_api.route('/', methods=['POST'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def create():
-    """
-    Crea una nueva categoría
-    ---
-    tags:
-      - Categorías
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              example: "Electrónica"
-    responses:
-      201:
-        description: Categoría creada exitosamente
-      400:
-        description: Datos inválidos
-    """
+    """Crea un nuevo categoría"""
     try:
         data = request.get_json()
-        if not data or 'name' not in data:
-            return jsonify({
-                'success': False,
-                'error': 'Campo requerido: name'
-            }), 400
+        # Invalidar cache
+        cache.delete_memoized(get_all)
         obj = handler.create(**data)
-        return jsonify({'success': True, 'message': 'Categoría creada exitosamente', 'data': obj.to_dict()}), 201
+        return success_response(obj.to_dict(), 'Categoría creado exitosamente', 201)
     except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+        return error_response(str(e), 400)
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)
 
 @item_category_api.route('/<int:id>', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
 def update(id):
-    """
-    Actualiza una categoría
-    ---
-    tags:
-      - Categorías
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            name:
-              type: string
-    responses:
-      200:
-        description: Categoría actualizada exitosamente
-      404:
-        description: Categoría no encontrada
-    """
+    """Actualiza un categoría"""
     try:
         data = request.get_json()
-        if not data:
-            return jsonify({
-                'success': False,
-                'error': 'No se proporcionaron datos para actualizar'
-            }), 400
+        # Invalidar cache
+        cache.delete_memoized(get_all)
+        cache.delete_memoized(get_by_id, id)
         obj = handler.update(id, **data)
-        return jsonify({'success': True, 'message': 'Categoría actualizada exitosamente', 'data': obj.to_dict()}), 200
+        return success_response(obj.to_dict(), 'Categoría actualizado exitosamente')
     except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 404
+        return error_response(str(e), 404)
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)
 
 @item_category_api.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+@require_role('ADMIN')
 def delete(id):
-    """
-    Elimina una categoría
-    ---
-    tags:
-      - Categorías
-    parameters:
-      - name: id
-        in: path
-        type: integer
-        required: true
-    responses:
-      200:
-        description: Categoría eliminada exitosamente
-      404:
-        description: Categoría no encontrada
-    """
+    """Elimina un categoría"""
     try:
+        # Invalidar cache
+        cache.delete_memoized(get_all)
+        cache.delete_memoized(get_by_id, id)
         deleted = handler.delete(id)
         if deleted:
-            return jsonify({'success': True, 'message': 'Categoría eliminada exitosamente'}), 200
-        return jsonify({'success': False, 'error': 'Categoría no encontrada'}), 404
+            return success_response(message='Categoría eliminado exitosamente')
+        return error_response('Categoría no encontrado', 404)
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response(str(e), 500)

@@ -2,7 +2,7 @@
 Authentication API - Endpoints de autenticación
 Login, Logout, Refresh Token, User Info
 """
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from flask_jwt_extended import (
     create_access_token, 
     create_refresh_token,
@@ -14,6 +14,12 @@ from app.use_cases.user_handler import UserHandler
 from app.utils.security import verify_password
 from app.entities.role import Role
 from app.entities.permission import Permission
+from app.api.helpers import (
+    success_response,
+    error_response,
+    validate_required_fields
+)
+from app import cache
 
 auth_api = Blueprint('auth_api', __name__, url_prefix='/api/auth')
 user_handler = UserHandler()
@@ -71,11 +77,9 @@ def login():
     data = request.get_json()
     
     # Validar campos requeridos
-    if not data or 'username' not in data or 'password' not in data:
-        return jsonify({
-            'success': False,
-            'error': 'Username y password son requeridos'
-        }), 400
+    is_valid, missing = validate_required_fields(data, ['username', 'password'])
+    if not is_valid:
+        return error_response(f'Campos requeridos: {", ".join(missing)}', 400)
     
     username = data['username']
     password = data['password']
@@ -85,17 +89,11 @@ def login():
         user = user_handler.get_user_by_username(username)
         
         if not user:
-            return jsonify({
-                'success': False,
-                'error': 'Usuario o contraseña incorrectos'
-            }), 401
+            return error_response('Usuario o contraseña incorrectos', 401)
         
         # Verificar contraseña
         if not verify_password(password, user.password):
-            return jsonify({
-                'success': False,
-                'error': 'Usuario o contraseña incorrectos'
-            }), 401
+            return error_response('Usuario o contraseña incorrectos', 401)
         
         # Obtener rol del usuario
         role = Role.query.get(user.role_id)
@@ -129,9 +127,10 @@ def login():
             additional_claims=additional_claims
         )
         
-        return jsonify({
-            'success': True,
-            'message': f'Bienvenido, {username}!',
+        # Invalidar caché de usuarios al hacer login
+        cache.delete_memoized(user_handler.get_user)
+        
+        response_data = {
             'access_token': access_token,
             'refresh_token': refresh_token,
             'user': {
@@ -140,13 +139,12 @@ def login():
                 'role': role_name,
                 'role_id': str(user.role_id)
             }
-        }), 200
+        }
+        
+        return success_response(response_data, f'Bienvenido, {username}!', 200)
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': f'Error en el login: {str(e)}'
-        }), 500
+        return error_response(f'Error en el login: {str(e)}', 500)
 
 
 @auth_api.route('/refresh', methods=['POST'])
@@ -189,16 +187,11 @@ def refresh():
             additional_claims=additional_claims
         )
         
-        return jsonify({
-            'success': True,
-            'access_token': new_access_token
-        }), 200
+        response_data = {'access_token': new_access_token}
+        return success_response(response_data, 'Token renovado exitosamente', 200)
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': f'Error al renovar token: {str(e)}'
-        }), 500
+        return error_response(f'Error al renovar token: {str(e)}', 500)
 
 
 @auth_api.route('/me', methods=['GET'])
@@ -232,25 +225,18 @@ def get_current_user_info():
         user = user_handler.get_user(int(current_user_id))
         
         if not user:
-            return jsonify({
-                'success': False,
-                'error': 'Usuario no encontrado'
-            }), 404
+            return error_response('Usuario no encontrado', 404)
         
-        return jsonify({
-            'success': True,
-            'user': {
-                **user.to_dict(),
-                'role': claims.get('role'),
-                'permissions': claims.get('permissions', [])
-            }
-        }), 200
+        user_data = {
+            **user.to_dict(),
+            'role': claims.get('role'),
+            'permissions': claims.get('permissions', [])
+        }
+        
+        return success_response(user_data, 'Información del usuario obtenida', 200)
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': f'Error al obtener información: {str(e)}'
-        }), 500
+        return error_response(f'Error al obtener información: {str(e)}', 500)
 
 
 @auth_api.route('/logout', methods=['POST'])
@@ -277,10 +263,7 @@ def logout():
     # En una implementación más completa, agregar el token a una blacklist
     # Por ahora, el logout es manejado en el cliente eliminando el token
     
-    return jsonify({
-        'success': True,
-        'message': 'Sesión cerrada exitosamente'
-    }), 200
+    return success_response(None, 'Sesión cerrada exitosamente', 200)
 
 
 @auth_api.route('/validate', methods=['GET'])
@@ -314,17 +297,14 @@ def validate_token():
         current_user_id = get_jwt_identity()
         claims = get_jwt()
         
-        return jsonify({
-            'success': True,
+        validation_data = {
             'valid': True,
             'user_id': current_user_id,
             'role': claims.get('role'),
             'permissions': claims.get('permissions', [])
-        }), 200
+        }
+        
+        return success_response(validation_data, 'Token válido', 200)
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'valid': False,
-            'error': str(e)
-        }), 401
+        return error_response(f'Token inválido: {str(e)}', 401)
