@@ -73,8 +73,8 @@ def require_role(*allowed_roles):
             except Exception as e:
                 return jsonify({
                     'success': False,
-                    'error': 'Error de autorización',
-                    'message': str(e)
+                    'error': 'Error de autorización en require_role',
+                    'details': str(e)
                 }), 401
         return wrapper
     return decorator
@@ -116,8 +116,8 @@ def require_permission(*required_permissions):
             except Exception as e:
                 return jsonify({
                     'success': False,
-                    'error': 'Error de autorización',
-                    'message': str(e)
+                    'error': 'Error de autorización en require_permission',
+                    'details': str(e)
                 }), 401
         return wrapper
     return decorator

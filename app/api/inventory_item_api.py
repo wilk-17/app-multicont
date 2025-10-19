@@ -234,9 +234,8 @@ def create():
         
     except ValidationError as e:
         return error_response(
-            message='Datos de validación incorrectos',
-            status_code=400,
-            errors=e.messages
+            f'Datos de validación incorrectos: {e.messages}',
+            status_code=400
         )
         
     except ValueError as e:
@@ -310,9 +309,8 @@ def update(id):
         
     except ValidationError as e:
         return error_response(
-            message='Datos de validación incorrectos',
-            status_code=400,
-            errors=e.messages
+            f'Datos de validación incorrectos: {e.messages}',
+            status_code=400
         )
         
     except ValueError as e:
