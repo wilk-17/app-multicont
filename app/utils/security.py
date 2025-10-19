@@ -2,11 +2,8 @@
 Security Utilities - Hash de passwords y JWT
 Funciones para seguridad de autenticación
 """
-from passlib.context import CryptContext
+import bcrypt
 from datetime import timedelta
-
-# Configuración para hash de passwords con bcrypt
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
@@ -24,7 +21,13 @@ def hash_password(password: str) -> str:
         >>> print(hashed)
         $2b$12$...
     """
-    return pwd_context.hash(password)
+    # Convertir password a bytes
+    password_bytes = password.encode('utf-8')
+    # Generar salt y hashear (12 rondas por defecto)
+    salt = bcrypt.gensalt(rounds=12)
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    # Retornar como string
+    return hashed.decode('utf-8')
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -45,7 +48,14 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         >>> verify_password("password_incorrecta", hashed)
         False
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        # Convertir a bytes
+        password_bytes = plain_password.encode('utf-8')
+        hashed_bytes = hashed_password.encode('utf-8')
+        # Verificar
+        return bcrypt.checkpw(password_bytes, hashed_bytes)
+    except Exception:
+        return False
 
 
 # Configuración de JWT
