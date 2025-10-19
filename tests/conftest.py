@@ -90,12 +90,8 @@ def test_organization(db_session):
         Organization: Test organization entity
     """
     org = Organization(
-        name='Test Organization',
-        nit='123456789-0',
-        address='Test Address 123',
-        phone='3001234567',
-        email='test@organization.com',
-        status='active'
+        historical_name='Test Organization',
+        current_name='Test Organization Current'
     )
     db_session.add(org)
     db_session.commit()

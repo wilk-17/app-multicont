@@ -26,7 +26,7 @@ class TestQuoteHandler:
         """Create QuoteHandler instance."""
         return QuoteHandler()
     
-    def test_create_quote_success(self, quote_handler, db_session, test_organization):
+    def test_create_quote_success(self, quote_handler, db_session, test_organization, app):
         """Test successful quote creation."""
         quote_data = {
             'organization_id': test_organization.id,
@@ -38,16 +38,17 @@ class TestQuoteHandler:
             'status': 'pending'
         }
         
-        try:
-            quote = quote_handler.create(**quote_data)
-            assert quote is not None
-            assert quote.client_name == 'Test Client'
-            assert quote.status == 'pending'
-        except Exception as e:
-            # May fail due to database constraints
-            pytest.skip(f"Skipped due to: {str(e)}")
+        with app.app_context():
+            try:
+                quote = quote_handler.create(**quote_data)
+                assert quote is not None
+                assert quote.client_name == 'Test Client'
+                assert quote.status == 'pending'
+            except Exception as e:
+                # May fail due to database constraints
+                pytest.skip(f"Skipped due to: {str(e)}")
     
-    def test_get_quote_by_id(self, quote_handler, db_session, test_organization):
+    def test_get_quote_by_id(self, quote_handler, db_session, test_organization, app):
         """Test retrieving quote by ID."""
         # Create quote first
         quote_data = {
@@ -58,16 +59,17 @@ class TestQuoteHandler:
             'status': 'pending'
         }
         
-        try:
-            created_quote = quote_handler.create(**quote_data)
-            
-            # Retrieve by ID
-            retrieved_quote = quote_handler.get(created_quote.id)
-            assert retrieved_quote is not None
-            assert retrieved_quote.id == created_quote.id
-            assert retrieved_quote.client_name == 'Test Client'
-        except Exception as e:
-            pytest.skip(f"Skipped due to: {str(e)}")
+        with app.app_context():
+            try:
+                created_quote = quote_handler.create(**quote_data)
+                
+                # Retrieve by ID
+                retrieved_quote = quote_handler.get(created_quote.id)
+                assert retrieved_quote is not None
+                assert retrieved_quote.id == created_quote.id
+                assert retrieved_quote.client_name == 'Test Client'
+            except Exception as e:
+                pytest.skip(f"Skipped due to: {str(e)}")
     
     def test_get_nonexistent_quote(self, quote_handler, app):
         """Test retrieving non-existent quote returns None."""
