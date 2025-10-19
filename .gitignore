@@ -159,3 +159,12 @@ app-multicont/
 test_data/
 scratch/
 temp/
+
+# API spec autogenerado
+apispec.json
+
+# Reports generados
+reports/
+
+# Scripts de GUI (evaluar si es parte del proyecto)
+simplex_gui.py

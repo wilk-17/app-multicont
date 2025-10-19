@@ -2,8 +2,13 @@
 Security Utilities - Hash de passwords y JWT
 Funciones para seguridad de autenticación
 """
+import os
 import bcrypt
 from datetime import timedelta
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
 
 
 def hash_password(password: str) -> str:
@@ -58,10 +63,16 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return False
 
 
-# Configuración de JWT
-JWT_SECRET_KEY = "tu-clave-secreta-muy-segura-cambiar-en-produccion"  # TODO: Mover a .env
-JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)  # Token expira en 24 horas
-JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)  # Refresh token expira en 30 días
+# Configuración de JWT desde variables de entorno
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+if not JWT_SECRET_KEY:
+    raise ValueError(
+        "JWT_SECRET_KEY no configurada. "
+        "Agregar JWT_SECRET_KEY=<tu-secret-key> en archivo .env"
+    )
+
+JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=int(os.getenv('JWT_ACCESS_TOKEN_HOURS', '24')))
+JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=int(os.getenv('JWT_REFRESH_TOKEN_DAYS', '30')))
 
 
 def get_jwt_config():
