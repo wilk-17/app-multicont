@@ -1,0 +1,200 @@
+@startuml ERD_Multicont
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b>x</b>
+hide methods
+hide stereotypes
+skinparam classAttributeIconSize 0
+
+class Organization {
+  + id : BIGINT <<PK>>
+  historical_name : VARCHAR(200)
+  current_name : VARCHAR(200)
+}
+
+class SalesOrderItem {
+  + id : BIGINT <<PK>>
+  # sales_order_id : BIGINT <<FK>>
+  # item_id : BIGINT <<FK>>
+  quantity : INTEGER
+}
+
+class UserRole {
+  + id : BIGINT <<PK>>
+  # user_id : BIGINT <<FK>>
+  # role_id : BIGINT <<FK>>
+}
+
+class City {
+  + id : BIGINT <<PK>>
+  description : VARCHAR(120)
+  code : VARCHAR(20)
+  # state_id : BIGINT <<FK>>
+}
+
+class Quote {
+  + id : BIGINT <<PK>>
+  customer_name : VARCHAR(200)
+  date : DATE
+  total : NUMERIC(12, 2)
+  # employee_id : BIGINT <<FK>>
+}
+
+class State {
+  + id : BIGINT <<PK>>
+  description : VARCHAR(120)
+  code : VARCHAR(20)
+}
+
+class Assignment {
+  + id : BIGINT <<PK>>
+  # employee_id : BIGINT <<FK>>
+  # item_id : BIGINT <<FK>>
+  assigned_date : DATE
+}
+
+class User {
+  + id : BIGINT <<PK>>
+  username : VARCHAR(120)
+  password : VARCHAR(200)
+  # role_id : BIGINT <<FK>>
+}
+
+class Role {
+  + id : BIGINT <<PK>>
+  name : VARCHAR(120)
+}
+
+class InventoryItem {
+  + id : BIGINT <<PK>>
+  name : VARCHAR(200)
+  description : VARCHAR(200)
+  quantity : INTEGER
+  price : NUMERIC(10, 2)
+  # category_id : BIGINT <<FK>>
+  # brand_id : BIGINT <<FK>>
+}
+
+class InvoiceItem {
+  + id : BIGINT <<PK>>
+  # invoice_id : BIGINT <<FK>>
+  # item_id : BIGINT <<FK>>
+  quantity : INTEGER
+  price : NUMERIC(10, 2)
+}
+
+class Employee {
+  + id : BIGINT <<PK>>
+  # person_id : BIGINT <<FK>>
+  # branch_id : BIGINT <<FK>>
+}
+
+class SalesOrder {
+  + id : BIGINT <<PK>>
+  # quote_id : BIGINT <<FK>>
+  date : DATE
+  total : NUMERIC(12, 2)
+  # employee_id : BIGINT <<FK>>
+}
+
+class Permission {
+  + id : BIGINT <<PK>>
+  name : VARCHAR(120)
+}
+
+class QuoteItem {
+  + id : BIGINT <<PK>>
+  # quote_id : BIGINT <<FK>>
+  # item_id : BIGINT <<FK>>
+  quantity : INTEGER
+}
+
+class Branch {
+  + id : BIGINT <<PK>>
+  # organization_id : BIGINT <<FK>>
+  # city_id : BIGINT <<FK>>
+}
+
+class Brand {
+  + id : BIGINT <<PK>>
+  name : VARCHAR(100)
+  description : VARCHAR(500)
+  creation_date : DATETIME
+}
+
+class Invoice {
+  + id : BIGINT <<PK>>
+  # sales_order_id : BIGINT <<FK>>
+  # quotation_line_id : BIGINT <<FK>>
+  date : DATE
+  total : NUMERIC(12, 2)
+  # employee_id : BIGINT <<FK>>
+}
+
+class ItemCategory {
+  + id : BIGINT <<PK>>
+  name : VARCHAR(120)
+}
+
+class Person {
+  + id : BIGINT <<PK>>
+  dni : VARCHAR(50)
+  first_name : VARCHAR(120)
+  last_name : VARCHAR(120)
+  address : VARCHAR(200)
+  phone : VARCHAR(50)
+  # city_id : BIGINT <<FK>>
+}
+
+class QuotationLine {
+  + id : BIGINT <<PK>>
+  # quote_id : BIGINT <<FK>>
+  description : VARCHAR(200)
+  quantity : INTEGER
+  price : NUMERIC(10, 2)
+  # item_id : BIGINT <<FK>>
+}
+
+class SalesGoal {
+  + id : BIGINT <<PK>>
+  # employee_id : BIGINT <<FK>>
+  # branch_id : BIGINT <<FK>>
+  period_type : VARCHAR(20)
+  start_date : DATE
+  end_date : DATE
+  target_amount : NUMERIC(12, 2)
+  creation_date : DATETIME
+  # created_by_user_id : BIGINT <<FK>>
+}
+
+SalesOrderItem --> SalesOrder
+SalesOrderItem --> InventoryItem
+UserRole --> User
+UserRole --> Role
+City --> State
+Quote --> Employee
+Assignment --> Employee
+Assignment --> InventoryItem
+User --> Role
+InventoryItem --> ItemCategory
+InventoryItem --> Brand
+InvoiceItem --> Invoice
+InvoiceItem --> InventoryItem
+Employee --> Person
+Employee --> Branch
+SalesOrder --> Quote
+SalesOrder --> Employee
+QuoteItem --> Quote
+QuoteItem --> InventoryItem
+Branch --> Organization
+Branch --> City
+Invoice --> SalesOrder
+Invoice --> QuotationLine
+Invoice --> Employee
+Person --> City
+QuotationLine --> Quote
+QuotationLine --> InventoryItem
+SalesGoal --> Employee
+SalesGoal --> Branch
+SalesGoal --> User
+
+@enduml

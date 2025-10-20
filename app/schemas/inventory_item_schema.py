@@ -36,11 +36,6 @@ class InventoryItemCreateSchema(Schema):
         allow_none=True,
         validate=validate.Range(min=1)
     )
-    branch_id = fields.Int(
-        required=False,
-        allow_none=True,
-        validate=validate.Range(min=1)
-    )
     
     @validates('name')
     def validate_name(self, value):
@@ -63,7 +58,6 @@ class InventoryItemUpdateSchema(Schema):
     quantity = fields.Int(validate=validate.Range(min=0))
     category_id = fields.Int(validate=validate.Range(min=1))
     brand_id = fields.Int(allow_none=True, validate=validate.Range(min=1))
-    branch_id = fields.Int(allow_none=True, validate=validate.Range(min=1))
 
 
 class StockOperationSchema(Schema):
@@ -87,7 +81,6 @@ class InventoryItemResponseSchema(Schema):
     quantity = fields.Int()
     category_id = fields.Str()
     brand_id = fields.Str(allow_none=True)
-    branch_id = fields.Str(allow_none=True)
     status = fields.Str()
     is_low_stock = fields.Boolean()
 
