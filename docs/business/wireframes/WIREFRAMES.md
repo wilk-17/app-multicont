@@ -12,6 +12,16 @@ Este documento describe los wireframes/mockups de las pantallas principales del 
 
 **Objetivo**: Proveer una guía visual de la interfaz de usuario (UI/UX) del sistema antes de implementar el frontend.
 
+## ⚠️ Nota Importante: Modelos Simplificados
+
+Los wireframes fueron diseñados pensando en un modelo de negocio completo (basado en SQL reference con todos los campos posibles). Sin embargo, el **modelo actual de la aplicación es SIMPLIFICADO** por decisión de arquitectura (Clean Architecture con entidades puras).
+
+**Ejemplo de diferencia**:
+- **Wireframe WF-004** muestra: Nombre, NIT, Teléfono, Email, Dirección para Organization
+- **Modelo actual `Organization`** tiene solo: `id`, `name`, `status`, `creation_date`, `update_date`
+
+Esto es **INTENCIONAL** para mantener el sistema simple y funcional. Los wireframes sirven como **guía de diseño futuro** si se decide extender el modelo con más campos. Para la implementación actual, solo se utilizan los campos que existen en los modelos de `app/entities/`.
+
 ---
 
 ## Convenciones de Diseño
@@ -69,7 +79,7 @@ Pantalla de autenticación con JWT. Permite al usuario ingresar sus credenciales
 4. Si válido: redirecciona a Dashboard
 5. Si inválido: muestra error
 
-**Estado actual**: ⚠️ PENDIENTE - Crear wireframe
+**Estado actual**: ✅ COMPLETADO - Archivo `WF-001_login.png` y `WF-001_login.html`
 
 ---
 
@@ -97,7 +107,7 @@ Panel principal con KPIs, gráficos y resumen de actividad reciente.
 - Filtrar gráficos por fecha
 - Ir a cotización desde tabla
 
-**Estado actual**: ⚠️ PENDIENTE - Crear wireframe
+**Estado actual**: ✅ COMPLETADO - Archivo `WF-002_dashboard.png`
 
 ---
 
@@ -130,7 +140,7 @@ Pantalla con tabla de organizaciones, búsqueda, filtros y paginación.
 - Click en "editar" → Modal de edición
 - Click en "eliminar" → Modal de confirmación
 
-**Estado actual**: ⚠️ PENDIENTE - Crear wireframe
+**Estado actual**: ✅ COMPLETADO - Archivo `WF-003_organizations_list.png`
 
 ---
 
@@ -160,7 +170,8 @@ Modal o página de formulario para crear/editar organizaciones.
 - Email: formato email válido
 - Indicadores visuales (rojo) para errores
 
-**Estado actual**: ⚠️ PENDIENTE - Crear wireframe
+**Estado actual**: ✅ COMPLETADO - Archivo `WF-004_organization_form.png`  
+**Nota**: Campos mostrados en wireframe son más completos que modelo actual (solo usa `name` + `status`)
 
 ---
 
@@ -185,7 +196,8 @@ Similar a lista de organizaciones, pero para empleados.
   - Acciones
 - Paginación
 
-**Estado actual**: ⚠️ PENDIENTE - Crear wireframe
+**Estado actual**: ✅ COMPLETADO - Archivo `WF-005_employees_list.png`  
+**Nota**: Modelo actual solo tiene `Employee` + `Person` + `Branch` (sin email, cargo, estado)
 
 ---
 
@@ -211,7 +223,8 @@ Tabla de items de inventario con alertas de stock bajo.
 - Indicador visual: filas con fondo rojo claro para stock bajo
 - Paginación
 
-**Estado actual**: ⚠️ PENDIENTE - Crear wireframe
+**Estado actual**: ✅ COMPLETADO - Archivo `WF-006_inventory_list.png`  
+**Nota**: Modelo actual no tiene campo `code` (SKU), se usa `id` como identificador
 
 ---
 
@@ -247,7 +260,8 @@ Formulario complejo para crear cotización con múltiples líneas de productos.
   - "Crear Cotización" (primario)
   - "Cancelar" (link)
 
-**Estado actual**: ⚠️ PENDIENTE - Crear wireframe
+**Estado actual**: ✅ COMPLETADO - Archivo `WF-007_create_quote.png`  
+**Nota**: Modelo simplificado - `QuoteItem` solo tiene `item_id` + `quantity` (precio viene de `InventoryItem`)
 
 ---
 
@@ -273,7 +287,8 @@ Pantalla de análisis con gráficos y métricas de ventas.
 - Gráfico de pie: Ventas por Marca
 - Tabla: Top 10 Performers
 
-**Estado actual**: ⚠️ PENDIENTE - Crear wireframe
+**Estado actual**: ✅ COMPLETADO - Archivo `WF-008_analytics_dashboard.png`  
+**Nota**: Métricas calculables con datos actuales, endpoints en `sales_analytics_api.py`
 
 ---
 
@@ -316,17 +331,18 @@ Actualizar este archivo con:
 
 ## Checklist de Entrega
 
-- [ ] WF-001: Login
-- [ ] WF-002: Dashboard Principal
-- [ ] WF-003: Lista de Organizaciones
-- [ ] WF-004: Formulario de Organización
-- [ ] WF-005: Lista de Empleados
-- [ ] WF-006: Lista de Inventario
-- [ ] WF-007: Crear Cotización
-- [ ] WF-008: Analytics Dashboard
-- [ ] Todos los PNG exportados en `docs/wireframes/`
-- [ ] Este archivo completado con screenshots y explicaciones
-- [ ] Commit y push al repositorio
+- [x] WF-001: Login ✅
+- [x] WF-002: Dashboard Principal ✅
+- [x] WF-003: Lista de Organizaciones ✅
+- [x] WF-004: Formulario de Organización ✅ 
+- [x] WF-005: Lista de Empleados ✅
+- [x] WF-006: Lista de Inventario ✅
+- [x] WF-007: Crear Cotización ✅
+- [x] WF-008: Analytics Dashboard ✅
+- [x] Todos los PNG exportados en `docs/business/wireframes/` ✅
+- [x] Este archivo completado con descripción de cada wireframe ✅
+- [x] Nota agregada sobre modelos simplificados ✅
+- [ ] Commit y push al repositorio (pendiente del usuario)
 
 ---
 
@@ -346,5 +362,6 @@ Actualizar este archivo con:
 
 ---
 
-**Última actualización**: 19 de Octubre, 2025  
-**Próximo paso**: Crear wireframes en Figma y exportar PNG
+**Última actualización**: 20 de Octubre, 2025  
+**Estado**: ✅ TODOS LOS WIREFRAMES COMPLETADOS (8 PNG + 1 HTML)  
+**Validación**: Ver `docs/summaries/VALIDACION_WIREFRAMES_20251020.md` para análisis completo

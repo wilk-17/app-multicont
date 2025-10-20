@@ -60,7 +60,7 @@ Subir código a: https://www.plantuml.com/plantuml/uml/
 
 ### Descripción
 
-Diagrama de base de datos mostrando las 21 entidades del sistema con sus relaciones (Foreign Keys).
+Diagrama de base de datos mostrando las **22 entidades** del sistema con sus relaciones (Foreign Keys).
 
 ### Entidades Principales
 
@@ -75,16 +75,17 @@ Diagrama de base de datos mostrando las 21 entidades del sistema con sus relacio
 9. **ItemCategory** - Categorías de productos
 10. **Brand** - Marcas de productos
 11. **Quote** - Cotizaciones
-12. **QuotationLine** - Líneas de cotización
-13. **SalesOrder** - Órdenes de venta
-14. **SalesOrderItem** - Items de órdenes
-15. **Invoice** - Facturas
-16. **InvoiceItem** - Items de facturas
-17. **SalesGoal** - Metas de ventas
-18. **City** - Ciudades
-19. **State** - Estados/Departamentos
-20. **UserRole** - Relación N:M User-Role
-21. **Assignment** - Asignaciones (empleados-items)
+12. **QuoteItem** - Items de cotización (relación Quote-InventoryItem)
+13. **QuotationLine** - Líneas de cotización
+14. **SalesOrder** - Órdenes de venta
+15. **SalesOrderItem** - Items de órdenes
+16. **Invoice** - Facturas
+17. **InvoiceItem** - Items de facturas
+18. **SalesGoal** - Metas de ventas
+19. **City** - Ciudades
+20. **State** - Estados/Departamentos
+21. **UserRole** - Relación N:M User-Role
+22. **Assignment** - Asignaciones (empleados-items)
 
 ### Relaciones Clave
 

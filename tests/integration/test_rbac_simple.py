@@ -11,9 +11,9 @@ HEADERS = {"Content-Type": "application/json"}
 
 # Usuarios
 USERS = {
-    'SALES': {'username': 'diego', 'password': 'diego123'},
-    'MANAGER': {'username': 'bruno', 'password': 'bruno123'},
-    'ADMIN': {'username': 'ana', 'password': 'ana123'}
+    'SALES': {'username': 'sales', 'password': 'sales123'},
+    'MANAGER': {'username': 'manager', 'password': 'manager123'},
+    'ADMIN': {'username': 'admin', 'password': 'admin123'}
 }
 
 def login(role):
@@ -23,7 +23,12 @@ def login(role):
         headers=HEADERS,
         json=USERS[role]
     )
-    data = response.json()['data']
+    if response.status_code != 200:
+        raise Exception(f"Login failed with status {response.status_code}: {response.text}")
+    
+    json_response = response.json()
+    # success_response() envuelve los datos en {'success': True, 'data': {...}, 'message': '...'}
+    data = json_response.get('data', json_response)
     return data['access_token']
 
 def test_endpoint(method, url, token, expected_status):

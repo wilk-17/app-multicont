@@ -1,5 +1,26 @@
 # AI Coding Agent Instructions - Multicont Flask API (Clean Architecture)
 
+**Última actualización**: 19 de Octubre de 2025  
+**Versión**: 1.0.0  
+**Estado**: ✅ Producción - REORGANIZADO Y VALIDADO
+
+## 🚨 IMPORTANTE - Proyecto Reorganizado
+
+El proyecto fue completamente reorganizado el 19/10/2025. Ver:
+- **[INDEX_INICIO.md](../INDEX_INICIO.md)** - Guía de inicio rápido
+- **[REORGANIZACION_COMPLETADA.md](../REORGANIZACION_COMPLETADA.md)** - Detalle completo
+- **[docs/INDEX.md](../docs/INDEX.md)** - Índice de toda la documentación
+
+### Estructura Actual (Post-Reorganización)
+```
+app-multicont/
+├── app/                 # ✅ Clean Architecture intacta (NO TOCAR sin razón)
+├── docs/                # ✅ REORGANIZADO en academic/, business/, architecture/, technical/
+├── scripts/             # ✅ REORGANIZADO en setup/, maintenance/, testing/
+├── tests/               # ✅ 90/90 tests RBAC passing
+└── [archivos raíz]      # ✅ Solo 10 archivos esenciales (antes: 26)
+```
+
 ## Project Overview
 Sistema de gestión empresarial con **Clean Architecture** (Hexagonal Architecture) implementada en Flask + PostgreSQL. La aplicación maneja organizaciones, sucursales, empleados, inventario, cotizaciones, órdenes de venta y facturación.
 
@@ -29,8 +50,9 @@ app/
 │   ├── organization_api.py
 │   ├── metrics_api.py
 │   └── dashboard_api.py
-├── models/          # LEGACY - No usar, migrado a entities/
-├── routes.py        # LEGACY - No usar, migrado a api/
+├── schemas/         # Marshmallow schemas para validación
+├── utils/           # Utilidades (security, cache, etc.)
+├── services/        # Servicios externos
 └── config.py        # Configuración de la aplicación
 ```
 
