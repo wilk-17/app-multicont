@@ -1,0 +1,110 @@
+@startuml Sequence_Invoice_Creation
+!theme plain
+autonumber
+
+actor "Manager" as Manager
+participant "Client" as Client
+participant "Invoice API\n(/api/invoices)" as InvoiceAPI
+participant "InvoiceHandler" as Handler
+participant "SalesOrder Model" as SOModel
+participant "Invoice Model" as InvoiceModel
+participant "InvoiceItem Model" as ItemModel
+participant "InventoryItem Model" as InventoryModel
+database "PostgreSQL" as DB
+
+Manager -> Client: Solicita crear factura\ndesde orden de venta
+activate Client
+
+Client -> InvoiceAPI: POST /api/invoices/\n{\n  "sales_order_id": 123,\n  "payment_method": "credit"\n}
+activate InvoiceAPI
+
+InvoiceAPI -> InvoiceAPI: @jwt_required()\n@role_required(['Admin', 'Manager'])
+
+InvoiceAPI -> Handler: create_from_sales_order(\nsales_order_id=123)
+activate Handler
+
+' Verificar orden existe
+Handler -> SOModel: query.get(123)
+activate SOModel
+SOModel -> DB: SELECT * FROM sales_order\nWHERE id = 123
+activate DB
+DB --> SOModel: sales_order_record
+deactivate DB
+SOModel --> Handler: SalesOrder object
+deactivate SOModel
+
+Handler -> Handler: validate:\nstatus == 'confirmed'
+
+' Crear Invoice
+Handler -> InvoiceModel: Invoice(\n  sales_order_id=123,\n  total=sales_order.total,\n  payment_status='pending'\n)
+activate InvoiceModel
+InvoiceModel --> Handler: invoice
+deactivate InvoiceModel
+
+Handler -> DB: db.session.add(invoice)
+activate DB
+DB --> Handler: OK
+deactivate DB
+
+' Crear InvoiceItems desde SalesOrderItems
+loop Para cada item en sales_order.items
+    Handler -> ItemModel: InvoiceItem(\n  invoice_id=invoice.id,\n  inventory_item_id=item.id,\n  quantity=item.quantity,\n  price=item.price\n)
+    activate ItemModel
+    ItemModel --> Handler: invoice_item
+    deactivate ItemModel
+    
+    Handler -> DB: db.session.add(invoice_item)
+    activate DB
+    DB --> Handler: OK
+    deactivate DB
+    
+    ' Reducir stock en inventario
+    Handler -> InventoryModel: query.get(item.inventory_item_id)
+    activate InventoryModel
+    InventoryModel -> DB: SELECT * FROM inventory_item
+    activate DB
+    DB --> InventoryModel: item_record
+    deactivate DB
+    InventoryModel --> Handler: InventoryItem
+    deactivate InventoryModel
+    
+    Handler -> Handler: inventory_item.remove_stock(\nitem.quantity)
+    
+    Handler -> DB: UPDATE inventory_item\nSET quantity = quantity - X
+    activate DB
+    DB --> Handler: OK
+    deactivate DB
+end
+
+' Commit transacción
+Handler -> DB: db.session.commit()
+activate DB
+DB --> Handler: Transaction committed
+deactivate DB
+
+Handler --> InvoiceAPI: invoice.to_dict()
+deactivate Handler
+
+InvoiceAPI --> Client: 201 Created\n{\n  "success": true,\n  "data": {\n    "id": 456,\n    "sales_order_id": 123,\n    "total": 15000.00,\n    "payment_status": "pending",\n    "items": [...]\n  }\n}
+deactivate InvoiceAPI
+
+Client --> Manager: Factura creada exitosamente
+deactivate Client
+
+note right of Handler
+  **Lógica de Negocio**
+  1. Validar orden confirmada
+  2. Crear Invoice
+  3. Copiar items de orden
+  4. Reducir stock automáticamente
+  5. Transacción atómica
+end note
+
+note right of DB
+  **Integridad**
+  - Foreign Keys
+  - Transactions
+  - Rollback on error
+end note
+
+@enduml

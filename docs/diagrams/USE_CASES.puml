@@ -1,0 +1,138 @@
+@startuml Use_Cases_Multicont
+!theme plain
+left to right direction
+
+' Actores
+actor "Administrador" as Admin
+actor "Manager" as Manager
+actor "Vendedor (Sales)" as Sales
+actor "Sistema Externo" as External
+
+' Sistema
+rectangle "Sistema Multicont" {
+    ' Autenticación y Seguridad
+    usecase "UC-001: Login con JWT" as UC001
+    usecase "UC-002: Refresh Token" as UC002
+    usecase "UC-003: Gestionar Roles" as UC003
+    usecase "UC-004: Gestionar Permisos" as UC004
+    
+    ' Gestión Organizacional
+    usecase "UC-005: CRUD Organizaciones" as UC005
+    usecase "UC-006: CRUD Sucursales" as UC006
+    usecase "UC-007: CRUD Empleados" as UC007
+    usecase "UC-008: Asignar Empleado a Sucursal" as UC008
+    
+    ' Gestión de Usuarios
+    usecase "UC-009: CRUD Usuarios" as UC009
+    usecase "UC-010: Asignar Roles a Usuario" as UC010
+    usecase "UC-011: Cambiar Password" as UC011
+    
+    ' Inventario
+    usecase "UC-012: CRUD Inventario" as UC012
+    usecase "UC-013: Gestionar Categorías" as UC013
+    usecase "UC-014: Gestionar Marcas" as UC014
+    usecase "UC-015: Ajustar Stock" as UC015
+    usecase "UC-016: Alertas Stock Bajo" as UC016
+    
+    ' Ciclo de Ventas
+    usecase "UC-017: Crear Cotización" as UC017
+    usecase "UC-018: Aprobar/Rechazar Cotización" as UC018
+    usecase "UC-019: Convertir Cotización a Orden" as UC019
+    usecase "UC-020: Crear Orden de Venta" as UC020
+    usecase "UC-021: Confirmar Orden" as UC021
+    usecase "UC-022: Generar Factura" as UC022
+    usecase "UC-023: Marcar Factura como Pagada" as UC023
+    
+    ' Analytics y Reportes
+    usecase "UC-024: Ver Dashboard KPIs" as UC024
+    usecase "UC-025: Analytics de Ventas" as UC025
+    usecase "UC-026: Reportes por Empleado" as UC026
+    usecase "UC-027: Reportes por Sucursal" as UC027
+    usecase "UC-028: Reportes por Marca" as UC028
+    usecase "UC-029: Metas vs Actual" as UC029
+    usecase "UC-030: Top Performers" as UC030
+}
+
+' Relaciones Admin
+Admin --> UC001
+Admin --> UC003
+Admin --> UC004
+Admin --> UC005
+Admin --> UC006
+Admin --> UC007
+Admin --> UC008
+Admin --> UC009
+Admin --> UC010
+Admin --> UC011
+Admin --> UC012
+Admin --> UC013
+Admin --> UC014
+Admin --> UC015
+Admin --> UC024
+Admin --> UC025
+
+' Relaciones Manager
+Manager --> UC001
+Manager --> UC002
+Manager --> UC006
+Manager --> UC007
+Manager --> UC008
+Manager --> UC012
+Manager --> UC015
+Manager --> UC017
+Manager --> UC018
+Manager --> UC019
+Manager --> UC020
+Manager --> UC021
+Manager --> UC022
+Manager --> UC023
+Manager --> UC024
+Manager --> UC025
+Manager --> UC026
+Manager --> UC027
+Manager --> UC028
+Manager --> UC029
+Manager --> UC030
+
+' Relaciones Sales
+Sales --> UC001
+Sales --> UC002
+Sales --> UC012
+Sales --> UC017
+Sales --> UC020
+Sales --> UC024
+Sales --> UC025
+
+' Sistema Externo (integraciones futuras)
+External --> UC001
+External --> UC012
+External --> UC025
+
+' Dependencias entre casos de uso
+UC017 ..> UC012 : <<include>>
+UC019 ..> UC018 : <<extend>>
+UC022 ..> UC020 : <<include>>
+UC025 ..> UC024 : <<include>>
+
+note right of Admin
+  **Administrador**
+  Acceso completo al sistema
+  Gestiona usuarios, roles,
+  permisos y configuración
+end note
+
+note right of Manager
+  **Manager**
+  Gestiona operaciones
+  del negocio, aprueba
+  cotizaciones y ve reportes
+end note
+
+note right of Sales
+  **Vendedor**
+  Crea cotizaciones,
+  órdenes y consulta
+  inventario
+end note
+
+@enduml

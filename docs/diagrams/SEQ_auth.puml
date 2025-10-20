@@ -1,0 +1,66 @@
+@startuml Sequence_Auth_JWT
+!theme plain
+autonumber
+
+actor "Usuario" as User
+participant "Browser/Client" as Client
+participant "Flask API\n(/api/auth/login)" as API
+participant "AuthService" as AuthService
+participant "User Model" as UserModel
+database "PostgreSQL" as DB
+
+User -> Client: Ingresa credenciales\n(username, password)
+activate Client
+
+Client -> API: POST /api/auth/login\n{username, password}
+activate API
+
+API -> AuthService: validate_credentials(username, password)
+activate AuthService
+
+AuthService -> UserModel: query.filter_by(username=username)
+activate UserModel
+
+UserModel -> DB: SELECT * FROM user\nWHERE username = ?
+activate DB
+DB --> UserModel: user_record
+deactivate DB
+
+UserModel --> AuthService: User object
+deactivate UserModel
+
+AuthService -> AuthService: bcrypt.check_password_hash(\nuser.password_hash,\npassword)
+
+alt Password válido
+    AuthService -> AuthService: generate_access_token(user)
+    AuthService -> AuthService: generate_refresh_token(user)
+    
+    AuthService --> API: {access_token, refresh_token,\nuser_data}
+    deactivate AuthService
+    
+    API --> Client: 200 OK\n{\n  "access_token": "eyJ...",\n  "refresh_token": "eyJ...",\n  "user": {...}\n}
+    deactivate API
+    
+    Client --> User: Login exitoso\n(guarda tokens en localStorage)
+    deactivate Client
+    
+else Password inválido
+    AuthService --> API: ValueError("Invalid credentials")
+    deactivate AuthService
+    
+    API --> Client: 401 Unauthorized\n{"error": "Invalid credentials"}
+    deactivate API
+    
+    Client --> User: Error de autenticación
+    deactivate Client
+end
+
+note right of AuthService
+  **Validación**
+  - bcrypt con 12 rounds
+  - Tokens JWT con expiración
+  - Access: 15 min
+  - Refresh: 30 días
+end note
+
+@enduml

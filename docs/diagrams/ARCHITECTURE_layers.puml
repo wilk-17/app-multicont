@@ -1,0 +1,97 @@
+@startuml Clean_Architecture_Multicont
+!theme plain
+skinparam packageStyle rectangle
+
+package "🌐 API Layer (Presentation)" as API {
+    [Flask Blueprints] as blueprints
+    [user_api.py] as user_api
+    [organization_api.py] as org_api
+    [inventory_api.py] as inv_api
+    [quote_api.py] as quote_api
+    [sales_order_api.py] as so_api
+    [invoice_api.py] as invoice_api
+    [metrics_api.py] as metrics_api
+    [dashboard_api.py] as dash_api
+    [auth_api.py] as auth_api
+}
+
+package "💼 Use Cases Layer (Application)" as UseCases {
+    [BaseHandler] as base_handler
+    [UserHandler] as user_handler
+    [OrganizationHandler] as org_handler
+    [InventoryItemHandler] as inv_handler
+    [QuoteHandler] as quote_handler
+    [SalesOrderHandler] as so_handler
+    [InvoiceHandler] as invoice_handler
+    [AuthService] as auth_service
+    [AuthorizationService] as authz_service
+}
+
+package "🎯 Entities Layer (Domain)" as Entities {
+    database "PostgreSQL" {
+        [User]
+        [Role]
+        [Permission]
+        [Organization]
+        [Branch]
+        [Employee]
+        [InventoryItem]
+        [ItemCategory]
+        [Brand]
+        [Quote]
+        [QuotationLine]
+        [SalesOrder]
+        [SalesOrderItem]
+        [Invoice]
+        [InvoiceItem]
+        [SalesGoal]
+    }
+}
+
+' Relaciones entre capas
+API --> UseCases : "usa"
+UseCases --> Entities : "accede"
+
+' Detalles de flujo
+user_api --> user_handler
+org_api --> org_handler
+inv_api --> inv_handler
+quote_api --> quote_handler
+so_api --> so_handler
+invoice_api --> invoice_handler
+auth_api --> auth_service
+
+user_handler -up-|> base_handler : "hereda"
+org_handler -up-|> base_handler : "hereda"
+inv_handler -up-|> base_handler : "hereda"
+
+user_handler --> User : "CRUD"
+org_handler --> Organization : "CRUD"
+inv_handler --> InventoryItem : "CRUD"
+quote_handler --> Quote : "CRUD"
+
+note right of API
+  **Presentation Layer**
+  - REST endpoints
+  - Request validation
+  - Response formatting
+  - Swagger docs
+end note
+
+note right of UseCases
+  **Application Layer**
+  - Business logic
+  - Transactions
+  - Validations
+  - Authorization
+end note
+
+note right of Entities
+  **Domain Layer**
+  - Database models
+  - Domain logic
+  - Relationships
+  - Constraints
+end note
+
+@enduml

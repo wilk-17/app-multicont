@@ -1,0 +1,159 @@
+@startuml Class_Diagram_Handlers
+!theme plain
+
+' BaseHandler (patrón DRY)
+abstract class BaseHandler {
+    - model_class
+    - schema_class
+    --
+    + create(**kwargs) : dict
+    + get(id: int) : object
+    + list_all(page: int, per_page: int, filters: dict) : dict
+    + update(id: int, **kwargs) : object
+    + delete(id: int) : bool
+    + count(filters: dict) : int
+    + search(query: str, fields: list) : list
+    + bulk_create(items: list) : list
+    + bulk_delete(ids: list) : bool
+    + export_to_csv() : str
+    + export_to_excel() : bytes
+}
+
+' Handlers específicos
+class UserHandler {
+    - model_class = User
+    - schema_class = UserSchema
+    --
+    + get_by_email(email: str)
+    + update_password(id: int, new_password: str)
+    + activate_user(id: int)
+    + deactivate_user(id: int)
+}
+
+class OrganizationHandler {
+    - model_class = Organization
+    - schema_class = OrganizationSchema
+    --
+    + get_with_branches(id: int)
+    + get_statistics(id: int)
+}
+
+class InventoryItemHandler {
+    - model_class = InventoryItem
+    - schema_class = InventoryItemSchema
+    --
+    + add_stock(id: int, quantity: int)
+    + remove_stock(id: int, quantity: int)
+    + get_low_stock_items()
+    + get_by_category(category_id: int)
+}
+
+class QuoteHandler {
+    - model_class = Quote
+    - schema_class = QuoteSchema
+    --
+    + create_with_lines(quote_data: dict, lines: list)
+    + convert_to_sales_order(id: int)
+    + calculate_total(id: int)
+}
+
+class SalesOrderHandler {
+    - model_class = SalesOrder
+    - schema_class = SalesOrderSchema
+    --
+    + create_with_items(order_data: dict, items: list)
+    + convert_to_invoice(id: int)
+    + get_by_status(status: str)
+}
+
+class InvoiceHandler {
+    - model_class = Invoice
+    - schema_class = InvoiceSchema
+    --
+    + create_from_sales_order(sales_order_id: int)
+    + mark_as_paid(id: int)
+    + get_pending_invoices()
+}
+
+class BranchHandler {
+    - model_class = Branch
+    - schema_class = BranchSchema
+    --
+    + get_by_organization(org_id: int)
+    + get_employees(id: int)
+}
+
+class EmployeeHandler {
+    - model_class = Employee
+    - schema_class = EmployeeSchema
+    --
+    + get_by_branch(branch_id: int)
+    + get_sales_performance(id: int)
+}
+
+' Herencia
+BaseHandler <|-- UserHandler
+BaseHandler <|-- OrganizationHandler
+BaseHandler <|-- InventoryItemHandler
+BaseHandler <|-- QuoteHandler
+BaseHandler <|-- SalesOrderHandler
+BaseHandler <|-- InvoiceHandler
+BaseHandler <|-- BranchHandler
+BaseHandler <|-- EmployeeHandler
+
+' Entidades (simplificado)
+class User {
+    + id : BigInteger
+    + username : String
+    + email : String
+    + password_hash : String
+}
+
+class Organization {
+    + id : BigInteger
+    + name : String
+    + nit : String
+}
+
+class InventoryItem {
+    + id : BigInteger
+    + name : String
+    + quantity : Integer
+    + price : Numeric
+}
+
+class Quote {
+    + id : BigInteger
+    + total : Numeric
+    + status : String
+}
+
+class SalesOrder {
+    + id : BigInteger
+    + total : Numeric
+    + status : String
+}
+
+class Invoice {
+    + id : BigInteger
+    + total : Numeric
+    + payment_status : String
+}
+
+' Relaciones Handler -> Entity
+UserHandler --> User : "manages"
+OrganizationHandler --> Organization : "manages"
+InventoryItemHandler --> InventoryItem : "manages"
+QuoteHandler --> Quote : "manages"
+SalesOrderHandler --> SalesOrder : "manages"
+InvoiceHandler --> Invoice : "manages"
+
+note right of BaseHandler
+  **Patrón DRY**
+  Todos los handlers heredan
+  métodos comunes de CRUD,
+  paginación, búsqueda y
+  exportación.
+end note
+
+@enduml
