@@ -312,3 +312,190 @@ def delete(id):
         return error_response('Assignment no encontrado', 404)
     except Exception as e:
         return error_response(str(e), 500)
+
+# ==================== TRAZABILIDAD ENDPOINTS ====================
+
+@assignment_api.route('/employee/<int:employee_id>/history', methods=['GET'])
+@jwt_required()
+def get_employee_history(employee_id):
+    """
+    Historial completo de asignaciones de un empleado
+    ---
+    tags:
+      - Asignaciones
+    security:
+      - Bearer: []
+    parameters:
+      - name: employee_id
+        in: path
+        type: integer
+        required: true
+        description: ID del empleado
+    responses:
+      200:
+        description: Historial de asignaciones del empleado
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              type: object
+              properties:
+                employee_id:
+                  type: integer
+                summary:
+                  type: object
+                  properties:
+                    total_assignments:
+                      type: integer
+                    active_count:
+                      type: integer
+                    returned_count:
+                      type: integer
+                    lost_count:
+                      type: integer
+                active:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Assignment'
+                returned:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Assignment'
+                lost:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Assignment'
+      401:
+        description: No autenticado
+      500:
+        description: Error del servidor
+    """
+    try:
+        history = handler.get_employee_history(employee_id)
+        return success_response(history, 'Historial obtenido exitosamente')
+    except Exception as e:
+        return error_response(str(e), 500)
+
+@assignment_api.route('/<int:id>/return', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
+def mark_returned(id):
+    """
+    Marca una asignación como devuelta
+    ---
+    tags:
+      - Asignaciones
+    security:
+      - Bearer: []
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: ID de la asignación
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            condition:
+              type: string
+              enum: [good, damaged]
+              example: good
+            notes:
+              type: string
+              example: "Item devuelto en buen estado"
+    responses:
+      200:
+        description: Asignación marcada como devuelta
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              $ref: '#/definitions/Assignment'
+            message:
+              type: string
+      404:
+        description: Asignación no encontrada
+      401:
+        description: No autenticado
+      403:
+        description: Sin permisos
+      500:
+        description: Error del servidor
+    """
+    try:
+        data = request.get_json()
+        condition = data.get('condition', 'good')
+        notes = data.get('notes', None)
+        
+        assignment = handler.mark_returned(id, condition=condition, notes=notes)
+        return success_response(assignment.to_dict(), 'Asignación marcada como devuelta')
+    except ValueError as e:
+        return error_response(str(e), 404)
+    except Exception as e:
+        return error_response(str(e), 500)
+
+@assignment_api.route('/<int:id>/lost', methods=['PUT'])
+@jwt_required()
+@require_role('ADMIN', 'MANAGER')
+def mark_lost(id):
+    """
+    Marca una asignación como perdida
+    ---
+    tags:
+      - Asignaciones
+    security:
+      - Bearer: []
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: ID de la asignación
+      - name: body
+        in: body
+        required: false
+        schema:
+          type: object
+          properties:
+            notes:
+              type: string
+              example: "Item reportado como extraviado"
+    responses:
+      200:
+        description: Asignación marcada como perdida
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              $ref: '#/definitions/Assignment'
+            message:
+              type: string
+      404:
+        description: Asignación no encontrada
+      401:
+        description: No autenticado
+      403:
+        description: Sin permisos
+      500:
+        description: Error del servidor
+    """
+    try:
+        data = request.get_json() or {}
+        notes = data.get('notes', None)
+        
+        assignment = handler.mark_lost(id, notes=notes)
+        return success_response(assignment.to_dict(), 'Asignación marcada como perdida')
+    except ValueError as e:
+        return error_response(str(e), 404)
+    except Exception as e:
+        return error_response(str(e), 500)
+
