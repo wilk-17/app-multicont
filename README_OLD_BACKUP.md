@@ -4,10 +4,8 @@
 [![Flask](https://img.shields.io/badge/Flask-3.1.0-green.svg)](https://flask.palletsprojects.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12%2B-blue.svg)](https://www.postgresql.org/)
 [![JWT](https://img.shields.io/badge/JWT-Enabled-orange.svg)](https://jwt.io/)
-[![RBAC](https://img.shields.io/badge/RBAC-Complete-red.svg)]()
 [![Tests](https://img.shields.io/badge/Tests-111%20passing-brightgreen.svg)]()
 [![Coverage](https://img.shields.io/badge/Coverage-37.69%25-yellow.svg)]()
-[![Team](https://img.shields.io/badge/Team-Wilker%20%26%20Daniel-blueviolet.svg)]()
 [![License](https://img.shields.io/badge/License-Academic-blue.svg)]()
 
 **Versión**: 3.0.0  
@@ -1575,25 +1573,9 @@ Todos los derechos reservados © 2025
 
 ---
 
-## 👥 Equipo de Desarrollo
+## 👥 Autores
 
-Este proyecto fue desarrollado colaborativamente por:
-
-- **Wilker** (@wilk-17) - Backend Lead & Architect
-  - 🏗️ Clean Architecture & Fundamentos
-  - 🔐 Sistema JWT + RBAC completo
-  - 📝 Validación Marshmallow
-  - ♻️ Refactoring DRY (BaseHandler)
-  - 🧪 Testing Infrastructure (111 tests)
-
-- **Daniel** - Backend Developer & Business Logic
-  - 📊 Sistema Analytics & Metas de Ventas
-  - 💾 Población de Base de Datos ($140M simulados)
-  - 🏷️ Sistema de Marcas
-  - 🗂️ Organización del Proyecto
-  - ⚙️ Scripts de Configuración & Verificación
-
-**📄 Aportes Detallados**: Ver [`APORTES_EQUIPO.md`](./APORTES_EQUIPO.md) para un desglose completo de las contribuciones de cada desarrollador (50% cada uno).
+- **Wilker** - Desarrollo principal - [@wilk-17](https://github.com/wilk-17)
 
 ---
 
@@ -1651,5 +1633,4 @@ Para comenzar de inmediato:
 ---
 
 **Última actualización**: 19 de Octubre, 2025  
-**Versión del README**: 3.0.0 - Documentación de equipo completa  
-**Desarrolladores**: Wilker & Daniel - Proyecto Académico 2025
+**Versión del README**: 2.0.0
