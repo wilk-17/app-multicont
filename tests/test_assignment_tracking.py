@@ -11,6 +11,8 @@ from app.entities.inventory_item import InventoryItem
 from app.entities.person import Person
 from app.entities.branch import Branch
 from app.entities.organization import Organization
+from app.entities.city import City
+from app.entities.state import State
 from app.use_cases.assignment_handler import AssignmentHandler
 
 
@@ -38,18 +40,28 @@ def client(app):
 def sample_data(app):
     """Crear datos de prueba"""
     with app.app_context():
+        # Estado (State)
+        state = State(description="Test State", code="TS")
+        db.session.add(state)
+        db.session.flush()
+        
+        # Ciudad (City)
+        city = City(description="Test City", state_id=state.id, code="TC")
+        db.session.add(city)
+        db.session.flush()
+        
         # Organización
-        org = Organization(name="Test Org", status='active')
+        org = Organization(
+            historical_name="Test Org Historical",
+            current_name="Test Org Current"
+        )
         db.session.add(org)
         db.session.flush()
         
-        # Sucursal
+        # Sucursal (Branch)
         branch = Branch(
-            name="Test Branch",
             organization_id=org.id,
-            address="Test Address",
-            phone="1234567",
-            status='active'
+            city_id=city.id
         )
         db.session.add(branch)
         db.session.flush()
@@ -58,8 +70,9 @@ def sample_data(app):
         person = Person(
             first_name="John",
             last_name="Doe",
-            email="john.doe@test.com",
-            phone="555-1234"
+            dni="123456789",
+            phone="555-1234",
+            city_id=city.id
         )
         db.session.add(person)
         db.session.flush()
@@ -67,9 +80,7 @@ def sample_data(app):
         # Empleado
         employee = Employee(
             person_id=person.id,
-            branch_id=branch.id,
-            position="Vendedor",
-            status='active'
+            branch_id=branch.id
         )
         db.session.add(employee)
         db.session.flush()
@@ -77,9 +88,9 @@ def sample_data(app):
         # Item de inventario
         item = InventoryItem(
             name="Laptop Dell",
+            price=1500000,
             quantity=10,
-            unit_price=1500000,
-            status='active'
+            description="Laptop para asignación de prueba"
         )
         db.session.add(item)
         db.session.flush()
