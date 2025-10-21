@@ -10,7 +10,7 @@ class InvoiceItem(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     
-    def __init__(self, invoice_id, item_id, quantity, price):
+    def __init__(self, invoice_id=None, item_id=None, quantity=None, price=None):
         self.invoice_id = invoice_id
         self.item_id = item_id
         self.quantity = quantity

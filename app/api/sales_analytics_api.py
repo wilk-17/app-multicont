@@ -12,7 +12,6 @@ from app.entities.sales_order import SalesOrder
 from app.entities.quote import Quote
 from app.entities.employee import Employee
 from app.entities.branch import Branch
-from app.entities.person import Person
 from app.entities.inventory_item import InventoryItem
 from app.entities.brand import Brand
 from app.entities.sales_goal import SalesGoal
@@ -38,7 +37,7 @@ def parse_date(date_str):
 
 @sales_analytics_api.route('/invoicing/by_employee', methods=['GET'])
 @jwt_required()
-@require_role(['ADMIN', 'MANAGER'])
+@require_role('ADMIN', 'MANAGER')
 @cache.cached(timeout=600, query_string=True)
 def invoicing_by_employee():
     """
@@ -46,6 +45,8 @@ def invoicing_by_employee():
     ---
     tags:
       - Analytics
+    security:
+      - Bearer: []
     parameters:
       - name: start_date
         in: query
@@ -102,8 +103,8 @@ def invoicing_by_employee():
             func.count(Invoice.id).label('invoice_count')
         ).filter(
             and_(
-                Invoice.date >= start_date,
-                Invoice.date <= end_date,
+                Invoice.invoice_date >= start_date,
+                Invoice.invoice_date <= end_date,
                 Invoice.employee_id.isnot(None)
             )
         ).group_by(Invoice.employee_id)
@@ -118,12 +119,11 @@ def invoicing_by_employee():
         for row in results:
             employee = Employee.query.get(row.employee_id)
             if employee:
-                person = Person.query.get(employee.person_id)
                 branch = Branch.query.get(employee.branch_id)
                 
                 data.append({
                     'employee_id': row.employee_id,
-                    'employee_name': f"{person.first_name} {person.last_name}" if person else "Unknown",
+                    'employee_name': f"{employee.first_name} {employee.last_name}" if employee else "Unknown",
                     'branch_id': employee.branch_id,
                     'branch_name': getattr(branch, 'name', 'Unknown') if hasattr(Branch, 'name') else f"Branch {employee.branch_id}",
                     'total_invoiced': float(row.total_invoiced) if row.total_invoiced else 0,
@@ -141,7 +141,7 @@ def invoicing_by_employee():
 
 @sales_analytics_api.route('/invoicing/by_branch', methods=['GET'])
 @jwt_required()
-@require_role(['ADMIN', 'MANAGER'])
+@require_role('ADMIN', 'MANAGER')
 @cache.cached(timeout=600, query_string=True)
 def invoicing_by_branch():
     """
@@ -149,6 +149,8 @@ def invoicing_by_branch():
     ---
     tags:
       - Analytics
+    security:
+      - Bearer: []
     parameters:
       - name: start_date
         in: query
@@ -186,8 +188,8 @@ def invoicing_by_branch():
             Employee, Invoice.employee_id == Employee.id
         ).filter(
             and_(
-                Invoice.date >= start_date,
-                Invoice.date <= end_date
+                Invoice.invoice_date >= start_date,
+                Invoice.invoice_date <= end_date
             )
         ).group_by(Employee.branch_id)
         
@@ -220,7 +222,7 @@ def invoicing_by_branch():
 
 @sales_analytics_api.route('/invoicing/by_brand', methods=['GET'])
 @jwt_required()
-@require_role(['ADMIN', 'MANAGER'])
+@require_role('ADMIN', 'MANAGER')
 @cache.cached(timeout=600, query_string=True)
 def invoicing_by_brand():
     """
@@ -228,6 +230,8 @@ def invoicing_by_brand():
     ---
     tags:
       - Analytics
+    security:
+      - Bearer: []
     parameters:
       - name: start_date
         in: query
@@ -267,8 +271,8 @@ def invoicing_by_brand():
             InventoryItem, InvoiceItem.item_id == InventoryItem.id
         ).filter(
             and_(
-                Invoice.date >= start_date,
-                Invoice.date <= end_date,
+                Invoice.invoice_date >= start_date,
+                Invoice.invoice_date <= end_date,
                 InventoryItem.brand_id.isnot(None)
             )
         ).group_by(InventoryItem.brand_id)
@@ -302,7 +306,7 @@ def invoicing_by_brand():
 
 @sales_analytics_api.route('/quotes/by_brand', methods=['GET'])
 @jwt_required()
-@require_role(['ADMIN', 'MANAGER'])
+@require_role('ADMIN', 'MANAGER')
 @cache.cached(timeout=600, query_string=True)
 def quotes_by_brand():
     """
@@ -310,6 +314,8 @@ def quotes_by_brand():
     ---
     tags:
       - Analytics
+    security:
+      - Bearer: []
     parameters:
       - name: start_date
         in: query
@@ -385,7 +391,7 @@ def quotes_by_brand():
 
 @sales_analytics_api.route('/goals/vs_actual', methods=['GET'])
 @jwt_required()
-@require_role(['ADMIN', 'MANAGER'])
+@require_role('ADMIN', 'MANAGER')
 @cache.cached(timeout=600, query_string=True)
 def goals_vs_actual():
     """
@@ -393,6 +399,8 @@ def goals_vs_actual():
     ---
     tags:
       - Analytics
+    security:
+      - Bearer: []
     parameters:
       - name: period_type
         in: query
@@ -485,16 +493,15 @@ def goals_vs_actual():
                 ).filter(
                     and_(
                         Invoice.employee_id == goal.employee_id,
-                        Invoice.date >= goal.start_date,
-                        Invoice.date <= goal.end_date
+                        Invoice.invoice_date >= goal.start_date,
+                        Invoice.invoice_date <= goal.end_date
                     )
                 )
                 actual_amount = actual_query.scalar() or 0
                 
                 # Obtener nombre del empleado
                 employee = Employee.query.get(goal.employee_id)
-                person = Person.query.get(employee.person_id) if employee else None
-                scope_name = f"{person.first_name} {person.last_name}" if person else "Unknown"
+                scope_name = f"{employee.first_name} {employee.last_name}" if employee else "Unknown"
                 scope_type = "employee"
                 scope_id = goal.employee_id
                 
@@ -507,8 +514,8 @@ def goals_vs_actual():
                 ).filter(
                     and_(
                         Employee.branch_id == goal.branch_id,
-                        Invoice.date >= goal.start_date,
-                        Invoice.date <= goal.end_date
+                        Invoice.invoice_date >= goal.start_date,
+                        Invoice.invoice_date <= goal.end_date
                     )
                 )
                 actual_amount = actual_query.scalar() or 0
@@ -558,7 +565,7 @@ def goals_vs_actual():
 
 @sales_analytics_api.route('/sales/summary', methods=['GET'])
 @jwt_required()
-@require_role(['ADMIN', 'MANAGER'])
+@require_role('ADMIN', 'MANAGER')
 @cache.cached(timeout=600, query_string=True)
 def sales_summary():
     """
@@ -566,6 +573,8 @@ def sales_summary():
     ---
     tags:
       - Analytics
+    security:
+      - Bearer: []
     parameters:
       - name: start_date
         in: query
@@ -593,8 +602,8 @@ def sales_summary():
             func.sum(Invoice.total)
         ).filter(
             and_(
-                Invoice.date >= start_date,
-                Invoice.date <= end_date
+                Invoice.invoice_date >= start_date,
+                Invoice.invoice_date <= end_date
             )
         ).scalar() or 0
         
@@ -603,8 +612,8 @@ def sales_summary():
             func.count(Invoice.id)
         ).filter(
             and_(
-                Invoice.date >= start_date,
-                Invoice.date <= end_date
+                Invoice.invoice_date >= start_date,
+                Invoice.invoice_date <= end_date
             )
         ).scalar() or 0
         
@@ -623,8 +632,8 @@ def sales_summary():
             func.count(SalesOrder.id)
         ).filter(
             and_(
-                SalesOrder.date >= start_date,
-                SalesOrder.date <= end_date
+                SalesOrder.order_date >= start_date,
+                SalesOrder.order_date <= end_date
             )
         ).scalar() or 0
         
@@ -633,8 +642,8 @@ def sales_summary():
             func.count(func.distinct(Invoice.employee_id))
         ).filter(
             and_(
-                Invoice.date >= start_date,
-                Invoice.date <= end_date,
+                Invoice.invoice_date >= start_date,
+                Invoice.invoice_date <= end_date,
                 Invoice.employee_id.isnot(None)
             )
         ).scalar() or 0
@@ -667,7 +676,7 @@ def sales_summary():
 
 @sales_analytics_api.route('/top_performers', methods=['GET'])
 @jwt_required()
-@require_role(['ADMIN', 'MANAGER'])
+@require_role('ADMIN', 'MANAGER')
 @cache.cached(timeout=600, query_string=True)
 def top_performers():
     """
@@ -675,6 +684,8 @@ def top_performers():
     ---
     tags:
       - Analytics
+    security:
+      - Bearer: []
     parameters:
       - name: start_date
         in: query
@@ -710,8 +721,8 @@ def top_performers():
             func.count(Invoice.id).label('invoice_count')
         ).filter(
             and_(
-                Invoice.date >= start_date,
-                Invoice.date <= end_date,
+                Invoice.invoice_date >= start_date,
+                Invoice.invoice_date <= end_date,
                 Invoice.employee_id.isnot(None)
             )
         ).group_by(
@@ -724,13 +735,12 @@ def top_performers():
         rank = 1
         for row in results:
             employee = Employee.query.get(row.employee_id)
-            person = Person.query.get(employee.person_id) if employee else None
             branch = Branch.query.get(employee.branch_id) if employee else None
             
             data.append({
                 'rank': rank,
                 'employee_id': row.employee_id,
-                'employee_name': f"{person.first_name} {person.last_name}" if person else "Unknown",
+                'employee_name': f"{employee.first_name} {employee.last_name}" if employee else "Unknown",
                 'branch_id': employee.branch_id if employee else None,
                 'branch_name': getattr(branch, 'name', 'Unknown') if (branch and hasattr(Branch, 'name')) else f"Branch {employee.branch_id if employee else ''}",
                 'total_invoiced': float(row.total_invoiced),

@@ -11,7 +11,7 @@ class QuotationLine(db.Model):
     price = db.Column(db.Numeric(10, 2), nullable=False)
     item_id = db.Column(db.BigInteger, db.ForeignKey("inventory_item.id"), nullable=False)
     
-    def __init__(self, quote_id, item_id, quantity, price, description=None):
+    def __init__(self, quote_id=None, item_id=None, quantity=None, price=None, description=None):
         self.quote_id = quote_id
         self.item_id = item_id
         self.quantity = quantity

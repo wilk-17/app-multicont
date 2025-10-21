@@ -9,7 +9,7 @@ class SalesOrderItem(db.Model):
     item_id = db.Column(db.BigInteger, db.ForeignKey("inventory_item.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     
-    def __init__(self, sales_order_id, item_id, quantity):
+    def __init__(self, sales_order_id=None, item_id=None, quantity=None):
         self.sales_order_id = sales_order_id
         self.item_id = item_id
         self.quantity = quantity

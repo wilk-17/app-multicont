@@ -9,7 +9,7 @@ class QuoteItem(db.Model):
     item_id = db.Column(db.BigInteger, db.ForeignKey("inventory_item.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     
-    def __init__(self, quote_id, item_id, quantity):
+    def __init__(self, quote_id=None, item_id=None, quantity=None):
         self.quote_id = quote_id
         self.item_id = item_id
         self.quantity = quantity
