@@ -1,32 +1,320 @@
-# 🏢 Multicont - Sistema de Gestión Empresarial# 🏢 Multicont - Sistema de Gestión Empresarial con Clean Architecture
+# 🏢 Multicont - Sistema de Gestión Empresarial# 🏢 Multicont - Sistema de Gestión Empresarial# 🏢 Multicont - Sistema de Gestión Empresarial con Clean Architecture
 
 
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
 
-[![Flask](https://img.shields.io/badge/Flask-3.1.0-green.svg)](https://flask.palletsprojects.com/)[![Flask](https://img.shields.io/badge/Flask-3.1.0-green.svg)](https://flask.palletsprojects.com/)
+[![Flask](https://img.shields.io/badge/Flask-3.1.0-green.svg)](https://flask.palletsprojects.com/)
 
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12%2B-blue.svg)](https://www.postgresql.org/)[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12%2B-blue.svg)](https://www.postgresql.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-blue.svg)](https://www.postgresql.org/)[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 
-[![JWT](https://img.shields.io/badge/JWT-Enabled-orange.svg)](https://jwt.io/)[![JWT](https://img.shields.io/badge/JWT-Enabled-orange.svg)](https://jwt.io/)
+[![Tests](https://img.shields.io/badge/Tests-369/369%20RBAC-brightgreen.svg)]()
 
-[![RBAC](https://img.shields.io/badge/RBAC-100%25-success.svg)]()[![RBAC](https://img.shields.io/badge/RBAC-Complete-red.svg)]()
-
-[![Tests](https://img.shields.io/badge/Tests-90/90%20RBAC-brightgreen.svg)]()[![Tests](https://img.shields.io/badge/Tests-111%20passing-brightgreen.svg)]()
-
-[![Clean Architecture](https://img.shields.io/badge/Architecture-Clean-blueviolet.svg)]()[![Coverage](https://img.shields.io/badge/Coverage-37.69%25-yellow.svg)]()
-
-[![License](https://img.shields.io/badge/License-Academic-blue.svg)]()[![Team](https://img.shields.io/badge/Team-Wilker%20%26%20Daniel-blueviolet.svg)]()
+[![Clean Architecture](https://img.shields.io/badge/Architecture-Clean-blueviolet.svg)]()[![Flask](https://img.shields.io/badge/Flask-3.1.0-green.svg)](https://flask.palletsprojects.com/)[![Flask](https://img.shields.io/badge/Flask-3.1.0-green.svg)](https://flask.palletsprojects.com/)
 
 [![License](https://img.shields.io/badge/License-Academic-blue.svg)]()
 
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12%2B-blue.svg)](https://www.postgresql.org/)[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12%2B-blue.svg)](https://www.postgresql.org/)
+
+**Versión**: 2.0.0  
+
+**Fecha**: 21 de Octubre de 2025  [![JWT](https://img.shields.io/badge/JWT-Enabled-orange.svg)](https://jwt.io/)[![JWT](https://img.shields.io/badge/JWT-Enabled-orange.svg)](https://jwt.io/)
+
+**Arquitectura**: Clean Architecture (Hexagonal)  
+
+**Stack**: Flask + PostgreSQL + SQLAlchemy + JWT + RBAC + pytest  [![RBAC](https://img.shields.io/badge/RBAC-100%25-success.svg)]()[![RBAC](https://img.shields.io/badge/RBAC-Complete-red.svg)]()
+
+**Estado**: ✅ Producción
+
+[![Tests](https://img.shields.io/badge/Tests-90/90%20RBAC-brightgreen.svg)]()[![Tests](https://img.shields.io/badge/Tests-111%20passing-brightgreen.svg)]()
+
+---
+
+[![Clean Architecture](https://img.shields.io/badge/Architecture-Clean-blueviolet.svg)]()[![Coverage](https://img.shields.io/badge/Coverage-37.69%25-yellow.svg)]()
+
+## 🎯 Descripción del Proyecto
+
+[![License](https://img.shields.io/badge/License-Academic-blue.svg)]()[![Team](https://img.shields.io/badge/Team-Wilker%20%26%20Daniel-blueviolet.svg)]()
+
+**Multicont** es un sistema integral de gestión empresarial con **Clean Architecture** que implementa control total sobre operaciones de negocio: organizaciones, sucursales, empleados, inventario, cotizaciones, órdenes de venta y facturación.
+
+[![License](https://img.shields.io/badge/License-Academic-blue.svg)]()
+
+### ✨ Características Principales
+
 **Versión**: 1.0.0  
 
-**Arquitectura**: Clean Architecture (Hexagonal)  **Versión**: 3.0.0  
+- 🏗️ **Clean Architecture (3 Capas)**: Entities (Domain) → Use Cases (Business Logic) → API (Presentation)
 
-**Stack**: Flask + PostgreSQL + SQLAlchemy + JWT + RBAC + Marshmallow + pytest  **Arquitectura**: Clean Architecture (Hexagonal) + DRY Pattern  
+- 🔐 **Sistema RBAC Completo**: JWT + bcrypt + 3 roles (ADMIN, MANAGER, SALES)**Arquitectura**: Clean Architecture (Hexagonal)  **Versión**: 3.0.0  
 
-**Estado**: ✅ Producción**Stack**: Flask + PostgreSQL + SQLAlchemy + JWT + RBAC + Marshmallow + pytest
+- ✅ **100% Tests RBAC**: 369/369 tests pasando (123 endpoints × 3 roles)
+
+- 📊 **Analytics Avanzados**: Dashboard, KPIs, métricas de ventas/inventario/empleados**Stack**: Flask + PostgreSQL + SQLAlchemy + JWT + RBAC + Marshmallow + pytest  **Arquitectura**: Clean Architecture (Hexagonal) + DRY Pattern  
+
+- 📝 **Validación Marshmallow**: Schemas en todos los endpoints
+
+- 📚 **Swagger UI**: Documentación interactiva completa en `/api/docs/`**Estado**: ✅ Producción**Stack**: Flask + PostgreSQL + SQLAlchemy + JWT + RBAC + Marshmallow + pytest
+
+- 🗂️ **22 Entidades ORM**: Completamente relacionadas
+
+- 🔄 **Migraciones Alembic**: Control de versiones de base de datos
+
+- 📄 **Paginación**: En todos los endpoints de listado
+
+------
+
+---
+
+
+
+## 📋 Tabla de Contenidos
+
+## 🎯 Descripción## 🎯 Descripción del Proyecto
+
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+
+- [Arquitectura](#️-arquitectura-clean-architecture)
+
+- [Requisitos](#-requisitos-del-sistema)
+
+- [Instalación](#-instalación)**Multicont** es un sistema integral de gestión empresarial con **Clean Architecture** que implementa control total sobre operaciones de negocio: organizaciones, sucursales, empleados, inventario, cotizaciones, órdenes de venta y facturación.**Multicont** es un sistema integral de gestión empresarial desarrollado completamente con **Clean Architecture**, diseñado para empresas que necesitan control total sobre su operación. Este proyecto académico implementa las mejores prácticas de desarrollo backend con Python/Flask.
+
+- [Configuración](#️-configuración)
+
+- [Base de Datos](#️-base-de-datos)
+
+- [Ejecución](#-ejecución)
+
+- [Testing](#-testing)### ✨ Características Principales### ✨ Características Destacadas
+
+- [Autenticación y RBAC](#-autenticación-y-rbac)
+
+- [Endpoints de la API](#-endpoints-de-la-api)
+
+- [Documentación](#-documentación)
+
+- [Equipo](#-equipo-de-desarrollo)- 🏗️ **Clean Architecture (3 Capas)**: Entities (Domain) → Use Cases (Business) → API (Presentation)- 🏗️ **Clean Architecture (3 Capas)**: Entities → Use Cases → API
+
+
+
+---- 🔐 **Sistema RBAC Completo**: JWT + bcrypt + 4 roles (ADMIN, MANAGER, SALES, VIEWER)- 🔐 **Sistema RBAC Completo**: Roles, permisos y JWT authentication (100% tests passing)
+
+
+
+## 📁 Estructura del Proyecto- ✅ **100% Tests RBAC**: 90/90 tests pasando (30 por rol)- 📊 **Analytics de Ventas**: 15+ endpoints con métricas avanzadas
+
+
+
+```- 📊 **Analytics Avanzados**: Dashboard, KPIs, métricas de ventas/inventario/empleados- ✅ **Testing Infrastructure**: 111 tests con pytest (37.69% coverage)
+
+app-multicont/
+
+├── app/                         # 💻 Aplicación principal (Clean Architecture)- 📝 **Validación Marshmallow**: Schemas en todos los endpoints- 📝 **Validación Robusta**: Marshmallow schemas en todos los endpoints
+
+│   ├── __init__.py              # Factory de Flask con blueprints
+
+│   ├── config.py                # Configuración (DB, JWT, CORS)- 🎯 **BaseHandler DRY**: Sin duplicación de código- 🎯 **BaseHandler DRY**: Sin repetición de código en 22 handlers
+
+│   │
+
+│   ├── entities/                # 🔷 CAPA 1 - Modelos de Dominio (22 entidades)- 📚 **Swagger UI**: Documentación interactiva en `/api/docs/`- 📚 **Swagger UI**: Documentación interactiva completa
+
+│   │   ├── user.py              # Usuario con RBAC
+
+│   │   ├── role.py              # Roles del sistema- 🗂️ **23 Entidades ORM**: Completamente implementadas- 🗂️ **21 Entidades de Dominio**: Completamente implementadas con ORM
+
+│   │   ├── permission.py        # Permisos granulares
+
+│   │   ├── organization.py      # Organizaciones- 🔄 **Migraciones Alembic**: Control de versiones de BD- 🔄 **Migraciones Alembic**: Control total de versiones de BD
+
+│   │   ├── branch.py            # Sucursales
+
+│   │   ├── person.py            # Personas (clientes/empleados)- 📄 **Paginación**: En todos los endpoints de listado- 🚀 **Production Ready**: Deployment guide completo
+
+│   │   ├── employee.py          # Empleados
+
+│   │   ├── inventory_item.py    # Items de inventario
+
+│   │   ├── assignment.py        # Asignaciones a empleados
+
+│   │   ├── quote.py             # Cotizaciones------- ✅ **Paginación** en todos los endpoints de lista
+
+│   │   ├── quotation_line.py    # Líneas de cotización
+
+│   │   ├── sales_order.py       # Órdenes de venta
+
+│   │   ├── invoice.py           # Facturas
+
+│   │   └── ... (22 entidades total)## 📁 Estructura del Proyecto- ✅ **Swagger UI** interactivo (Flasgger)
+
+│   │
+
+│   ├── use_cases/               # ⚙️ CAPA 2 - Lógica de Negocio (20 handlers)
+
+│   │   ├── base_handler.py      # Handler base con DRY pattern
+
+│   │   ├── user_handler.py      # Lógica de usuarios```## 📋 Tabla de Contenidos- ✅ **PostgreSQL** con SQLAlchemy ORM
+
+│   │   ├── organization_handler.py
+
+│   │   ├── inventory_item_handler.pyapp-multicont/
+
+│   │   └── ... (20 handlers total)
+
+│   │├── app/                    # Aplicación principal- ✅ **Migraciones** con Flask-Migrate (Alembic)
+
+│   ├── api/                     # 🌐 CAPA 3 - REST API (24 blueprints)
+
+│   │   ├── user_api.py          # Endpoints de usuarios│   ├── entities/           # CAPA 1 - Modelos de Dominio (DB Models)
+
+│   │   ├── role_api.py          # Endpoints de roles
+
+│   │   ├── organization_api.py  # Endpoints de organizaciones│   │   ├── user.py- [Descripción](#-descripción)
+
+│   │   ├── inventory_item_api.py
+
+│   │   ├── sales_analytics_api.py  # 7 endpoints de analytics│   │   ├── organization.py
+
+│   │   ├── metrics_api.py       # 5 endpoints de métricas
+
+│   │   ├── dashboard_api.py     # Dashboard principal│   │   ├── inventory_item.py- [Características](#-características)## 📁 Estructura del Proyecto
+
+│   │   └── ... (24 APIs total)
+
+│   ││   │   └── ... (23 modelos)
+
+│   ├── schemas/                 # 📝 Validación Marshmallow
+
+│   │   ├── user_schemas.py│   ├── use_cases/          # CAPA 2 - Lógica de Negocio (Handlers)- [Arquitectura](#-arquitectura)
+
+│   │   ├── organization_schemas.py
+
+│   │   └── ... (22 schemas)│   │   ├── base_handler.py
+
+│   │
+
+│   ├── services/                # 🔧 Servicios auxiliares│   │   ├── user_handler.py- [Requisitos](#-requisitos)```
+
+│   │   ├── authorization_service.py  # Decorador @require_role()
+
+│   │   └── authentication_service.py  # Login, JWT, validación│   │   └── ... (20 handlers)
+
+│   │
+
+│   └── utils/                   # 🛠️ Utilidades│   ├── api/                # CAPA 3 - Endpoints REST (Blueprints)- [Instalación Rápida](#-instalación-rápida)app/
+
+│       ├── security.py          # Hashing bcrypt
+
+│       ├── cache.py             # Cache de sesiones│   │   ├── user_api.py
+
+│       └── validators.py        # Validadores personalizados
+
+││   │   ├── metrics_api.py- [Configuración](#-configuración)├── entities/          # 🎯 Domain Models (Lógica de dominio)
+
+├── migrations/                  # 🗄️ Migraciones Alembic
+
+│   └── versions/                # 5 migraciones (23 tablas)│   │   └── ... (20 APIs)
+
+│
+
+├── tests/                       # 🧪 Tests automatizados│   ├── schemas/            # Validación con Marshmallow- [Uso de la API](#-uso-de-la-api)│   ├── user.py
+
+│   ├── integration/             # Tests de integración
+
+│   │   ├── test_rbac_simple.py             # 90 tests RBAC (30 × 3 roles)│   ├── utils/              # Utilidades (security, cache, etc.)
+
+│   │   ├── test_rbac_exhaustive_interactive.py  # 369 tests (123 × 3)
+
+│   │   └── test_rbac_endpoints.py│   ├── services/           # Servicios externos- [Endpoints Principales](#-endpoints-principales)│   ├── organization.py
+
+│   └── unit/                    # Tests unitarios
+
+│       └── test_assignment_tracking.py  # 7 tests tracking│   └── config.py           # Configuración
+
+│
+
+├── scripts/                     # 🛠️ Scripts auxiliares├── migrations/             # Migraciones Alembic- [Autenticación JWT](#-autenticación-jwt)│   ├── inventory_item.py
+
+│   ├── setup/                   # Scripts de instalación
+
+│   │   ├── populate_rbac_data.py  # Poblar roles y permisos├── tests/                  # Tests automatizados
+
+│   │   └── generate_secret_keys.py
+
+│   ├── maintenance/             # Mantenimiento de BD│   ├── integration/        # Tests RBAC (90 tests)- [Testing](#-testing)│   └── ...
+
+│   │   └── check_database.py
+
+│   └── testing/                 # Scripts de testing│   └── unit/               # Tests unitarios
+
+│       └── test_all_endpoints_all_roles.py  # Test exhaustivo original
+
+│├── scripts/                # Scripts auxiliares- [Seguridad](#-seguridad)│
+
+├── docs/                        # 📚 Documentación completa
+
+│   ├── INDEX.md                 # Índice de toda la documentación│   ├── setup/              # Scripts de instalación
+
+│   ├── academic/                # Documentación académica
+
+│   │   ├── METODOLOGIA_RAD.md│   ├── maintenance/        # Scripts de mantenimiento- [Deployment](#-deployment)├── use_cases/         # 💼 Application Logic (Handlers)
+
+│   │   ├── ALCANCE_DEL_PROYECTO.md
+
+│   │   ├── AUDITORIA_REQUISITOS.md│   ├── testing/            # Scripts de testing
+
+│   │   └── requirements/
+
+│   ├── business/                # Documentación de negocio│   └── database/           # Scripts de BD- [Estructura del Proyecto](#-estructura-del-proyecto)│   ├── user_handler.py
+
+│   │   ├── REGLAS_DE_NEGOCIO.md
+
+│   │   └── wireframes/├── docs/                   # Documentación completa
+
+│   ├── architecture/            # Documentación de arquitectura
+
+│   │   └── diagrams/            # Diagramas UML│   ├── INDEX.md            # 📋 Índice de documentación- [Scripts Útiles](#-scripts-útiles)│   ├── organization_handler.py
+
+│   ├── technical/               # Documentación técnica
+
+│   │   ├── api/│   ├── academic/           # Docs académicos (RAD, Alcance, etc.)
+
+│   │   │   ├── EJEMPLOS_USO_API.md
+
+│   │   │   └── MODELO_NEGOCIO_RBAC.md│   ├── business/           # Reglas de negocio, wireframes- [Contribuir](#-contribuir)│   └── ...
+
+│   │   └── guides/
+
+│   │       ├── AUTHENTICATION_GUIDE.md│   ├── architecture/       # Diagramas UML
+
+│   │       ├── TESTING_GUIDE.md
+
+│   │       └── DEPLOYMENT.md│   └── technical/          # Guías técnicas, API docs- [FAQ](#-faq)│
+
+│   └── summaries/               # Resúmenes ejecutivos
+
+│├── run.py                  # Punto de entrada
+
+├── .env                         # ⚙️ Variables de entorno (NO en git)
+
+├── .env.example                 # Template de configuración├── requirements.txt        # Dependencias├── api/               # 🌐 REST Endpoints (Blueprints)
+
+├── .gitignore                   # Archivos ignorados por git
+
+├── pytest.ini                   # Configuración de pytest├── pytest.ini              # Configuración pytest
+
+├── requirements.txt             # Dependencias Python
+
+├── run.py                       # 🚀 Punto de entrada de la aplicación└── .env                    # Variables de entorno---│   ├── user_api.py
+
+├── README.md                    # Este archivo
+
+├── INDEX_INICIO.md              # Guía de inicio rápido```
+
+└── REORGANIZACION_COMPLETADA.md # Detalle de reorganización
+
+```│   ├── metrics_api.py
 
 
 
@@ -34,843 +322,1429 @@
 
 
 
-## 🎯 Descripción## 🎯 Descripción del Proyecto
+## 🏗️ Arquitectura: Clean Architecture## 🎯 Descripción│   ├── dashboard_api.py
 
 
 
-**Multicont** es un sistema integral de gestión empresarial con **Clean Architecture** que implementa control total sobre operaciones de negocio: organizaciones, sucursales, empleados, inventario, cotizaciones, órdenes de venta y facturación.**Multicont** es un sistema integral de gestión empresarial desarrollado completamente con **Clean Architecture**, diseñado para empresas que necesitan control total sobre su operación. Este proyecto académico implementa las mejores prácticas de desarrollo backend con Python/Flask.
+### Flujo de Datos (3 Capas)## 🏗️ Arquitectura Clean (3 Capas)
 
 
 
-### ✨ Características Principales### ✨ Características Destacadas
+```│   └── ...
 
+HTTP Request
 
+    ↓### Flujo de Datos
 
-- 🏗️ **Clean Architecture (3 Capas)**: Entities (Domain) → Use Cases (Business) → API (Presentation)- 🏗️ **Clean Architecture (3 Capas)**: Entities → Use Cases → API
+┌─────────────────────────────────────────┐
 
-- 🔐 **Sistema RBAC Completo**: JWT + bcrypt + 4 roles (ADMIN, MANAGER, SALES, VIEWER)- 🔐 **Sistema RBAC Completo**: Roles, permisos y JWT authentication (100% tests passing)
+│  CAPA 3: API (Presentation Layer)      │**Multicont** es un sistema integral de gestión empresarial desarrollado con **Clean Architecture**, diseñado para empresas que necesitan control completo sobre:│
 
-- ✅ **100% Tests RBAC**: 90/90 tests pasando (30 por rol)- 📊 **Analytics de Ventas**: 15+ endpoints con métricas avanzadas
+│  - Blueprints Flask                     │
 
-- 📊 **Analytics Avanzados**: Dashboard, KPIs, métricas de ventas/inventario/empleados- ✅ **Testing Infrastructure**: 111 tests con pytest (37.69% coverage)
+│  - Validación de entrada (Marshmallow)  │```
 
-- 📝 **Validación Marshmallow**: Schemas en todos los endpoints- 📝 **Validación Robusta**: Marshmallow schemas en todos los endpoints
+│  - Manejo de errores HTTP               │
 
-- 🎯 **BaseHandler DRY**: Sin duplicación de código- 🎯 **BaseHandler DRY**: Sin repetición de código en 22 handlers
+│  - Documentación Swagger                │HTTP Request → API Blueprint → Handler (Use Case) → Entity (Domain Model) → Database├── config.py          # ⚙️ Configuración
 
-- 📚 **Swagger UI**: Documentación interactiva en `/api/docs/`- 📚 **Swagger UI**: Documentación interactiva completa
+└─────────────────┬───────────────────────┘
 
-- 🗂️ **23 Entidades ORM**: Completamente implementadas- 🗂️ **21 Entidades de Dominio**: Completamente implementadas con ORM
+                  ↓                    ↓              ↓                      ↓
 
-- 🔄 **Migraciones Alembic**: Control de versiones de BD- 🔄 **Migraciones Alembic**: Control total de versiones de BD
+┌─────────────────────────────────────────┐
 
-- 📄 **Paginación**: En todos los endpoints de listado- 🚀 **Production Ready**: Deployment guide completo
+│  CAPA 2: Use Cases (Business Logic)    │               Validación    Lógica Negocio        Lógica Dominio- 👥 **Gestión Organizacional**: Organizaciones, sucursales, empleados└── __init__.py        # 🏗️ Application Factory
 
+│  - Handlers con lógica de negocio      │
 
+│  - Transacciones de BD (db.session)    │```
 
-------- ✅ **Paginación** en todos los endpoints de lista
+│  - Validaciones de negocio             │
 
+│  - Paginación y filtros                │- 📦 **Control de Inventario**: Productos, categorías, marcas, stock en tiempo real```
 
+└─────────────────┬───────────────────────┘
 
-## 📁 Estructura del Proyecto- ✅ **Swagger UI** interactivo (Flasgger)
+                  ↓### 1️⃣ Entities (Domain Layer)
 
+┌─────────────────────────────────────────┐
 
+│  CAPA 1: Entities (Domain Models)      │**Ubicación**: `app/entities/`- 💰 **Ciclo de Ventas Completo**: Cotizaciones → Órdenes → Facturas
 
-```## 📋 Tabla de Contenidos- ✅ **PostgreSQL** con SQLAlchemy ORM
+│  - Modelos SQLAlchemy (ORM)            │
 
-app-multicont/
+│  - Lógica de dominio pura              │
 
-├── app/                    # Aplicación principal- ✅ **Migraciones** con Flask-Migrate (Alembic)
+│  - Relaciones entre entidades          │
 
-│   ├── entities/           # CAPA 1 - Modelos de Dominio (DB Models)
+│  - Métodos de negocio                  │- Modelos SQLAlchemy (hereda de `db.Model`)- 📊 **Analytics y Metas**: KPIs, métricas de ventas, metas por empleado/sucursal## 🔧 Instalación
 
-│   │   ├── user.py- [Descripción](#-descripción)
+└─────────────────┬───────────────────────┘
 
-│   │   ├── organization.py
+                  ↓- Lógica de dominio pura
 
-│   │   ├── inventory_item.py- [Características](#-características)## 📁 Estructura del Proyecto
+              PostgreSQL
 
-│   │   └── ... (23 modelos)
+```- Método `to_dict()` para serialización- 🔐 **Seguridad Empresarial**: JWT, RBAC, auditoría de cambios
 
-│   ├── use_cases/          # CAPA 2 - Lógica de Negocio (Handlers)- [Arquitectura](#-arquitectura)
 
-│   │   ├── base_handler.py
 
-│   │   ├── user_handler.py- [Requisitos](#-requisitos)```
+### Principios Implementados
 
-│   │   └── ... (20 handlers)
 
-│   ├── api/                # CAPA 3 - Endpoints REST (Blueprints)- [Instalación Rápida](#-instalación-rápida)app/
 
-│   │   ├── user_api.py
+- ✅ **Separación de responsabilidades**: Cada capa tiene un propósito claro**Ejemplo**:- 🌐 **API RESTful**: 24 endpoints documentados con Swagger### Prerrequisitos
 
-│   │   ├── metrics_api.py- [Configuración](#-configuración)├── entities/          # 🎯 Domain Models (Lógica de dominio)
+- ✅ **Independencia de frameworks**: Lógica de negocio independiente de Flask
 
-│   │   └── ... (20 APIs)
+- ✅ **Testeable**: Cada capa se puede probar independientemente```python
 
-│   ├── schemas/            # Validación con Marshmallow- [Uso de la API](#-uso-de-la-api)│   ├── user.py
+- ✅ **DRY (Don't Repeat Yourself)**: BaseHandler elimina código duplicado
 
-│   ├── utils/              # Utilidades (security, cache, etc.)
+- ✅ **SOLID**: Principios de diseño orientado a objetosclass InventoryItem(db.Model):- Python 3.9+
 
-│   ├── services/           # Servicios externos- [Endpoints Principales](#-endpoints-principales)│   ├── organization.py
-
-│   └── config.py           # Configuración
-
-├── migrations/             # Migraciones Alembic- [Autenticación JWT](#-autenticación-jwt)│   ├── inventory_item.py
-
-├── tests/                  # Tests automatizados
-
-│   ├── integration/        # Tests RBAC (90 tests)- [Testing](#-testing)│   └── ...
-
-│   └── unit/               # Tests unitarios
-
-├── scripts/                # Scripts auxiliares- [Seguridad](#-seguridad)│
-
-│   ├── setup/              # Scripts de instalación
-
-│   ├── maintenance/        # Scripts de mantenimiento- [Deployment](#-deployment)├── use_cases/         # 💼 Application Logic (Handlers)
-
-│   ├── testing/            # Scripts de testing
-
-│   └── database/           # Scripts de BD- [Estructura del Proyecto](#-estructura-del-proyecto)│   ├── user_handler.py
-
-├── docs/                   # Documentación completa
-
-│   ├── INDEX.md            # 📋 Índice de documentación- [Scripts Útiles](#-scripts-útiles)│   ├── organization_handler.py
-
-│   ├── academic/           # Docs académicos (RAD, Alcance, etc.)
-
-│   ├── business/           # Reglas de negocio, wireframes- [Contribuir](#-contribuir)│   └── ...
-
-│   ├── architecture/       # Diagramas UML
-
-│   └── technical/          # Guías técnicas, API docs- [FAQ](#-faq)│
-
-├── run.py                  # Punto de entrada
-
-├── requirements.txt        # Dependencias├── api/               # 🌐 REST Endpoints (Blueprints)
-
-├── pytest.ini              # Configuración pytest
-
-└── .env                    # Variables de entorno---│   ├── user_api.py
-
-```
-
-│   ├── metrics_api.py
-
----
-
-## 🎯 Descripción│   ├── dashboard_api.py
-
-## 🏗️ Arquitectura Clean (3 Capas)
-
-│   └── ...
-
-### Flujo de Datos
-
-**Multicont** es un sistema integral de gestión empresarial desarrollado con **Clean Architecture**, diseñado para empresas que necesitan control completo sobre:│
-
-```
-
-HTTP Request → API Blueprint → Handler (Use Case) → Entity (Domain Model) → Database├── config.py          # ⚙️ Configuración
-
-                    ↓              ↓                      ↓
-
-               Validación    Lógica Negocio        Lógica Dominio- 👥 **Gestión Organizacional**: Organizaciones, sucursales, empleados└── __init__.py        # 🏗️ Application Factory
-
-```
-
-- 📦 **Control de Inventario**: Productos, categorías, marcas, stock en tiempo real```
-
-### 1️⃣ Entities (Domain Layer)
-
-**Ubicación**: `app/entities/`- 💰 **Ciclo de Ventas Completo**: Cotizaciones → Órdenes → Facturas
-
-
-
-- Modelos SQLAlchemy (hereda de `db.Model`)- 📊 **Analytics y Metas**: KPIs, métricas de ventas, metas por empleado/sucursal## 🔧 Instalación
-
-- Lógica de dominio pura
-
-- Método `to_dict()` para serialización- 🔐 **Seguridad Empresarial**: JWT, RBAC, auditoría de cambios
-
-
-
-**Ejemplo**:- 🌐 **API RESTful**: 24 endpoints documentados con Swagger### Prerrequisitos
-
-```python
-
-class InventoryItem(db.Model):- Python 3.9+
+- ✅ **Dependency Injection**: Handlers reciben dependencias
 
     __tablename__ = "inventory_item"
 
+---
+
     id = db.Column(db.BigInteger, primary_key=True)### ¿Por qué Multicont?- PostgreSQL 12+
+
+## 🔧 Requisitos del Sistema
 
     name = db.Column(db.String(200), nullable=False)
 
+### Software Necesario
+
     quantity = db.Column(db.Integer, default=0)- pip
 
-    
+- **Python**: 3.10+ (recomendado: 3.13)
 
-    def add_stock(self, amount):✅ **Clean Architecture** - Código mantenible y testeable  
+- **PostgreSQL**: 12+ (recomendado: 16+)    
 
-        self.quantity += amount
+- **pip**: 23.0+
 
-```✅ **Seguridad Robusta** - JWT + bcrypt + RBAC  ### Setup
+- **Git**: 2.40+    def add_stock(self, amount):✅ **Clean Architecture** - Código mantenible y testeable  
 
 
 
-### 2️⃣ Use Cases (Application Layer)✅ **Escalable** - PostgreSQL + SQLAlchemy ORM  
+### Dependencias Principales        self.quantity += amount
 
-**Ubicación**: `app/use_cases/`
 
-✅ **Documentación Auto-generada** - Swagger UI incluido  1. **Clonar repositorio**
 
-- Lógica de aplicación y casos de uso
+``````✅ **Seguridad Robusta** - JWT + bcrypt + RBAC  ### Setup
 
-- Interacción con `db.session`✅ **Listo para Producción** - Migraciones, logs, error handling  ```bash
+Flask==3.1.0
 
-- Métodos estándar: `create()`, `get()`, `list_all()`, `update()`, `delete()`
+Flask-SQLAlchemy==3.1.1
+
+Flask-Migrate==4.0.7
+
+Flask-JWT-Extended==4.7.1### 2️⃣ Use Cases (Application Layer)✅ **Escalable** - PostgreSQL + SQLAlchemy ORM  
+
+Flask-CORS==5.0.0
+
+flask-marshmallow==1.2.1**Ubicación**: `app/use_cases/`
+
+marshmallow-sqlalchemy==1.1.0
+
+psycopg2-binary==2.9.10✅ **Documentación Auto-generada** - Swagger UI incluido  1. **Clonar repositorio**
+
+bcrypt==4.2.1
+
+flasgger==0.9.7.1- Lógica de aplicación y casos de uso
+
+pytest==8.3.3
+
+pytest-cov==6.0.0- Interacción con `db.session`✅ **Listo para Producción** - Migraciones, logs, error handling  ```bash
+
+requests==2.32.3
+
+python-dotenv==1.0.1- Métodos estándar: `create()`, `get()`, `list_all()`, `update()`, `delete()`
+
+```
 
 git clone https://github.com/wilk-17/app-multicont.git
+
+---
 
 **Ejemplo**:
 
+## 🚀 Instalación
+
 ```python---cd app-multicont
+
+### 1. Clonar el Repositorio
 
 class InventoryItemHandler(BaseHandler):
 
-    model = InventoryItem```
+```bash
 
-    
+git clone https://github.com/wilk-17/app-multicont.git    model = InventoryItem```
 
-    def add_stock(self, id, amount):## ✨ Características
+cd app-multicont
 
-        item = self.get(id)
-
-        item.add_stock(amount)2. **Crear entorno virtual**
-
-        db.session.commit()
-
-        return item### Backend API```bash
-
-```
-
-python -m venv venv
-
-### 3️⃣ API (Presentation Layer)
-
-**Ubicación**: `app/api/`| Módulo | Funcionalidades |
+```    
 
 
 
-- Flask Blueprints con rutas RESTful|--------|----------------|# Windows
-
-- Parseo de request/response
-
-- Documentación Swagger| **Autenticación** | Login JWT, refresh tokens, roles (ADMIN/MANAGER/SALES) |venv\Scripts\activate
+### 2. Crear Entorno Virtual    def add_stock(self, id, amount):## ✨ Características
 
 
 
-**Rutas estándar**:| **Organizaciones** | Multi-organización, sucursales, jerarquías |
+**Windows:**        item = self.get(id)
 
-- `GET /api/{resource}/` - Listar con paginación
+```powershell
 
-- `GET /api/{resource}/<int:id>` - Obtener por ID| **Empleados** | Gestión de personal, asignación de items |# Linux/Mac
+python -m venv .venv        item.add_stock(amount)2. **Crear entorno virtual**
 
-- `POST /api/{resource}/` - Crear
+.venv\Scripts\activate
 
-- `PUT /api/{resource}/<int:id>` - Actualizar| **Inventario** | Stock en tiempo real, alertas de bajo stock, categorías |source venv/bin/activate
-
-- `DELETE /api/{resource}/<int:id>` - Eliminar
-
-| **Cotizaciones** | Creación, líneas de items, conversión a órdenes |```
-
----
-
-| **Órdenes de Venta** | Gestión completa, reducción automática de stock |
-
-## 🚀 Instalación y Setup
-
-| **Facturación** | Generación de facturas, items facturados |3. **Instalar dependencias**
-
-### Requisitos Previos
-
-| **Metas de Ventas** | Metas mensuales/trimestrales/anuales, tracking |```bash
-
-- Python 3.10+
-
-- PostgreSQL 12+| **Analytics** | Dashboard con métricas, reportes de ventas |pip install -r requirements.txt
-
-- pip
-
-- virtualenv```
+```        db.session.commit()
 
 
 
-### Paso 1: Clonar el Repositorio### Seguridad Implementada
-
-
-
-```bash4. **Configurar variables de entorno**
-
-git clone https://github.com/wilk-17/app-multicont.git
-
-cd app-multicont- 🔒 **Password Hashing**: Bcrypt con 12 rounds
-
-```
-
-- 🔒 **JWT Authentication**: Tokens con expiración configurableCrear archivo `.env` en la raíz:
-
-### Paso 2: Crear Entorno Virtual
-
-- 🔒 **RBAC**: Control de acceso basado en roles```env
+**Linux/Mac:**        return item### Backend API```bash
 
 ```bash
 
-# Windows- 🔒 **Secrets Management**: Variables de entorno (.env)DATABASE_URL=postgresql+psycopg2://postgres:tu_password@localhost:5432/nombre_db
+python3 -m venv .venv```
 
-python -m venv .venv
+source .venv/bin/activate
 
-.venv\Scripts\activate- 🔒 **Input Validation**: Esquemas Marshmallow (Fase 3)SECRET_KEY=tu-secret-key-aqui
+```python -m venv venv
 
 
+
+### 3. Instalar Dependencias### 3️⃣ API (Presentation Layer)
+
+
+
+```bash**Ubicación**: `app/api/`| Módulo | Funcionalidades |
+
+pip install -r requirements.txt
+
+```
+
+
+
+### 4. Configurar PostgreSQL- Flask Blueprints con rutas RESTful|--------|----------------|# Windows
+
+
+
+Crear una base de datos en PostgreSQL:- Parseo de request/response
+
+
+
+```sql- Documentación Swagger| **Autenticación** | Login JWT, refresh tokens, roles (ADMIN/MANAGER/SALES) |venv\Scripts\activate
+
+CREATE DATABASE multicont;
+
+CREATE USER multicont_user WITH PASSWORD 'tu_password_seguro';
+
+GRANT ALL PRIVILEGES ON DATABASE multicont TO multicont_user;
+
+```**Rutas estándar**:| **Organizaciones** | Multi-organización, sucursales, jerarquías |
+
+
+
+---- `GET /api/{resource}/` - Listar con paginación
+
+
+
+## ⚙️ Configuración- `GET /api/{resource}/<int:id>` - Obtener por ID| **Empleados** | Gestión de personal, asignación de items |# Linux/Mac
+
+
+
+### 1. Crear archivo `.env`- `POST /api/{resource}/` - Crear
+
+
+
+Copiar el template y editar:- `PUT /api/{resource}/<int:id>` - Actualizar| **Inventario** | Stock en tiempo real, alertas de bajo stock, categorías |source venv/bin/activate
+
+
+
+```bash- `DELETE /api/{resource}/<int:id>` - Eliminar
+
+cp .env.example .env
+
+```| **Cotizaciones** | Creación, líneas de items, conversión a órdenes |```
+
+
+
+### 2. Editar `.env` con tus credenciales---
+
+
+
+```env| **Órdenes de Venta** | Gestión completa, reducción automática de stock |
+
+# Base de Datos
+
+DATABASE_URL=postgresql+psycopg2://multicont_user:tu_password@localhost:5432/multicont## 🚀 Instalación y Setup
+
+
+
+# JWT| **Facturación** | Generación de facturas, items facturados |3. **Instalar dependencias**
+
+SECRET_KEY=tu_clave_secreta_muy_segura_aqui
+
+JWT_SECRET_KEY=otra_clave_jwt_diferente_aqui### Requisitos Previos
+
+
+
+# Flask| **Metas de Ventas** | Metas mensuales/trimestrales/anuales, tracking |```bash
+
+FLASK_APP=run.py
+
+FLASK_ENV=development- Python 3.10+
+
+
+
+# Otros- PostgreSQL 12+| **Analytics** | Dashboard con métricas, reportes de ventas |pip install -r requirements.txt
+
+SQLALCHEMY_TRACK_MODIFICATIONS=False
+
+```- pip
+
+
+
+⚠️ **IMPORTANTE**: Nunca subir `.env` a git. Está en `.gitignore`.- virtualenv```
+
+
+
+---
+
+
+
+## 🗄️ Base de Datos### Paso 1: Clonar el Repositorio### Seguridad Implementada
+
+
+
+### Estructura de Tablas (23 entidades)
+
+
+
+``````bash4. **Configurar variables de entorno**
+
+users                    # Usuarios del sistema (RBAC)
+
+roles                    # Roles (ADMIN, MANAGER, SALES)git clone https://github.com/wilk-17/app-multicont.git
+
+permissions              # Permisos granulares
+
+organizations            # Organizaciones/empresascd app-multicont- 🔒 **Password Hashing**: Bcrypt con 12 rounds
+
+branches                 # Sucursales
+
+persons                  # Personas (base para empleados/clientes)```
+
+employees                # Empleados
+
+states                   # Estados/departamentos- 🔒 **JWT Authentication**: Tokens con expiración configurableCrear archivo `.env` en la raíz:
+
+cities                   # Ciudades
+
+item_categories          # Categorías de items### Paso 2: Crear Entorno Virtual
+
+item_brands              # Marcas de items
+
+inventory_items          # Items de inventario- 🔒 **RBAC**: Control de acceso basado en roles```env
+
+assignments              # Asignaciones de items a empleados
+
+quotes                   # Cotizaciones```bash
+
+quotation_lines          # Líneas de cotización
+
+sales_orders             # Órdenes de venta# Windows- 🔒 **Secrets Management**: Variables de entorno (.env)DATABASE_URL=postgresql+psycopg2://postgres:tu_password@localhost:5432/nombre_db
+
+sales_order_items        # Items de órdenes
+
+invoices                 # Facturaspython -m venv .venv
+
+invoice_items            # Items de facturas
+
+sales_goals              # Metas de ventas.venv\Scripts\activate- 🔒 **Input Validation**: Esquemas Marshmallow (Fase 3)SECRET_KEY=tu-secret-key-aqui
+
+quote_items              # Items de cotización (legacy)
+
+user_roles               # Tabla pivote user-role (legacy)
+
+```
 
 # Linux/Mac- 🔒 **Rate Limiting**: Protección contra fuerza bruta (Fase 5)FLASK_ENV=development
 
+### Migraciones
+
 python3 -m venv .venv
+
+#### Inicializar migraciones (solo si no existe `/migrations`)
 
 source .venv/bin/activate- 🔒 **CORS**: Configurado para frontend Angular```
 
+```bash
+
+flask db init```
+
 ```
 
 
+
+#### Aplicar migraciones existentes
 
 ### Paso 3: Instalar Dependencias
 
-### API Features5. **Inicializar base de datos**
+```bash
+
+flask db upgrade### API Features5. **Inicializar base de datos**
+
+```
 
 ```bash
+
+#### Crear nueva migración (después de cambios en entities/)
 
 pip install -r requirements.txt```bash
 
-```
+```bash
 
-- ✅ Paginación en todos los listados (`?page=1&per_page=10`)# Crear migraciones (si no existen)
-
-### Paso 4: Configurar Base de Datos
-
-- ✅ Filtros por status y fechasflask db init
-
-Crear archivo `.env` en la raíz:
-
-- ✅ Respuestas JSON estandarizadas
-
-```env
-
-DATABASE_URL=postgresql+psycopg2://usuario:password@localhost:5432/multicont- ✅ Códigos HTTP apropiados (200, 201, 400, 401, 403, 404, 500)# Generar migración inicial
-
-SECRET_KEY=tu-secret-key-aqui
-
-JWT_SECRET_KEY=tu-jwt-secret-aqui- ✅ Swagger UI interactivo en `/api/docs/`flask db migrate -m "Initial migration"
-
-FLASK_ENV=development
-
-DEBUG=True- ✅ Error handling robusto
-
-```
-
-- ✅ Logging de operaciones# Aplicar migraciones
-
-O generar claves automáticamente:
+flask db migrate -m "Descripción del cambio"```
 
 flask db upgrade
 
-```bash
+```- ✅ Paginación en todos los listados (`?page=1&per_page=10`)# Crear migraciones (si no existen)
 
-python scripts/setup/generate_secret_keys.py---```
+
+
+#### Revertir última migración### Paso 4: Configurar Base de Datos
+
+
+
+```bash- ✅ Filtros por status y fechasflask db init
+
+flask db downgrade
+
+```Crear archivo `.env` en la raíz:
+
+
+
+### Poblar Datos Iniciales (RBAC)- ✅ Respuestas JSON estandarizadas
+
+
+
+```bash```env
+
+python scripts/setup/populate_rbac_data.py
+
+```DATABASE_URL=postgresql+psycopg2://usuario:password@localhost:5432/multicont- ✅ Códigos HTTP apropiados (200, 201, 400, 401, 403, 404, 500)# Generar migración inicial
+
+
+
+**Esto crea**:SECRET_KEY=tu-secret-key-aqui
+
+- 3 roles (ADMIN, MANAGER, SALES)
+
+- 15+ permisosJWT_SECRET_KEY=tu-jwt-secret-aqui- ✅ Swagger UI interactivo en `/api/docs/`flask db migrate -m "Initial migration"
+
+- 3 usuarios de prueba:
+
+  - `admin` / `admin123` (ADMIN)FLASK_ENV=development
+
+  - `manager` / `manager123` (MANAGER)
+
+  - `sales` / `sales123` (SALES)DEBUG=True- ✅ Error handling robusto
+
+
+
+---```
+
+
+
+## 🏃 Ejecución- ✅ Logging de operaciones# Aplicar migraciones
+
+
+
+### Iniciar el ServidorO generar claves automáticamente:
+
+
+
+```bashflask db upgrade
+
+python run.py
+
+``````bash
+
+
+
+**Output esperado:**python scripts/setup/generate_secret_keys.py---```
+
+```
+
+ * Running on http://127.0.0.1:5000```
+
+ * Debug mode: on
 
 ```
 
 
 
-### Paso 5: Crear Base de Datos
+### Verificar que funciona### Paso 5: Crear Base de Datos
 
-## 🏗️ Arquitectura6. **Poblar base de datos con dataset completo** (OPCIONAL)
 
-```bash
+
+**Swagger UI** (Documentación Interactiva):## 🏗️ Arquitectura6. **Poblar base de datos con dataset completo** (OPCIONAL)
+
+```
+
+http://127.0.0.1:5000/api/docs/```bash
+
+```
 
 # Crear BD en PostgreSQL```bash
 
-psql -U postgres
+**Endpoint de prueba**:
 
-CREATE DATABASE multicont;### Clean Architecture (3 Capas)python populate_database.py
+```bashpsql -U postgres
 
-\q
+curl http://127.0.0.1:5000/api/auth/validate
 
-``````
-
-
-
-### Paso 6: Aplicar Migraciones```
+```CREATE DATABASE multicont;### Clean Architecture (3 Capas)python populate_database.py
 
 
 
-```bash┌─────────────────────────────────────────────────────────┐Esto crea:
-
-flask db upgrade
-
-```│                   PRESENTATION LAYER                     │- 5 Estados y 20 Ciudades
+---\q
 
 
 
-Este comando crea 23 tablas:│              API Endpoints (Flask Blueprints)            │- 7 Organizaciones y 5 Sucursales
+## 🧪 Testing``````
 
-- user, role, permission, user_role
+
+
+### Tests RBAC (Recomendado)
+
+
+
+#### Test Exhaustivo Interactivo (123 endpoints × 3 roles = 369 tests)### Paso 6: Aplicar Migraciones```
+
+
+
+```bash
+
+python tests/integration/test_rbac_exhaustive_interactive.py
+
+``````bash┌─────────────────────────────────────────────────────────┐Esto crea:
+
+
+
+**Output esperado:**flask db upgrade
+
+```
+
+✓ ADMIN    - 123/123 tests pasados (100.0%)```│                   PRESENTATION LAYER                     │- 5 Estados y 20 Ciudades
+
+✓ MANAGER  - 123/123 tests pasados (100.0%)
+
+✓ SALES    - 123/123 tests pasados (100.0%)
+
+────────────────────────────────────────────
+
+TOTAL GLOBAL - 369/369 tests pasados (100.0%)Este comando crea 23 tablas:│              API Endpoints (Flask Blueprints)            │- 7 Organizaciones y 5 Sucursales
+
+
+
+🎉 ¡PERFECTO! Todos los tests pasaron (100%)- user, role, permission, user_role
+
+```
 
 - organization, branch, employee, assignment│  ┌──────────┬──────────┬──────────┬──────────────────┐  │- 15 Empleados y 10 Usuarios
 
+#### Test RBAC Simple (90 tests)
+
 - inventory_item, item_category, brand
 
-- quote, quotation_line, sales_order, sales_order_item, invoice, invoice_item│  │  Auth    │ Quotes   │ Invoices │  Analytics       │  │- 6 Marcas y 60 Items de inventario
+```bash
+
+python tests/integration/test_rbac_simple.py- quote, quotation_line, sales_order, sales_order_item, invoice, invoice_item│  │  Auth    │ Quotes   │ Invoices │  Analytics       │  │- 6 Marcas y 60 Items de inventario
+
+```
 
 - person, city, state
 
+### Tests con pytest
+
 │  │   API    │   API    │   API    │  24 APIs total   │  │- 12 Cotizaciones y 10 Facturas ($140M facturados)
 
-### Paso 7: Poblar Datos de Prueba (Opcional)
-
-│  └──────────┴──────────┴──────────┴──────────────────┘  │- 18 Metas de ventas retroactivas
-
 ```bash
 
-python scripts/setup/populate_rbac_data.py│                           ↓                              │
-
-```
-
-├─────────────────────────────────────────────────────────┤7. **Verificar datos poblados** (OPCIONAL)
-
-Crea:
-
-- 8 usuarios con roles RBAC (ana, bruno, carla, diego, elena, felipe, gloria, hugo)│                  APPLICATION LAYER                       │```bash
-
-- 1 organización con 1 sucursal
-
-- 8 empleados│           Use Cases / Business Logic (Handlers)          │python verify_data.py
-
-- 5 marcas y 8 items de inventario
-
-- 1 Quote, 1 SalesOrder, 1 Invoice│  ┌──────────┬──────────┬──────────┬──────────────────┐  │```
-
-- 4 Permissions
-
-│  │  Quote   │ Invoice  │  Sales   │   Inventory      │  │
-
-### Paso 8: Ejecutar Servidor
-
-│  │ Handler  │ Handler  │ Handler  │  22 Handlers     │  │8. **Crear metas retroactivas para análisis** (OPCIONAL)
-
-```bash
-
-python run.py│  └──────────┴──────────┴──────────┴──────────────────┘  │```bash
-
-```
-
-│                           ↓                              │python create_retroactive_goals.py
-
-Servidor corriendo en: **http://127.0.0.1:5000**  
-
-Swagger UI: **http://127.0.0.1:5000/api/docs/**├─────────────────────────────────────────────────────────┤```
-
-
-
----│                    DOMAIN LAYER                          │
-
-
-
-## 🧪 Testing│         Entities (Domain Models + Business Logic)        │9. **Ejecutar aplicación**
-
-
-
-### Ejecutar Tests RBAC│  ┌──────────┬──────────┬──────────┬──────────────────┐  │```bash
-
-
-
-```bash│  │  Quote   │ Invoice  │  Sales   │   Employee       │  │python run.py
-
-python tests/integration/test_rbac_simple.py
-
-```│  │  Entity  │  Entity  │  Order   │  22 Entities     │  │```
-
-
-
-**Resultado esperado**: `90/90 tests passed (100.0%)`│  └──────────┴──────────┴──────────┴──────────────────┘  │
-
-
-
-### Ejecutar Tests Unitarios│                           ↓                              │La API estará disponible en: `http://127.0.0.1:5000`
-
-
-
-```bash├─────────────────────────────────────────────────────────┤
+# Todos los tests### Paso 7: Poblar Datos de Prueba (Opcional)
 
 pytest
 
-```│            DATABASE (PostgreSQL + SQLAlchemy)            │## 📚 Documentación API
+│  └──────────┴──────────┴──────────┴──────────────────┘  │- 18 Metas de ventas retroactivas
+
+# Con verbosidad
+
+pytest -v```bash
 
 
 
-### Tests con Coverage└─────────────────────────────────────────────────────────┘
-
-
-
-```bash```### Swagger UI
+# Con coveragepython scripts/setup/populate_rbac_data.py│                           ↓                              │
 
 pytest --cov=app tests/
 
-```Acceder a: `http://127.0.0.1:5000/api/docs/`
+```
+
+# Test específico
+
+pytest tests/unit/test_assignment_tracking.py -v├─────────────────────────────────────────────────────────┤7. **Verificar datos poblados** (OPCIONAL)
+
+```
+
+Crea:
+
+### Scripts de Testing Auxiliares
+
+- 8 usuarios con roles RBAC (ana, bruno, carla, diego, elena, felipe, gloria, hugo)│                  APPLICATION LAYER                       │```bash
+
+```bash
+
+# Test exhaustivo original (123 endpoints)- 1 organización con 1 sucursal
+
+python scripts/testing/test_all_endpoints_all_roles.py
+
+```- 8 empleados│           Use Cases / Business Logic (Handlers)          │python verify_data.py
 
 
 
-### Verificar Setup### Flujo de Request
+---- 5 marcas y 8 items de inventario
 
 
 
-```bashDocumentación interactiva con todos los endpoints, schemas y posibilidad de probar directamente.
-
-python scripts/setup/check_setup.py
-
-``````
+## 🔐 Autenticación y RBAC- 1 Quote, 1 SalesOrder, 1 Invoice│  ┌──────────┬──────────┬──────────┬──────────────────┐  │```
 
 
 
----1. HTTP Request → 2. API Blueprint → 3. Handler (Use Case) → 4. Entity (Domain) → 5. Database### Endpoints Principales
+### Sistema de Roles- 4 Permissions
 
 
 
-## 🔐 Autenticación y RBAC                        ↓                    ↓                        ↓
+| Rol       | Permisos                                      | Color   |│  │  Quote   │ Invoice  │  Sales   │   Inventory      │  │
+
+|-----------|-----------------------------------------------|---------|
+
+| **ADMIN** | Acceso total (CRUD completo en todos los recursos) | 🔴 Rojo |### Paso 8: Ejecutar Servidor
+
+| **MANAGER** | CRUD en mayoría de recursos (excepto usuarios/roles) | 🟡 Amarillo |
+
+| **SALES** | Lectura general + CRUD en cotizaciones         | 🟢 Verde |│  │ Handler  │ Handler  │ Handler  │  22 Handlers     │  │8. **Crear metas retroactivas para análisis** (OPCIONAL)
 
 
 
-### Login                   Validación         Lógica Negocio           Lógica Dominio#### 👤 Usuarios
+### Flujo de Autenticación```bash
 
 
 
-```bash                   - `GET /api/users/?page=1&per_page=10` - Listar usuarios
+#### 1. Login (Obtener Token JWT)python run.py│  └──────────┴──────────┴──────────┴──────────────────┘  │```bash
+
+
+
+```bash```
 
 curl -X POST http://127.0.0.1:5000/api/auth/login \
 
-  -H "Content-Type: application/json" \← 6. JSON Response ← 7. to_dict() ← 8. Commit ← 9. Save- `GET /api/users/<id>` - Obtener usuario
+  -H "Content-Type: application/json" \│                           ↓                              │python create_retroactive_goals.py
 
-  -d '{"username": "ana", "password": "password123"}'
+  -d '{
 
-``````- `POST /api/users/` - Crear usuario
+    "username": "admin",Servidor corriendo en: **http://127.0.0.1:5000**  
+
+    "password": "admin123"
+
+  }'Swagger UI: **http://127.0.0.1:5000/api/docs/**├─────────────────────────────────────────────────────────┤```
+
+```
 
 
 
-**Response**:- `PUT /api/users/<id>/activate` - Activar usuario
+**Respuesta:**
 
-```json
+```json---│                    DOMAIN LAYER                          │
 
-{### Principios Aplicados- `GET /api/users/statistics` - Estadísticas de usuarios
+{
 
   "success": true,
 
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "data": {
 
-  "user": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",## 🧪 Testing│         Entities (Domain Models + Business Logic)        │9. **Ejecutar aplicación**
 
-    "id": "1",- ✅ **Separation of Concerns**: Cada capa tiene responsabilidad única#### 🏢 Organizaciones
+    "user": {
 
-    "username": "ana",
+      "id": 1,
 
-    "role": "ADMIN"- ✅ **Dependency Inversion**: Capas externas dependen de las internas- `GET /api/organizations/` - Listar organizaciones
+      "username": "admin",
+
+      "role": "ADMIN"### Ejecutar Tests RBAC│  ┌──────────┬──────────┬──────────┬──────────────────┐  │```bash
+
+    }
 
   }
 
-}- ✅ **Single Responsibility**: Cada clase/función hace una cosa- `POST /api/organizations/` - Crear organización
+}
 
-```
+``````bash│  │  Quote   │ Invoice  │  Sales   │   Employee       │  │python run.py
 
-- ✅ **DRY (Don't Repeat Yourself)**: Código reutilizable- `PUT /api/organizations/<id>` - Actualizar
 
-### Usar Token
 
-- ✅ **SOLID Principles**: Código mantenible y extensible- `DELETE /api/organizations/<id>` - Eliminar
+#### 2. Usar Token en Requestspython tests/integration/test_rbac_simple.py
 
-```bash
+
+
+```bash```│  │  Entity  │  Entity  │  Order   │  22 Entities     │  │```
 
 curl -X GET http://127.0.0.1:5000/api/users/ \
 
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..."
-
-```---#### 📦 Inventario
-
-
-
-### Roles y Permisos- `GET /api/inventory_items/?status=active` - Items de inventario
-
-
-
-| Rol      | Usuarios | Ventas | Inventario | Organizaciones |## 📦 Requisitos- `POST /api/inventory_items/` - Agregar item
-
-|----------|----------|--------|------------|----------------|
-
-| ADMIN    | CRUD     | CRUD   | CRUD       | CRUD           |- `PUT /api/inventory_items/<id>` - Actualizar item
-
-| MANAGER  | Read     | CRUD   | CRUD       | Read           |
-
-| SALES    | Read     | CRUD   | Read       | Read           |### Software Necesario
-
-| VIEWER   | Read     | Read   | Read       | Read           |
-
-#### 💰 Ventas
-
----
-
-| Software | Versión Mínima | Recomendada |- `GET /api/quotes/` - Cotizaciones
-
-## 📊 Endpoints Principales
-
-|----------|----------------|-------------|- `GET /api/sales_orders/` - Órdenes de venta
-
-### Autenticación
-
-- `POST /api/auth/login` - Login con JWT| **Python** | 3.10 | 3.11+ |- `GET /api/invoices/` - Facturas
-
-- `POST /api/auth/register` - Registro de usuario
-
-- `GET /api/auth/me` - Perfil del usuario| **PostgreSQL** | 12 | 15+ |
-
-
-
-### Gestión| **pip** | 21.0 | Latest |#### 🏷️ Marcas
-
-- `GET /api/users/` - Listar usuarios
-
-- `GET /api/organizaciones/` - Listar organizaciones| **virtualenv** | - | Latest |- `GET /api/brands/` - Listar marcas
-
-- `GET /api/sucursales/` - Listar sucursales
-
-- `GET /api/empleados/` - Listar empleados- `POST /api/brands/` - Crear marca
-
-- `GET /api/inventory_items/` - Listar inventario
-
-### Dependencias Python Principales- `GET /api/brands/<id>` - Obtener marca
-
-### Ventas
-
-- `GET /api/quotes/` - Listar cotizaciones- `GET /api/brands/search?name=Omron` - Buscar por nombre
-
-- `GET /api/sales_orders/` - Listar órdenes de venta
-
-- `GET /api/invoices/` - Listar facturas```
-
-
-
-### AnalyticsFlask==3.1.0                  # Framework web#### 🎯 Metas de Ventas
-
-- `GET /api/metrics/summary` - Resumen de todas las métricas
-
-- `GET /api/metrics/sales` - Métricas de ventasFlask-SQLAlchemy==3.1.1       # ORM- `GET /api/sales_goals/` - Listar metas
-
-- `GET /api/metrics/inventory` - Métricas de inventario
-
-- `GET /api/dashboard/?period=month` - Dashboard con KPIsFlask-Migrate==4.0.5          # Migraciones DB- `POST /api/sales_goals/` - Crear meta
-
-
-
-**Ver todos los endpoints**: http://127.0.0.1:5000/api/docs/Flask-JWT-Extended==4.7.1     # Autenticación JWT- `GET /api/sales_goals/current` - Metas actuales
-
-
-
----psycopg2-binary==2.9.9        # Driver PostgreSQL- `GET /api/sales_goals/by_employee/<id>` - Metas de empleado
-
-
-
-## 📝 Ejemplos de Usobcrypt==5.0.0                 # Password hashing- `GET /api/sales_goals/by_branch/<id>` - Metas de sucursal
-
-
-
-### PaginaciónFlasgger==0.9.7.1             # Swagger UI
-
-
-
-```bashpython-dotenv==1.0.0          # Variables de entorno#### 📊 Analytics (CORE FEATURE)
-
-curl "http://127.0.0.1:5000/api/users/?page=1&per_page=10&status=active"
-
-```marshmallow==3.22.0           # Validación (Fase 3)- `GET /api/analytics/invoicing/by_employee` - Facturación por empleado
-
-
-
-**Response**:```- `GET /api/analytics/invoicing/by_branch` - Facturación por sucursal
-
-```json
-
-{- `GET /api/analytics/invoicing/by_brand` - Facturación por marca
-
-  "success": true,
-
-  "data": {Ver `requirements.txt` completo.- `GET /api/analytics/quotes/by_brand` - Cotizaciones por marca
-
-    "items": [...],
-
-    "total": 100,- `GET /api/analytics/goals/vs_actual` - **Metas vs Ventas Reales** ⭐
-
-    "page": 1,
-
-    "per_page": 10,---- `GET /api/analytics/sales/summary` - Resumen consolidado
-
-    "total_pages": 10
-
-  }- `GET /api/analytics/top_performers` - Ranking de vendedores
-
-}
-
-```## 🚀 Instalación Rápida
-
-
-
-### Crear Item de Inventario## 🧪 Testing
-
-
-
-```bash### Método 1: Instalación Manual (Recomendado)
-
-curl -X POST http://127.0.0.1:5000/api/inventory_items/ \
-
-  -H "Authorization: Bearer TOKEN" \```bash
-
-  -H "Content-Type: application/json" \
-
-  -d '{```bash# Ejecutar todos los tests
-
-    "name": "Laptop Dell XPS 15",
-
-    "quantity": 10,# 1. Clonar repositoriopytest
-
-    "unit_price": 3500000,
-
-    "brand_id": 1,git clone https://github.com/wilk-17/app-multicont.git
-
-    "category_id": 1
-
-  }'cd app-multicont# Con coverage
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
 ```
 
-pytest --cov=app
+**Resultado esperado**: `90/90 tests passed (100.0%)`│  └──────────┴──────────┴──────────┴──────────────────┘  │
 
-### Dashboard de Métricas
+#### 3. Validar Token
 
-# 2. Crear entorno virtual
+
 
 ```bash
 
-curl "http://127.0.0.1:5000/api/dashboard/?period=month" \python -m venv venv# Verbose
+curl -X GET http://127.0.0.1:5000/api/auth/validate \### Ejecutar Tests Unitarios│                           ↓                              │La API estará disponible en: `http://127.0.0.1:5000`
 
-  -H "Authorization: Bearer TOKEN"
+  -H "Authorization: Bearer TU_TOKEN_AQUI"
 
-```pytest -v
-
-
-
----# Windows```
+```
 
 
 
-## 📚 Documentación Completavenv\Scripts\activate
+#### 4. Logout```bash├─────────────────────────────────────────────────────────┤
 
 
 
-**Ver índice completo**: [docs/INDEX.md](docs/INDEX.md)## 🏗️ Arquitectura
+```bashpytest
+
+curl -X POST http://127.0.0.1:5000/api/auth/logout \
+
+  -H "Authorization: Bearer TU_TOKEN_AQUI"```│            DATABASE (PostgreSQL + SQLAlchemy)            │## 📚 Documentación API
+
+```
 
 
 
-### Para Desarrolladores# Linux/Mac
+### Matriz de Permisos (Resumen)
 
-- [AUTHENTICATION_GUIDE.md](docs/technical/guides/AUTHENTICATION_GUIDE.md) - Guía de autenticación JWT
+### Tests con Coverage└─────────────────────────────────────────────────────────┘
 
-- [TESTING_GUIDE.md](docs/technical/guides/TESTING_GUIDE.md) - Guía de testingsource venv/bin/activate### Clean Architecture (3 Capas)
+| Recurso            | ADMIN | MANAGER | SALES |
 
-- [EJEMPLOS_USO_API.md](docs/technical/api/EJEMPLOS_USO_API.md) - Ejemplos de uso
+|--------------------|-------|---------|-------|
 
+| **Usuarios**       | CRUD  | R       | R     |
 
+| **Roles**          | CRUD  | R       | R     |```bash```### Swagger UI
 
-### Para Evaluadores Académicos
+| **Organizaciones** | CRUD  | CRU     | R     |
 
-- [AUDITORIA_REQUISITOS.md](docs/academic/AUDITORIA_REQUISITOS.md) - ✅ **Cumplimiento de requisitos**# 3. Instalar dependencias```
+| **Sucursales**     | CRUD  | CRU     | R     |pytest --cov=app tests/
 
-- [METODOLOGIA_RAD.md](docs/academic/METODOLOGIA_RAD.md) - Evidencia de metodología RAD
+| **Empleados**      | CRUD  | CRU     | R     |
 
-- [ALCANCE_DEL_PROYECTO.md](docs/academic/ALCANCE_DEL_PROYECTO.md) - Alcance del proyectopip install -r requirements.txt┌─────────────────────────────────────────┐
+| **Inventario**     | CRUD  | CRU     | R     |```Acceder a: `http://127.0.0.1:5000/api/docs/`
 
-- [PLANTEAMIENTO_PROYECTO.docx](docs/PLANTEAMIENTO_PROYECTO.docx) - Documento académico APA 7
+| **Asignaciones**   | CRUD  | CRU     | R     |
 
-│         API Layer (Blueprints)          │  ← Flask Routes
+| **Cotizaciones**   | CRUD  | CRU     | CRUD  |
 
-### Para Product Owners
+| **Órdenes**        | CRUD  | CR      | -     |
 
-- [REGLAS_DE_NEGOCIO.md](docs/business/REGLAS_DE_NEGOCIO.md) - Reglas de negocio# 4. Configurar PostgreSQL│  - Parsing requests                     │
+| **Facturas**       | CRUD  | CR      | -     |### Verificar Setup### Flujo de Request
 
-- [WIREFRAMES.md](docs/business/wireframes/WIREFRAMES.md) - Wireframes del sistema
-
-- [DIAGRAMAS.md](docs/architecture/diagrams/DIAGRAMAS.md) - Diagramas UMLpsql -U postgres│  - JSON responses                       │
-
-
-
----CREATE DATABASE multicont_db;│  - Swagger docs                         │
+| **Analytics**      | R     | R       | -     |
 
 
 
-## 🛠️ Scripts Auxiliares\q└──────────────┬──────────────────────────┘
+**Leyenda**: C=Create, R=Read, U=Update, D=Delete
 
-
-
-### Setup               │
-
-- `scripts/setup/check_setup.py` - Verificar configuración del proyecto
-
-- `scripts/setup/generate_secret_keys.py` - Generar claves secretas# 5. Generar claves secretas┌──────────────▼──────────────────────────┐
-
-- `scripts/setup/populate_rbac_data.py` - Poblar datos de prueba RBAC
-
-python scripts/generate_secret_keys.py│      Use Cases Layer (Handlers)         │  ← Business Logic
-
-### Mantenimiento
-
-- `scripts/maintenance/check_database.py` - Verificar estado de la base de datos│  - CRUD operations                      │
-
-
-
-### Testing# 6. Configurar .env│  - Validation                           │
-
-- `scripts/testing/verification/verify_rbac.py` - Verificar compliance RBAC (80 endpoints)
-
-copy .env.example .env│  - Transactions                         │
+```bashDocumentación interactiva con todos los endpoints, schemas y posibilidad de probar directamente.
 
 ---
 
-# Editar .env con tus configuraciones y claves generadas│  - Pagination                           │
+python scripts/setup/check_setup.py
+
+## 🌐 Endpoints de la API
+
+``````
+
+### Resumen por Categoría (123 endpoints)
+
+
+
+#### 🔐 Autenticación (4 endpoints)
+
+- `POST /api/auth/login` - Login con username/password---1. HTTP Request → 2. API Blueprint → 3. Handler (Use Case) → 4. Entity (Domain) → 5. Database### Endpoints Principales
+
+- `GET /api/auth/validate` - Validar token JWT
+
+- `POST /api/auth/logout` - Cerrar sesión
+
+- `GET /api/auth/me` - Usuario actual
+
+## 🔐 Autenticación y RBAC                        ↓                    ↓                        ↓
+
+#### 👥 Gestión de Usuarios (5 endpoints)
+
+- `GET /api/users/` - Listar usuarios (paginado)
+
+- `GET /api/users/<id>` - Obtener usuario
+
+- `POST /api/users/` - Crear usuario (ADMIN)### Login                   Validación         Lógica Negocio           Lógica Dominio#### 👤 Usuarios
+
+- `PUT /api/users/<id>` - Actualizar usuario (ADMIN)
+
+- `DELETE /api/users/<id>` - Eliminar usuario (ADMIN)
+
+
+
+#### 🎭 Roles y Permisos (10 endpoints)```bash                   - `GET /api/users/?page=1&per_page=10` - Listar usuarios
+
+- `GET /api/roles/` - Listar roles
+
+- `POST /api/roles/` - Crear rol (ADMIN)curl -X POST http://127.0.0.1:5000/api/auth/login \
+
+- `GET /api/permisos/` - Listar permisos
+
+- `POST /api/permisos/` - Crear permiso (ADMIN)  -H "Content-Type: application/json" \← 6. JSON Response ← 7. to_dict() ← 8. Commit ← 9. Save- `GET /api/users/<id>` - Obtener usuario
+
+- ... (CRUD completo)
+
+  -d '{"username": "ana", "password": "password123"}'
+
+#### 🏢 Organizaciones (5 endpoints)
+
+- `GET /api/organizaciones/` - Listar organizaciones``````- `POST /api/users/` - Crear usuario
+
+- `POST /api/organizaciones/` - Crear organización (ADMIN/MANAGER)
+
+- ... (CRUD completo)
+
+
+
+#### 📍 Sucursales (5 endpoints)**Response**:- `PUT /api/users/<id>/activate` - Activar usuario
+
+- `GET /api/sucursales/` - Listar sucursales
+
+- `POST /api/sucursales/` - Crear sucursal (ADMIN/MANAGER)```json
+
+- ... (CRUD completo)
+
+{### Principios Aplicados- `GET /api/users/statistics` - Estadísticas de usuarios
+
+#### 👤 Personas y Empleados (10 endpoints)
+
+- `GET /api/personas/` - Listar personas  "success": true,
+
+- `GET /api/empleados/` - Listar empleados
+
+- `POST /api/empleados/` - Crear empleado (ADMIN/MANAGER)  "token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+
+- ... (CRUD completo)
+
+  "user": {
+
+#### 📦 Inventario (15 endpoints)
+
+- `GET /api/inventory_items/` - Listar items    "id": "1",- ✅ **Separation of Concerns**: Cada capa tiene responsabilidad única#### 🏢 Organizaciones
+
+- `POST /api/inventory_items/` - Crear item (ADMIN/MANAGER)
+
+- `GET /api/categorías/` - Listar categorías    "username": "ana",
+
+- `GET /api/marcas/` - Listar marcas
+
+- ... (CRUD completo)    "role": "ADMIN"- ✅ **Dependency Inversion**: Capas externas dependen de las internas- `GET /api/organizations/` - Listar organizaciones
+
+
+
+#### 🔖 Asignaciones (8 endpoints)  }
+
+- `GET /api/asignaciones/` - Listar asignaciones
+
+- `GET /api/asignaciones/employee/<id>/history` - Historial de empleado}- ✅ **Single Responsibility**: Cada clase/función hace una cosa- `POST /api/organizations/` - Crear organización
+
+- `POST /api/asignaciones/` - Crear asignación (ADMIN/MANAGER)
+
+- `PUT /api/asignaciones/<id>/return` - Marcar como devuelta```
+
+- `PUT /api/asignaciones/<id>/lost` - Reportar como perdida
+
+- ... (CRUD completo)- ✅ **DRY (Don't Repeat Yourself)**: Código reutilizable- `PUT /api/organizations/<id>` - Actualizar
+
+
+
+#### 📋 Cotizaciones (15 endpoints)### Usar Token
+
+- `GET /api/quotes/` - Listar cotizaciones
+
+- `POST /api/quotes/` - Crear cotización (TODOS)- ✅ **SOLID Principles**: Código mantenible y extensible- `DELETE /api/organizations/<id>` - Eliminar
+
+- `GET /api/items de cotización/` - Items de cotización
+
+- `GET /api/líneas de cotización/` - Líneas de cotización```bash
+
+- ... (CRUD completo)
+
+curl -X GET http://127.0.0.1:5000/api/users/ \
+
+#### 🛒 Órdenes de Venta (10 endpoints)
+
+- `GET /api/sales_orders/` - Listar órdenes (ADMIN/MANAGER)  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..."
+
+- `POST /api/sales_orders/` - Crear orden (ADMIN/MANAGER)
+
+- `GET /api/items de orden/` - Items de orden```---#### 📦 Inventario
+
+- ... (CRUD completo)
+
+
+
+#### 🧾 Facturas (10 endpoints)
+
+- `GET /api/invoices/` - Listar facturas (ADMIN/MANAGER)### Roles y Permisos- `GET /api/inventory_items/?status=active` - Items de inventario
+
+- `POST /api/invoices/` - Crear factura (ADMIN/MANAGER)
+
+- `GET /api/items de factura/` - Items de factura
+
+- ... (CRUD completo)
+
+| Rol      | Usuarios | Ventas | Inventario | Organizaciones |## 📦 Requisitos- `POST /api/inventory_items/` - Agregar item
+
+#### 🎯 Metas de Ventas (5 endpoints)
+
+- `GET /api/metas de ventas/` - Listar metas|----------|----------|--------|------------|----------------|
+
+- `POST /api/metas de ventas/` - Crear meta (ADMIN/MANAGER)
+
+- ... (CRUD completo)| ADMIN    | CRUD     | CRUD   | CRUD       | CRUD           |- `PUT /api/inventory_items/<id>` - Actualizar item
+
+
+
+#### 📊 Analytics (7 endpoints - ADMIN/MANAGER)| MANAGER  | Read     | CRUD   | CRUD       | Read           |
+
+- `GET /api/analytics/sales/summary` - Resumen de ventas
+
+- `GET /api/analytics/invoicing/by_employee` - Facturación por empleado| SALES    | Read     | CRUD   | Read       | Read           |### Software Necesario
+
+- `GET /api/analytics/invoicing/by_branch` - Facturación por sucursal
+
+- `GET /api/analytics/invoicing/by_brand` - Facturación por marca| VIEWER   | Read     | Read   | Read       | Read           |
+
+- `GET /api/analytics/quotes/by_brand` - Cotizaciones por marca
+
+- `GET /api/analytics/goals/vs_actual` - Metas vs real#### 💰 Ventas
+
+- `GET /api/analytics/top_performers` - Top performers
+
+---
+
+#### 📈 Métricas (5 endpoints)
+
+- `GET /api/metrics/users` - Métricas de usuarios| Software | Versión Mínima | Recomendada |- `GET /api/quotes/` - Cotizaciones
+
+- `GET /api/metrics/inventory` - Métricas de inventario
+
+- `GET /api/metrics/sales` - Métricas de ventas## 📊 Endpoints Principales
+
+- `GET /api/metrics/employees` - Métricas de empleados
+
+- `GET /api/metrics/summary` - Resumen consolidado|----------|----------------|-------------|- `GET /api/sales_orders/` - Órdenes de venta
+
+
+
+#### 📊 Dashboard (2 endpoints)### Autenticación
+
+- `GET /api/dashboard/?period=month` - Dashboard principal
+
+- `GET /api/dashboard/kpis` - KPIs del negocio- `POST /api/auth/login` - Login con JWT| **Python** | 3.10 | 3.11+ |- `GET /api/invoices/` - Facturas
+
+
+
+### Ejemplos de Uso- `POST /api/auth/register` - Registro de usuario
+
+
+
+#### Paginación- `GET /api/auth/me` - Perfil del usuario| **PostgreSQL** | 12 | 15+ |
+
+
+
+Todos los endpoints de lista soportan paginación:
+
+
+
+```bash### Gestión| **pip** | 21.0 | Latest |#### 🏷️ Marcas
+
+GET /api/users/?page=1&per_page=10&status=active
+
+```- `GET /api/users/` - Listar usuarios
+
+
+
+**Respuesta:**- `GET /api/organizaciones/` - Listar organizaciones| **virtualenv** | - | Latest |- `GET /api/brands/` - Listar marcas
+
+```json
+
+{- `GET /api/sucursales/` - Listar sucursales
+
+  "success": true,
+
+  "data": {- `GET /api/empleados/` - Listar empleados- `POST /api/brands/` - Crear marca
+
+    "items": [...],
+
+    "total": 100,- `GET /api/inventory_items/` - Listar inventario
+
+    "page": 1,
+
+    "per_page": 10,### Dependencias Python Principales- `GET /api/brands/<id>` - Obtener marca
+
+    "total_pages": 10
+
+  }### Ventas
+
+}
+
+```- `GET /api/quotes/` - Listar cotizaciones- `GET /api/brands/search?name=Omron` - Buscar por nombre
+
+
+
+#### Crear Organización- `GET /api/sales_orders/` - Listar órdenes de venta
+
+
+
+```bash- `GET /api/invoices/` - Listar facturas```
+
+curl -X POST http://127.0.0.1:5000/api/organizaciones/ \
+
+  -H "Authorization: Bearer TU_TOKEN" \
+
+  -H "Content-Type: application/json" \
+
+  -d '{### AnalyticsFlask==3.1.0                  # Framework web#### 🎯 Metas de Ventas
+
+    "historical_name": "Empresa ABC",
+
+    "current_name": "ABC Corp"- `GET /api/metrics/summary` - Resumen de todas las métricas
+
+  }'
+
+```- `GET /api/metrics/sales` - Métricas de ventasFlask-SQLAlchemy==3.1.1       # ORM- `GET /api/sales_goals/` - Listar metas
+
+
+
+#### Dashboard con Periodo- `GET /api/metrics/inventory` - Métricas de inventario
+
+
+
+```bash- `GET /api/dashboard/?period=month` - Dashboard con KPIsFlask-Migrate==4.0.5          # Migraciones DB- `POST /api/sales_goals/` - Crear meta
+
+curl "http://127.0.0.1:5000/api/dashboard/?period=month" \
+
+  -H "Authorization: Bearer TU_TOKEN"
+
+```
+
+**Ver todos los endpoints**: http://127.0.0.1:5000/api/docs/Flask-JWT-Extended==4.7.1     # Autenticación JWT- `GET /api/sales_goals/current` - Metas actuales
+
+**Periodos válidos**: `day`, `week`, `month`, `year`
+
+
+
+---
+
+---psycopg2-binary==2.9.9        # Driver PostgreSQL- `GET /api/sales_goals/by_employee/<id>` - Metas de empleado
+
+## 📚 Documentación
+
+
+
+### Documentación Interactiva
+
+## 📝 Ejemplos de Usobcrypt==5.0.0                 # Password hashing- `GET /api/sales_goals/by_branch/<id>` - Metas de sucursal
+
+**Swagger UI**: http://127.0.0.1:5000/api/docs/
+
+
+
+- Probar todos los endpoints directamente desde el navegador
+
+- Ver schemas de request/response### PaginaciónFlasgger==0.9.7.1             # Swagger UI
+
+- Autenticación JWT integrada
+
+
+
+### Documentación Completa
+
+```bashpython-dotenv==1.0.0          # Variables de entorno#### 📊 Analytics (CORE FEATURE)
+
+Ver [docs/INDEX.md](docs/INDEX.md) para el índice completo de documentación organizada por categorías:
+
+curl "http://127.0.0.1:5000/api/users/?page=1&per_page=10&status=active"
+
+- **📚 Académica**: Metodología RAD, Alcance, Requisitos
+
+- **💼 Negocio**: Reglas de negocio, Wireframes```marshmallow==3.22.0           # Validación (Fase 3)- `GET /api/analytics/invoicing/by_employee` - Facturación por empleado
+
+- **🏗️ Arquitectura**: Diagramas UML, Fases de implementación
+
+- **🔧 Técnica**: Guías de API, Testing, Deployment
+
+- **📊 Resúmenes**: Reportes ejecutivos, Análisis
+
+**Response**:```- `GET /api/analytics/invoicing/by_branch` - Facturación por sucursal
+
+### Guías Principales
+
+```json
+
+- [AUTHENTICATION_GUIDE.md](docs/technical/guides/AUTHENTICATION_GUIDE.md) - Guía de JWT y RBAC
+
+- [TESTING_GUIDE.md](docs/technical/guides/TESTING_GUIDE.md) - Guía de testing{- `GET /api/analytics/invoicing/by_brand` - Facturación por marca
+
+- [DEPLOYMENT.md](docs/technical/guides/DEPLOYMENT.md) - Guía de deployment
+
+- [EJEMPLOS_USO_API.md](docs/technical/api/EJEMPLOS_USO_API.md) - Ejemplos con curl  "success": true,
+
+
+
+---  "data": {Ver `requirements.txt` completo.- `GET /api/analytics/quotes/by_brand` - Cotizaciones por marca
+
+
+
+## 🛠️ Scripts Auxiliares    "items": [...],
+
+
+
+### Setup (Instalación)    "total": 100,- `GET /api/analytics/goals/vs_actual` - **Metas vs Ventas Reales** ⭐
+
+
+
+```bash    "page": 1,
+
+# Poblar roles, permisos y usuarios RBAC
+
+python scripts/setup/populate_rbac_data.py    "per_page": 10,---- `GET /api/analytics/sales/summary` - Resumen consolidado
+
+
+
+# Generar secret keys seguras    "total_pages": 10
+
+python scripts/setup/generate_secret_keys.py
+
+  }- `GET /api/analytics/top_performers` - Ranking de vendedores
+
+# Verificar instalación
+
+python scripts/setup/check_setup.py}
+
+```
+
+```## 🚀 Instalación Rápida
+
+### Maintenance (Mantenimiento)
+
+
+
+```bash
+
+# Verificar estado de la base de datos### Crear Item de Inventario## 🧪 Testing
+
+python scripts/maintenance/check_database.py
+
+```
+
+
+
+### Testing```bash### Método 1: Instalación Manual (Recomendado)
+
+
+
+```bashcurl -X POST http://127.0.0.1:5000/api/inventory_items/ \
+
+# Test exhaustivo original (123 endpoints × 3 roles)
+
+python scripts/testing/test_all_endpoints_all_roles.py  -H "Authorization: Bearer TOKEN" \```bash
+
+```
+
+  -H "Content-Type: application/json" \
+
+---
+
+  -d '{```bash# Ejecutar todos los tests
 
 ## 🎓 Cumplimiento de Requisitos Académicos
 
-└──────────────┬──────────────────────────┘
+    "name": "Laptop Dell XPS 15",
+
+### Metodología RAD
+
+    "quantity": 10,# 1. Clonar repositoriopytest
+
+✅ **Fase 1 - Requerimientos**: Ver [REQUERIMIENTOS_FUNCIONALES.md](docs/academic/requirements/REQUERIMIENTOS_FUNCIONALES.md)  
+
+✅ **Fase 2 - Planificación**: Ver [METODOLOGIA_RAD.md](docs/academic/METODOLOGIA_RAD.md)      "unit_price": 3500000,
+
+✅ **Fase 3 - Ejecución**: Código fuente en `app/` (Clean Architecture)  
+
+✅ **Fase 4 - Testing**: 369 tests RBAC (100% pasando)      "brand_id": 1,git clone https://github.com/wilk-17/app-multicont.git
+
+
+
+### Auditoría de Requisitos    "category_id": 1
+
+
+
+Ver [AUDITORIA_REQUISITOS.md](docs/academic/AUDITORIA_REQUISITOS.md) para cumplimiento detallado:  }'cd app-multicont# Con coverage
+
+
+
+- ✅ **ORM**: 22 entidades con SQLAlchemy (100%)```
+
+- ✅ **Controladores**: 20 handlers validados (100%)
+
+- ✅ **Interfaces CRUD**: 24 APIs RESTful (100%)pytest --cov=app
+
+- ✅ **Paginación**: Todos los endpoints de lista (100%)
+
+- ✅ **Funciones Principales**: Wireframes + Modelo de Negocio (100%)### Dashboard de Métricas
+
+- ✅ **Reportes**: Dashboard + Analytics + Métricas (100%)
+
+- ✅ **Configuración**: .env + config.py (100%)# 2. Crear entorno virtual
+
+- ✅ **Usuarios-Permisos**: RBAC + JWT + bcrypt (100%)
+
+- ✅ **Llaveros**: Secret keys + JWT keys (100%)```bash
+
+
+
+**Cumplimiento Total: 100%** 🎉curl "http://127.0.0.1:5000/api/dashboard/?period=month" \python -m venv venv# Verbose
+
+
+
+---  -H "Authorization: Bearer TOKEN"
+
+
+
+## 👥 Equipo de Desarrollo```pytest -v
+
+
+
+| Nombre          | Rol                              | Responsabilidades                  |
+
+|-----------------|----------------------------------|------------------------------------|
+
+| **Wilker**      | Backend Developer & DB Architect | Clean Architecture, Base de Datos  |---# Windows```
+
+| **Daniel**      | Backend Developer & Test Engineer| Testing, RBAC, Validaciones        |
+
+
+
+### Contribuciones
+
+## 📚 Documentación Completavenv\Scripts\activate
+
+- **Wilker**: 
+
+  - Diseño de Clean Architecture (3 capas)
+
+  - Implementación de 22 entidades ORM
+
+  - Migraciones Alembic (23 tablas)**Ver índice completo**: [docs/INDEX.md](docs/INDEX.md)## 🏗️ Arquitectura
+
+  - BaseHandler con DRY pattern
+
+  - Documentación técnica
+
+
+
+- **Daniel**:### Para Desarrolladores# Linux/Mac
+
+  - Sistema RBAC completo (JWT + bcrypt)
+
+  - 369 tests automatizados (100% passing)- [AUTHENTICATION_GUIDE.md](docs/technical/guides/AUTHENTICATION_GUIDE.md) - Guía de autenticación JWT
+
+  - Schemas Marshmallow (validación)
+
+  - Analytics y Dashboard- [TESTING_GUIDE.md](docs/technical/guides/TESTING_GUIDE.md) - Guía de testingsource venv/bin/activate### Clean Architecture (3 Capas)
+
+  - Guías de testing
+
+- [EJEMPLOS_USO_API.md](docs/technical/api/EJEMPLOS_USO_API.md) - Ejemplos de uso
+
+---
+
+
+
+## 📊 Estadísticas del Proyecto
+
+### Para Evaluadores Académicos
+
+- **Líneas de código Python**: ~15,000+
+
+- **Entidades de dominio**: 22- [AUDITORIA_REQUISITOS.md](docs/academic/AUDITORIA_REQUISITOS.md) - ✅ **Cumplimiento de requisitos**# 3. Instalar dependencias```
+
+- **Handlers de negocio**: 20
+
+- **APIs RESTful**: 24 blueprints- [METODOLOGIA_RAD.md](docs/academic/METODOLOGIA_RAD.md) - Evidencia de metodología RAD
+
+- **Endpoints totales**: 123
+
+- **Tests automatizados**: 369 (100% passing)- [ALCANCE_DEL_PROYECTO.md](docs/academic/ALCANCE_DEL_PROYECTO.md) - Alcance del proyectopip install -r requirements.txt┌─────────────────────────────────────────┐
+
+- **Migraciones**: 5 aplicadas (23 tablas)
+
+- **Documentación**: 50+ archivos organizados- [PLANTEAMIENTO_PROYECTO.docx](docs/PLANTEAMIENTO_PROYECTO.docx) - Documento académico APA 7
+
+- **Archivos legacy eliminados**: 54 (85 MB liberados)
+
+│         API Layer (Blueprints)          │  ← Flask Routes
+
+---
+
+### Para Product Owners
+
+## 🔗 Enlaces Útiles
+
+- [REGLAS_DE_NEGOCIO.md](docs/business/REGLAS_DE_NEGOCIO.md) - Reglas de negocio# 4. Configurar PostgreSQL│  - Parsing requests                     │
+
+- **Repositorio**: https://github.com/wilk-17/app-multicont
+
+- **Documentación completa**: [docs/INDEX.md](docs/INDEX.md)- [WIREFRAMES.md](docs/business/wireframes/WIREFRAMES.md) - Wireframes del sistema
+
+- **Guía de inicio**: [INDEX_INICIO.md](INDEX_INICIO.md)
+
+- **Auditoría de requisitos**: [docs/academic/AUDITORIA_REQUISITOS.md](docs/academic/AUDITORIA_REQUISITOS.md)- [DIAGRAMAS.md](docs/architecture/diagrams/DIAGRAMAS.md) - Diagramas UMLpsql -U postgres│  - JSON responses                       │
+
+
+
+---
+
+
+
+## 📝 Changelog---CREATE DATABASE multicont_db;│  - Swagger docs                         │
+
+
+
+### [2.0.0] - 2025-10-21
+
+
+
+#### ✨ Agregado## 🛠️ Scripts Auxiliares\q└──────────────┬──────────────────────────┘
+
+- Test exhaustivo interactivo (369 tests con 100% éxito)
+
+- Sistema RBAC completo validado en 123 endpoints
+
+- README completamente renovado y actualizado
+
+### Setup               │
+
+#### 🔧 Mejorado
+
+- Limpieza de 54 archivos legacy (85 MB liberados)- `scripts/setup/check_setup.py` - Verificar configuración del proyecto
+
+- Estructura de proyecto optimizada
+
+- Documentación completamente reorganizada- `scripts/setup/generate_secret_keys.py` - Generar claves secretas# 5. Generar claves secretas┌──────────────▼──────────────────────────┐
+
+
+
+#### 🗑️ Eliminado- `scripts/setup/populate_rbac_data.py` - Poblar datos de prueba RBAC
+
+- `app/models/` (reemplazado por `app/entities/`)
+
+- `app/routes.py` (reemplazado por `app/api/`)python scripts/generate_secret_keys.py│      Use Cases Layer (Handlers)         │  ← Business Logic
+
+- Scripts de testing obsoletos (11 archivos)
+
+- Documentos MD legacy en raíz (7 archivos)### Mantenimiento
+
+- Archivos temporales (6 archivos .txt)
+
+- Scripts de mantenimiento legacy (4 archivos)- `scripts/maintenance/check_database.py` - Verificar estado de la base de datos│  - CRUD operations                      │
+
+- Tests legacy (2 archivos)
+
+- 15 scripts Python obsoletos en raíz
+
+
+
+### [1.0.0] - 2025-10-19### Testing# 6. Configurar .env│  - Validation                           │
+
+
+
+#### ✨ Lanzamiento Inicial- `scripts/testing/verification/verify_rbac.py` - Verificar compliance RBAC (80 endpoints)
+
+- Clean Architecture implementada
+
+- 22 entidades de dominiocopy .env.example .env│  - Transactions                         │
+
+- Sistema RBAC básico
+
+- Swagger UI integrado---
+
+
+
+---# Editar .env con tus configuraciones y claves generadas│  - Pagination                           │
+
+
+
+## 📄 Licencia## 🎓 Cumplimiento de Requisitos Académicos
+
+
+
+Este proyecto es de uso académico.  └──────────────┬──────────────────────────┘
+
+**Prohibida su distribución o uso comercial sin autorización.**
 
 ✅ **Metodología RAD**: Requerimientos + Planificación + Ejecución + Testing  
 
+---
+
 ✅ **ORM**: SQLAlchemy con 23 modelos  # 7. Ejecutar migraciones               │
+
+## 🙏 Agradecimientos
 
 ✅ **Controladores**: 20 handlers validados (100% RBAC)  
 
-✅ **Interfaces CRUD**: 20 APIs con Swagger UI  flask db upgrade┌──────────────▼──────────────────────────┐
+- **Flask Community** - Por la excelente documentación
 
-✅ **Paginación**: En todos los endpoints de listado  
+- **SQLAlchemy** - Por el ORM robusto✅ **Interfaces CRUD**: 20 APIs con Swagger UI  flask db upgrade┌──────────────▼──────────────────────────┐
 
-✅ **Funciones Principales**: Wireframes + Modelo de Negocio  │       Entities Layer (Models)           │  ← Domain Logic
+- **pytest** - Por el framework de testing
 
-✅ **Reportes**: Dashboard + Métricas + KPIs  
+- **Marshmallow** - Por la validación de datos✅ **Paginación**: En todos los endpoints de listado  
+
+
+
+---✅ **Funciones Principales**: Wireframes + Modelo de Negocio  │       Entities Layer (Models)           │  ← Domain Logic
+
+
+
+**Desarrollado con ❤️ por el equipo Wilker & Daniel**  ✅ **Reportes**: Dashboard + Métricas + KPIs  
+
+**2025 © Todos los derechos reservados**
 
 ✅ **Configuración**: .env + config.py  # 8. Poblar base de datos (opcional)│  - SQLAlchemy models                    │
 
