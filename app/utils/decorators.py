@@ -37,19 +37,24 @@ def jwt_required_custom(fn):
 def require_role(*allowed_roles):
     """
     Decorador que verifica que el usuario tenga uno de los roles permitidos
+    Si no se especifican roles, solo valida autenticación JWT.
     
     Args:
         *allowed_roles: Lista de roles permitidos ('ADMIN', 'MANAGER', 'SALES')
+                        Si está vacío, permite cualquier usuario autenticado.
         
     Usage:
+        @app.route('/authenticated-only')
+        @require_role()  # Solo requiere autenticación
+        def any_user():
+            return {'message': 'Cualquier usuario autenticado'}
+    
         @app.route('/admin-only')
-        @jwt_required()
         @require_role('ADMIN')
         def admin_route():
             return {'message': 'Solo admins'}
             
         @app.route('/admin-or-manager')
-        @jwt_required()
         @require_role('ADMIN', 'MANAGER')
         def manager_route():
             return {'message': 'Admins o Managers'}
@@ -62,6 +67,11 @@ def require_role(*allowed_roles):
                 claims = get_jwt()
                 user_role = claims.get('role')
                 
+                # Si no se especificaron roles, permitir cualquier usuario autenticado
+                if len(allowed_roles) == 0:
+                    return fn(*args, **kwargs)
+                
+                # Verificar si el usuario tiene un rol permitido
                 if user_role not in allowed_roles:
                     return jsonify({
                         'success': False,

@@ -28,7 +28,7 @@ quote_api = Blueprint('quote_api', __name__, url_prefix='/api/quotes')
 handler = QuoteHandler()
 
 @quote_api.route('/', methods=['GET'])
-@jwt_required()
+@require_role()
 @cache.cached(timeout=300, query_string=True)
 def get_all():
     """
@@ -36,6 +36,8 @@ def get_all():
     ---
     tags:
       - Cotizaciones
+    security:
+      - Bearer: []
     parameters:
       - name: page
         in: query
@@ -98,13 +100,15 @@ def get_all():
         return error_response(f"Error al listar cotizaciones: {str(e)}", 500)
 
 @quote_api.route('/<int:id>', methods=['GET'])
-@jwt_required()
+@require_role()
 def get_by_id(id):
     """
     Obtiene una cotización por ID
     ---
     tags:
       - Cotizaciones
+    security:
+      - Bearer: []
     parameters:
       - name: id
         in: path
@@ -138,13 +142,15 @@ def get_by_id(id):
         return error_response(f"Error al obtener cotización: {str(e)}", 500)
 
 @quote_api.route('/', methods=['POST'])
-@jwt_required()
+@require_role('ADMIN', 'MANAGER', 'SALES')
 def create():
     """
     Crea una nueva cotización con validación automática
     ---
     tags:
       - Cotizaciones
+    security:
+      - Bearer: []
     parameters:
       - name: body
         in: body
@@ -251,7 +257,6 @@ def create():
         return error_response('Error interno del servidor', 500)
 
 @quote_api.route('/<int:id>', methods=['PUT'])
-@jwt_required()
 @require_role('ADMIN', 'MANAGER')
 def update(id):
     """
@@ -348,7 +353,6 @@ def update(id):
         return error_response('Error interno del servidor', 500)
 
 @quote_api.route('/<int:id>', methods=['DELETE'])
-@jwt_required()
 @require_role('ADMIN')
 def delete(id):
     """

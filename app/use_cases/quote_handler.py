@@ -28,6 +28,59 @@ class QuoteHandler(BaseHandler):
         """Inicializa con el modelo Quote."""
         super().__init__(Quote)
     
+    # Override del método create para manejar items anidados
+    
+    def create(self, **kwargs) -> Quote:
+        """
+        Crea una nueva cotización con sus líneas de items.
+        
+        Args:
+            **kwargs: Datos de la cotización incluyendo 'items' (lista de líneas)
+        
+        Returns:
+            Quote: Cotización creada
+        
+        Raises:
+            ValueError: Si hay error en los datos
+        """
+        from app import db
+        from app.entities.quotation_line import QuotationLine
+        
+        try:
+            # Extraer items del kwargs si existen
+            items_data = kwargs.pop('items', [])
+            
+            # Crear la cotización sin los items
+            quote = Quote(**kwargs)
+            db.session.add(quote)
+            db.session.flush()  # Para obtener el ID de la quote
+            
+            # Crear las líneas de items
+            total = 0
+            for item_data in items_data:
+                line = QuotationLine(
+                    quote_id=quote.id,
+                    item_id=item_data['inventory_item_id'],  # Mapeo de nombre
+                    quantity=item_data['quantity'],
+                    price=item_data['unit_price'],  # Mapeo de nombre
+                    description=item_data.get('description')
+                )
+                # Calcular total de la línea
+                line_total = item_data['quantity'] * float(item_data['unit_price'])
+                total += line_total
+                
+                db.session.add(line)
+            
+            # Actualizar el total de la cotización
+            quote.total = total
+            
+            db.session.commit()
+            return quote
+            
+        except Exception as e:
+            db.session.rollback()
+            raise ValueError(f"Error al crear cotización: {str(e)}")
+    
     # Métodos específicos del dominio Quote
     
     def approve(self, id: int) -> Optional[Quote]:

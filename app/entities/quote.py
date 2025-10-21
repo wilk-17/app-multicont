@@ -10,6 +10,9 @@ class Quote(db.Model):
     total = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     employee_id = db.Column(db.BigInteger, db.ForeignKey("employee.id"), nullable=True)  # Vendedor responsable
     
+    # Relación con líneas de cotización (cascade delete)
+    lines = db.relationship("QuotationLine", backref="quote", cascade="all, delete-orphan", lazy=True)
+    
     def __init__(self, customer_name, date, total=0, employee_id=None):
         self.customer_name = customer_name
         self.date = date

@@ -191,26 +191,27 @@ def require_any_permission(permissions: list):
     return decorator
 
 
-def require_role(roles):
+def require_role(*allowed_roles):
     """
     Decorador que requiere un rol específico o lista de roles.
+    Si no se pasa ningún rol, solo valida que el usuario esté autenticado.
     
     Args:
-        roles: Rol requerido (str) o lista de roles permitidos (list)
+        *allowed_roles: Rol(es) requerido(s). Si no se pasa ninguno, permite todos los roles autenticados.
         
     Usage:
+        @require_role()  # Cualquier usuario autenticado
+        def public_for_auth():
+            ...
+            
         @require_role('ADMIN')
         def admin_only():
             ...
             
-        @require_role(['ADMIN', 'MANAGER'])
+        @require_role('ADMIN', 'MANAGER')
         def manager_or_admin():
             ...
     """
-    # Convertir a lista si es string
-    if isinstance(roles, str):
-        roles = [roles]
-    
     def decorator(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -224,11 +225,16 @@ def require_role(roles):
                     'error': 'No se pudo determinar el rol del usuario'
                 }), 403
             
-            if user_role not in roles:
+            # Si no se especificaron roles, permitir todos los roles autenticados
+            if len(allowed_roles) == 0:
+                return fn(*args, **kwargs)
+            
+            # Verificar si el rol del usuario está en los roles permitidos
+            if user_role not in allowed_roles:
                 return jsonify({
                     'success': False,
-                    'error': f'Acceso denegado. Roles permitidos: {", ".join(roles)}',
-                    'required_roles': roles,
+                    'error': f'Acceso denegado. Roles permitidos: {", ".join(allowed_roles)}',
+                    'required_roles': list(allowed_roles),
                     'your_role': user_role
                 }), 403
             
@@ -258,4 +264,4 @@ def manager_or_admin():
         def approve_quote():
             ...
     """
-    return require_role(['ADMIN', 'MANAGER'])
+    return require_role('ADMIN', 'MANAGER')
