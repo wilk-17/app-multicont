@@ -132,7 +132,7 @@ def get_by_id(id):
 
 @user_role_api.route('/', methods=['POST'])
 @jwt_required()
-@require_role('ADMIN', 'MANAGER')
+@require_role('ADMIN')
 def create():
     """
     Crea un nuevo rol de usuario
@@ -190,7 +190,7 @@ def create():
 
 @user_role_api.route('/<int:id>', methods=['PUT'])
 @jwt_required()
-@require_role('ADMIN', 'MANAGER')
+@require_role('ADMIN')
 def update(id):
     """
     Actualiza un rol de usuario

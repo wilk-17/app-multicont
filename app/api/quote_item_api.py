@@ -132,7 +132,7 @@ def get_by_id(id):
 
 @quote_item_api.route('/', methods=['POST'])
 @jwt_required()
-@require_role('ADMIN', 'MANAGER')
+@require_role('ADMIN', 'MANAGER', 'SALES')
 def create():
     """
     Crea un nuevo item de cotización

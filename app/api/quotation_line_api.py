@@ -132,7 +132,7 @@ def get_by_id(id):
 
 @quotation_line_api.route('/', methods=['POST'])
 @jwt_required()
-@require_role('ADMIN', 'MANAGER')
+@require_role('ADMIN', 'MANAGER', 'SALES')
 def create():
     """
     Crea un nuevo línea de cotización
@@ -192,6 +192,15 @@ def create():
     """
     try:
         data = request.get_json()
+        
+        # Transformar inventory_item_id a item_id (modelo usa item_id)
+        if 'inventory_item_id' in data:
+            data['item_id'] = data.pop('inventory_item_id')
+        
+        # Transformar unit_price a price (modelo usa price)
+        if 'unit_price' in data:
+            data['price'] = data.pop('unit_price')
+        
         # Invalidar cache
         obj = handler.create(**data)
         return success_response(obj.to_dict(), 'QuotationLine creado exitosamente', 201)
@@ -258,11 +267,17 @@ def update(id):
     """
     try:
         data = request.get_json()
+        # Transformar inventory_item_id a item_id (como espera el modelo)
+        if 'inventory_item_id' in data:
+            data['item_id'] = data.pop('inventory_item_id')
+        # Transformar unit_price a price (como espera el modelo)
+        if 'unit_price' in data:
+            data['price'] = data.pop('unit_price')
         # Invalidar cache
-        obj = handler.update(id, **data)
-        return success_response(obj.to_dict(), 'QuotationLine actualizado exitosamente')
+        obj = handler.create(**data)
+        return success_response(obj.to_dict(), 'QuotationLine creado exitosamente', 201)
     except ValueError as e:
-        return error_response(str(e), 404)
+        return error_response(str(e), 400)
     except Exception as e:
         return error_response(str(e), 500)
 

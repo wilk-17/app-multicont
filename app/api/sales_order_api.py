@@ -164,7 +164,7 @@ def create():
             status_code=201
         )
     except ValidationError as e:
-        return error_response('Datos de validación incorrectos', 400, errors=e.messages)
+        return error_response(f'Datos de validación incorrectos: {e.messages}', 400)
     except ValueError as e:
         return error_response(str(e), 400)
     except Exception as e:
@@ -206,7 +206,7 @@ def update(id):
         result = sales_order_response_schema.dump(obj)
         return success_response(data=result, message='Orden de venta actualizada exitosamente')
     except ValidationError as e:
-        return error_response('Datos de validación incorrectos', 400, errors=e.messages)
+        return error_response(f'Datos de validación incorrectos: {e.messages}', 400)
     except ValueError as e:
         return error_response(str(e), 404)
     except Exception as e:

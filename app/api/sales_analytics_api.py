@@ -17,6 +17,7 @@ from app.entities.inventory_item import InventoryItem
 from app.entities.brand import Brand
 from app.entities.sales_goal import SalesGoal
 from flask_jwt_extended import jwt_required
+from app.services.authorization_service import require_role
 from app.api.helpers import (
     success_response,
     error_response
@@ -37,6 +38,7 @@ def parse_date(date_str):
 
 @sales_analytics_api.route('/invoicing/by_employee', methods=['GET'])
 @jwt_required()
+@require_role(['ADMIN', 'MANAGER'])
 @cache.cached(timeout=600, query_string=True)
 def invoicing_by_employee():
     """
@@ -139,6 +141,7 @@ def invoicing_by_employee():
 
 @sales_analytics_api.route('/invoicing/by_branch', methods=['GET'])
 @jwt_required()
+@require_role(['ADMIN', 'MANAGER'])
 @cache.cached(timeout=600, query_string=True)
 def invoicing_by_branch():
     """
@@ -217,6 +220,7 @@ def invoicing_by_branch():
 
 @sales_analytics_api.route('/invoicing/by_brand', methods=['GET'])
 @jwt_required()
+@require_role(['ADMIN', 'MANAGER'])
 @cache.cached(timeout=600, query_string=True)
 def invoicing_by_brand():
     """
@@ -257,7 +261,7 @@ def invoicing_by_brand():
             func.sum(InvoiceItem.quantity * InvoiceItem.price).label('total_invoiced'),
             func.sum(InvoiceItem.quantity).label('total_quantity'),
             func.count(func.distinct(InvoiceItem.invoice_id)).label('invoice_count')
-        ).join(
+        ).select_from(Invoice).join(
             InvoiceItem, Invoice.id == InvoiceItem.invoice_id
         ).join(
             InventoryItem, InvoiceItem.item_id == InventoryItem.id
@@ -298,6 +302,7 @@ def invoicing_by_brand():
 
 @sales_analytics_api.route('/quotes/by_brand', methods=['GET'])
 @jwt_required()
+@require_role(['ADMIN', 'MANAGER'])
 @cache.cached(timeout=600, query_string=True)
 def quotes_by_brand():
     """
@@ -340,7 +345,7 @@ def quotes_by_brand():
             InventoryItem.brand_id,
             func.count(func.distinct(QuoteItem.quote_id)).label('quote_count'),
             func.sum(QuoteItem.quantity).label('total_quantity')
-        ).join(
+        ).select_from(Quote).join(
             QuoteItem, Quote.id == QuoteItem.quote_id
         ).join(
             InventoryItem, QuoteItem.item_id == InventoryItem.id
@@ -380,6 +385,7 @@ def quotes_by_brand():
 
 @sales_analytics_api.route('/goals/vs_actual', methods=['GET'])
 @jwt_required()
+@require_role(['ADMIN', 'MANAGER'])
 @cache.cached(timeout=600, query_string=True)
 def goals_vs_actual():
     """
@@ -552,6 +558,7 @@ def goals_vs_actual():
 
 @sales_analytics_api.route('/sales/summary', methods=['GET'])
 @jwt_required()
+@require_role(['ADMIN', 'MANAGER'])
 @cache.cached(timeout=600, query_string=True)
 def sales_summary():
     """
@@ -660,6 +667,7 @@ def sales_summary():
 
 @sales_analytics_api.route('/top_performers', methods=['GET'])
 @jwt_required()
+@require_role(['ADMIN', 'MANAGER'])
 @cache.cached(timeout=600, query_string=True)
 def top_performers():
     """

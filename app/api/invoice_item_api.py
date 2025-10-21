@@ -18,6 +18,7 @@ handler = InvoiceItemHandler()
 
 @invoice_item_api.route('/', methods=['GET'])
 @jwt_required()
+@require_role('ADMIN', 'MANAGER')
 @cache.cached(timeout=300, query_string=True)
 def get_all():
     """
