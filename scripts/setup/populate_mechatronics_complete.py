@@ -25,6 +25,7 @@ seed(42)
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
+from sqlalchemy import text
 from app import create_app, db
 from app.entities.state import State
 from app.entities.city import City
@@ -94,31 +95,31 @@ def delete_seeded(session):
     print('⏳ Resetting seeded data (best-effort) ...')
     try:
         # invoice items/orders/quotes first
-        session.execute('DELETE FROM invoice_item')
-        session.execute('DELETE FROM invoice')
-        session.execute('DELETE FROM sales_order_item')
-        session.execute('DELETE FROM sales_order')
-        session.execute('DELETE FROM quotation_line')
-        session.execute('DELETE FROM quote')
+        session.execute(text('DELETE FROM invoice_item'))
+        session.execute(text('DELETE FROM invoice'))
+        session.execute(text('DELETE FROM sales_order_item'))
+        session.execute(text('DELETE FROM sales_order'))
+        session.execute(text('DELETE FROM quotation_line'))
+        session.execute(text('DELETE FROM quote'))
 
         # assignments, employees, persons
-        session.execute('DELETE FROM employee')
-        session.execute('DELETE FROM person')
+        session.execute(text('DELETE FROM employee'))
+        session.execute(text('DELETE FROM person'))
 
         # inventory and categories and brands
-        session.execute("DELETE FROM inventory_item WHERE name ILIKE 'OMR_%' OR name ILIKE 'RC_%' OR name ILIKE 'GF_%' OR name ILIKE 'WM_%' OR name ILIKE 'RL_%' OR brand_id IN (SELECT id FROM brand WHERE name IN ('OMRON','ING Multicontrol','Gefran','Weidmüller','Rice Lake','Optec'))")
-        session.execute("DELETE FROM brand WHERE name IN ('OMRON','ING Multicontrol','Gefran','Weidmüller','Rice Lake','Optec')")
+        session.execute(text("DELETE FROM inventory_item WHERE name ILIKE 'OMR_%' OR name ILIKE 'RC_%' OR name ILIKE 'GF_%' OR name ILIKE 'WM_%' OR name ILIKE 'RL_%' OR brand_id IN (SELECT id FROM brand WHERE name IN ('OMRON','ING Multicontrol','Gefran','Weidmüller','Rice Lake','Optec'))"))
+        session.execute(text("DELETE FROM brand WHERE name IN ('OMRON','ING Multicontrol','Gefran','Weidmüller','Rice Lake','Optec')"))
 
         # branches and organizations created by this script
-        session.execute("DELETE FROM branch WHERE id IN (SELECT b.id FROM branch b JOIN organization o ON o.id = b.organization_id WHERE o.current_name ILIKE '%Multicontrol%' OR o.current_name ILIKE '%SeedCo%')")
-        session.execute("DELETE FROM organization WHERE current_name ILIKE '%Multicontrol%' OR current_name ILIKE 'SeedCo %'")
+        session.execute(text("DELETE FROM branch WHERE id IN (SELECT b.id FROM branch b JOIN organization o ON o.id = b.organization_id WHERE o.current_name ILIKE '%Multicontrol%' OR o.current_name ILIKE '%SeedCo%')"))
+        session.execute(text("DELETE FROM organization WHERE current_name ILIKE '%Multicontrol%' OR current_name ILIKE 'SeedCo %'"))
 
         # cities & states created by this run (conservative: we won't drop states that have other data)
-        session.execute("DELETE FROM city WHERE code IN ('BOG','MED','CAL','IBA','CTG')")
+        session.execute(text("DELETE FROM city WHERE code IN ('BOG','MED','CAL','IBA','CTG')"))
         # roles/users created by seeding
-        session.execute("DELETE FROM user_role WHERE user_id IN (SELECT id FROM user WHERE username ILIKE 'seed_%')")
-        session.execute("DELETE FROM user WHERE username ILIKE 'seed_%'")
-        session.execute("DELETE FROM role WHERE name ILIKE 'SEED_%'")
+        session.execute(text("DELETE FROM user_role WHERE user_id IN (SELECT id FROM \"user\" WHERE username ILIKE 'seed_%')"))
+        session.execute(text("DELETE FROM \"user\" WHERE username ILIKE 'seed_%'"))
+        session.execute(text("DELETE FROM role WHERE name ILIKE 'SEED_%'"))
 
         session.commit()
         print('✅ Reset completed (best-effort).')
@@ -255,14 +256,10 @@ def seed_persons_and_employees(session, branch_map):
 def seed_item_categories(session):
     cat_names = ['IC', 'AT', 'SAFETY', 'PESAJE', 'ACCESSORIES']
     for name in cat_names:
-        exists = session.query(ItemCategory).filter_by(code=name).first() if hasattr(ItemCategory,'code') else session.query(ItemCategory).filter_by(name=name).first()
+        # ItemCategory only has 'name' field
+        exists = session.query(ItemCategory).filter_by(name=name).first()
         if not exists:
-            # ItemCategory in this project likely has 'name' field
-            try:
-                c = ItemCategory(name=name, description=f'Category {name} (seed)')
-            except Exception:
-                # fallback if signature differs
-                c = ItemCategory(description=name)
+            c = ItemCategory(name=name)
             session.add(c)
     session.flush()
 
@@ -280,20 +277,38 @@ def seed_inventory(session):
 
     # small helper to add item if missing
     def add_item(sku_prefix, name, brand_name, category_code, price_range=(100000,2000000), qty_range=(1,50)):
-        sku = f'{sku_prefix}_{randint(1000,9999)}'
-        exists = session.query(InventoryItem).filter(InventoryItem.name==name, InventoryItem.brand_id==brand_objs.get(brand_name).id if brand_objs.get(brand_name) else None).first()
+        brand_obj = brand_objs.get(brand_name)
+        if not brand_obj:
+            return
+        
+        # Check if item already exists
+        exists = session.query(InventoryItem).filter(
+            InventoryItem.name==name, 
+            InventoryItem.brand_id==brand_obj.id
+        ).first()
         if exists:
             return
+        
         price = randint(*price_range)
         qty = randint(*qty_range)
-        brand_id = brand_objs.get(brand_name).id if brand_objs.get(brand_name) else None
+        brand_id = brand_obj.id
         category_id = None
+        
         # pick category id by code if available
         for c in categories:
             if getattr(c,'name',None) == category_code or getattr(c,'code',None) == category_code:
                 category_id = c.id
                 break
-        item = InventoryItem(name=name, price=price, quantity=qty, description=f'{name} - {brand_name}', category_id=category_id, brand_id=brand_id)
+        
+        # Create item with correct constructor signature
+        item = InventoryItem(
+            name=name, 
+            price=price, 
+            quantity=qty, 
+            description=f'{name} - {brand_name}', 
+            category_id=category_id, 
+            brand_id=brand_id
+        )
         session.add(item)
 
     # Use representative items inspired by the sample list (abbreviated names)
@@ -344,11 +359,9 @@ def seed_quarterly_sales(session):
             role_sales = Role(name='SALES')
             session.add(role_sales)
             session.flush()
-        sales_user = User(username='seed_sales', password=generate_password_hash('salespass'))
+        # User requires (username, password, role_id)
+        sales_user = User(username='seed_sales', password=generate_password_hash('salespass'), role_id=role_sales.id)
         session.add(sales_user)
-        session.flush()
-        ur = UserRole(user_id=sales_user.id, role_id=role_sales.id)
-        session.add(ur)
         session.flush()
 
     items = session.query(InventoryItem).limit(20).all()
@@ -356,37 +369,86 @@ def seed_quarterly_sales(session):
         print('   No inventory items found for sales seeding; skipping')
         return
 
+    # Get first employee for linking
+    first_employee = session.query(Employee).first()
+    if not first_employee:
+        print('   No employees found for sales seeding; skipping')
+        return
+
     def create_transaction(transaction_date, suffix):
-        # quote
-        q = Quote(branch_id=session.query(Branch).first().id if session.query(Branch).first() else None,
-                  user_id=sales_user.id,
-                  customer_name=f'Cliente {suffix}',
-                  customer_email=f'cliente{suffix}@example.com',
-                  quote_date=transaction_date,
-                  expiration_date=transaction_date, status='approved')
+        # Quote: (customer_name, date, total=0, employee_id=None)
+        q = Quote(
+            customer_name=f'Cliente {suffix}',
+            date=transaction_date,
+            total=0,
+            employee_id=first_employee.id
+        )
         session.add(q)
         session.flush()
-        # add 1-3 lines
+        
+        # add 1-3 quotation lines
+        # QuotationLine: (quote_id, item_id, quantity, price, description=None)
+        total = 0
         for _ in range(randint(1,3)):
             it = choice(items)
             qty = randint(1,5)
-            line = QuotationLine(quote_id=q.id, item_id=it.id, quantity=qty, unit_price=float(it.price), subtotal=float(it.price)*qty, total=float(it.price)*qty)
+            price = float(it.price)
+            subtotal = price * qty
+            total += subtotal
+            line = QuotationLine(
+                quote_id=q.id,
+                item_id=it.id,
+                quantity=qty,
+                price=price,
+                description=f'{it.name} x{qty}'
+            )
             session.add(line)
+        q.total = total
         session.flush()
-        # convert to sales order
-        so = SalesOrder(quote_id=q.id, branch_id=q.branch_id, user_id=q.user_id, order_date=transaction_date, status='approved')
+        
+        # Convert to sales order
+        # SalesOrder: (quote_id, date, total=0, employee_id=None)
+        so = SalesOrder(
+            quote_id=q.id,
+            date=transaction_date,
+            total=total,
+            employee_id=first_employee.id
+        )
         session.add(so)
         session.flush()
+        
+        # Add sales order items
+        # SalesOrderItem: (sales_order_id, item_id, quantity)
         for line in session.query(QuotationLine).filter_by(quote_id=q.id).all():
-            soi = SalesOrderItem(order_id=so.id, item_id=line.item_id, quantity=line.quantity, unit_price=line.unit_price, subtotal=line.subtotal, total=line.total)
+            soi = SalesOrderItem(
+                sales_order_id=so.id,
+                item_id=line.item_id,
+                quantity=line.quantity
+            )
             session.add(soi)
         session.flush()
-        # create invoice
-        inv = Invoice(order_id=so.id, branch_id=so.branch_id, user_id=so.user_id, invoice_date=transaction_date, due_date=transaction_date)
+        
+        # Create invoice
+        # Invoice: (sales_order_id, date, total=0, quotation_line_id=None, employee_id=None)
+        inv = Invoice(
+            sales_order_id=so.id,
+            date=transaction_date,
+            total=total,
+            employee_id=first_employee.id
+        )
         session.add(inv)
         session.flush()
-        for soi in session.query(SalesOrderItem).filter_by(order_id=so.id).all():
-            ii = InvoiceItem(invoice_id=inv.id, item_id=soi.item_id, quantity=soi.quantity, unit_price=soi.unit_price, subtotal=soi.subtotal, total=soi.total)
+        
+        # Add invoice items
+        # InvoiceItem: (invoice_id, item_id, quantity, price)
+        for soi in session.query(SalesOrderItem).filter_by(sales_order_id=so.id).all():
+            item = session.query(InventoryItem).get(soi.item_id)
+            ii = InvoiceItem(
+                invoice_id=inv.id,
+                item_id=soi.item_id,
+                quantity=soi.quantity,
+                price=float(item.price)
+            )
             session.add(ii)
         session.flush()
 
@@ -418,14 +480,10 @@ def main():
 
         try:
             # wrap all seeding in a transaction and commit at the end
-            branch_map = seed_brands(session) or {}
-        except Exception:
-            # brands function returns None; ignore
-            pass
-
-        try:
+            # seed_brands returns None, just call it directly
+            seed_brands(session)
+            
             # 1. ensure states/cities and organizations + branches
-            session.begin()
             branch_map = seed_organizations_and_branches(session)
             # 2. persons & employees
             seed_persons_and_employees(session, branch_map)
